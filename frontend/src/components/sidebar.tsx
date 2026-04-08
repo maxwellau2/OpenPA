@@ -21,6 +21,7 @@ import {
   Plus,
   MessageSquare,
   Trash2,
+  Youtube, // Added Youtube icon
 } from "lucide-react";
 import Link from "next/link";
 
@@ -112,7 +113,7 @@ const SECTIONS: SidebarSection[] = [
     actions: [
       { label: "Search the web", prompt: "Search for " },
       { label: "Latest news on...", prompt: "Search for the latest news on " },
-      { label: "What is...", prompt: "Search the web: what is " },
+      { label: "What is...?", prompt: "Search the web: what is " },
     ],
   },
   {
@@ -139,6 +140,15 @@ const SECTIONS: SidebarSection[] = [
       { label: "Search posts", prompt: "Search Mastodon for " },
       { label: "Post a toot", prompt: "Help me post to Mastodon" },
       { label: "My profile", prompt: "Show my Mastodon profile info" },
+    ],
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    icon: <Youtube className="w-4 h-4" />,
+    service: "youtube",
+    actions: [
+      { label: "Download video", prompt: "Download YouTube video from URL: " },
     ],
   },
   {
