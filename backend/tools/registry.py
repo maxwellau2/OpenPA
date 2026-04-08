@@ -12,6 +12,7 @@ from tools.discord_tool import mcp as discord_mcp
 from tools.telegram import mcp as telegram_mcp
 from tools.web_search import mcp as web_search_mcp
 from tools.mastodon import mcp as mastodon_mcp
+from tools.scheduled_jobs import mcp as scheduled_jobs_mcp
 
 # Main MCP server that composes all sub-servers
 mcp = FastMCP("openpa")
@@ -26,3 +27,4 @@ mcp.mount(discord_mcp, namespace="discord")
 mcp.mount(telegram_mcp, namespace="telegram")
 mcp.mount(web_search_mcp, namespace="web")
 mcp.mount(mastodon_mcp, namespace="mastodon")
+mcp.mount(scheduled_jobs_mcp, namespace="scheduled_jobs")
