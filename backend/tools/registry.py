@@ -12,7 +12,10 @@ from tools.discord_tool import mcp as discord_mcp
 from tools.telegram import mcp as telegram_mcp
 from tools.web_search import mcp as web_search_mcp
 from tools.mastodon import mcp as mastodon_mcp
-from tools.youtube import mcp as youtube_mcp # Added YouTube tool
+from tools.youtube import mcp as youtube_mcp
+from tools.sandbox import mcp as sandbox_mcp
+from tools.web_scrape import mcp as web_scrape_mcp
+from tools.scheduler import mcp as scheduler_mcp
 
 # Main MCP server that composes all sub-servers
 mcp = FastMCP("openpa")
@@ -27,4 +30,7 @@ mcp.mount(discord_mcp, namespace="discord")
 mcp.mount(telegram_mcp, namespace="telegram")
 mcp.mount(web_search_mcp, namespace="web")
 mcp.mount(mastodon_mcp, namespace="mastodon")
-mcp.mount(youtube_mcp, namespace="youtube") # Mounted YouTube tool
+mcp.mount(youtube_mcp, namespace="youtube")
+mcp.mount(sandbox_mcp, namespace="sandbox")
+mcp.mount(web_scrape_mcp, namespace="scrape")
+mcp.mount(scheduler_mcp, namespace="scheduler")

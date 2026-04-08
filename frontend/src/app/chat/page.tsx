@@ -5,7 +5,7 @@ import Link from "next/link";
 import { chatStream, listConfig, getConversation, SSEEvent } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Send, Loader2, Bot, User, Wrench, Settings, ChevronDown, Brain, CheckCircle2, Circle, Square } from "lucide-react";
+import { Send, Loader2, Bot, User, Wrench, Settings, ChevronDown, Brain, CheckCircle2, Circle, Square, Download } from "lucide-react";
 import Sidebar from "@/components/sidebar";
 import ReactMarkdown from "react-markdown";
 
@@ -291,7 +291,41 @@ export default function ChatPage() {
                     }`}
                   >
                     <div className="text-sm prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      <ReactMarkdown components={{
+                        a: ({ href, children }) => {
+                          if (href && href.includes("/api/download/")) {
+                            const token = typeof window !== "undefined" ? localStorage.getItem("openpa_token") : null;
+                            const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                            const fullUrl = `${apiBase}${href}`;
+                            return (
+                              <a
+                                href={fullUrl}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  fetch(fullUrl, { headers: { Authorization: `Bearer ${token}` } })
+                                    .then(res => {
+                                      if (!res.ok) throw new Error("Download failed");
+                                      const filename = res.headers.get("content-disposition")?.match(/filename="?(.+)"?/)?.[1] || "download";
+                                      return res.blob().then(blob => ({ blob, filename }));
+                                    })
+                                    .then(({ blob, filename }) => {
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url; a.download = filename; a.click();
+                                      URL.revokeObjectURL(url);
+                                    })
+                                    .catch(err => alert(err.message));
+                                }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white no-underline text-xs font-medium hover:bg-primary/90 transition-colors cursor-pointer"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                {children}
+                              </a>
+                            );
+                          }
+                          return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+                        },
+                      }}>{msg.content}</ReactMarkdown>
                     </div>
                   </div>
                 </div>

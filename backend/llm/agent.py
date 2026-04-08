@@ -150,8 +150,17 @@ class Agent:
         tool_names = [f"- {t['name']}: {t['description'][:80]}" for t in tools]
         tool_list = "\n".join(tool_names)
 
+        # Include recent conversation context so the planner understands references like "it", "that", etc.
+        context = ""
+        recent = [m for m in self.conversation[-6:] if m.role in ("user", "assistant") and m.content]
+        if len(recent) > 1:  # Only if there's actual history
+            context = "Recent conversation:\n"
+            for m in recent[:-1]:  # Exclude current message
+                context += f"  {m.role}: {m.content[:300]}\n"
+            context += "\n"
+
         plan_messages = [
-            Message(role="user", content=f"Available tools:\n{tool_list}\n\nUser request: {user_message}")
+            Message(role="user", content=f"Available tools:\n{tool_list}\n\n{context}User request: {user_message}")
         ]
 
         response = await self.provider.chat(
@@ -295,15 +304,27 @@ class Agent:
 
         # === SIMPLE EXECUTION (normal agent loop) ===
         iterations = 0
+        tools_called: list[str] = []  # Track what we've done to keep the agent focused
         while iterations < MAX_ITERATIONS:
             iterations += 1
             if iterations > 1:
                 yield AgentEvent("thinking", {"iteration": iterations})
 
+            # Inject a progress reminder every few iterations to prevent drift
+            effective_system = system_prompt
+            if tools_called and iterations > 3 and iterations % 3 == 0:
+                progress = ", ".join(tools_called[-10:])
+                effective_system = (
+                    f"{system_prompt}\n\n## Progress so far\n"
+                    f"Original request: {user_message}\n"
+                    f"Tools called: {progress}\n"
+                    f"Iteration: {iterations}/{MAX_ITERATIONS} — stay focused on the original request."
+                )
+
             response: LLMResponse = await self.provider.chat(
                 messages=self.conversation,
                 tools=tools if tools else None,
-                system=system_prompt,
+                system=effective_system,
             )
 
             if response.thinking:
@@ -318,6 +339,7 @@ class Agent:
 
                 for tool_call in response.tool_calls:
                     logger.info(f"Calling MCP tool: {tool_call.name}({tool_call.arguments})")
+                    tools_called.append(tool_call.name)
 
                     yield AgentEvent("tool_call", {
                         "tool": tool_call.name,

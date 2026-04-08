@@ -15,13 +15,14 @@ import {
   Search,
   Send,
   Globe,
+  Clock,
   Brain,
   ChevronRight,
   Settings,
   Plus,
   MessageSquare,
   Trash2,
-  Youtube, // Added Youtube icon
+  Play,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -145,10 +146,21 @@ const SECTIONS: SidebarSection[] = [
   {
     id: "youtube",
     label: "YouTube",
-    icon: <Youtube className="w-4 h-4" />,
-    service: "youtube",
+    icon: <Play className="w-4 h-4" />,
+    service: null,
     actions: [
       { label: "Download video", prompt: "Download YouTube video from URL: " },
+    ],
+  },
+  {
+    id: "scheduler",
+    label: "Scheduler",
+    icon: <Clock className="w-4 h-4" />,
+    service: null,
+    actions: [
+      { label: "Scheduled jobs", prompt: "List my scheduled tasks" },
+      { label: "Schedule a task", prompt: "Schedule a task: " },
+      { label: "Cancel a job", prompt: "Cancel scheduled task " },
     ],
   },
   {
