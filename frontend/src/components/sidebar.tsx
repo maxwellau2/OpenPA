@@ -15,12 +15,14 @@ import {
   Search,
   Send,
   Globe,
+  Clock,
   Brain,
   ChevronRight,
   Settings,
   Plus,
   MessageSquare,
   Trash2,
+  Play,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -112,7 +114,7 @@ const SECTIONS: SidebarSection[] = [
     actions: [
       { label: "Search the web", prompt: "Search for " },
       { label: "Latest news on...", prompt: "Search for the latest news on " },
-      { label: "What is...", prompt: "Search the web: what is " },
+      { label: "What is...?", prompt: "Search the web: what is " },
     ],
   },
   {
@@ -139,6 +141,26 @@ const SECTIONS: SidebarSection[] = [
       { label: "Search posts", prompt: "Search Mastodon for " },
       { label: "Post a toot", prompt: "Help me post to Mastodon" },
       { label: "My profile", prompt: "Show my Mastodon profile info" },
+    ],
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    icon: <Play className="w-4 h-4" />,
+    service: null,
+    actions: [
+      { label: "Download video", prompt: "Download YouTube video from URL: " },
+    ],
+  },
+  {
+    id: "scheduler",
+    label: "Scheduler",
+    icon: <Clock className="w-4 h-4" />,
+    service: null,
+    actions: [
+      { label: "Scheduled jobs", prompt: "List my scheduled tasks" },
+      { label: "Schedule a task", prompt: "Schedule a task: " },
+      { label: "Cancel a job", prompt: "Cancel scheduled task " },
     ],
   },
   {
