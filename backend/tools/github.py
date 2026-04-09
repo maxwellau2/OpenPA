@@ -229,7 +229,14 @@ async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, 
             headers=headers,
             json={"title": title, "body": body, "head": head, "base": base},
         )
-        resp.raise_for_status()
+        if resp.status_code >= 400:
+            error_body = resp.json()
+            errors = error_body.get("errors", [])
+            error_msgs = [e.get("message", "") for e in errors] if errors else []
+            raise RuntimeError(
+                f"GitHub PR creation failed ({resp.status_code}): {error_body.get('message', 'Unknown error')}. "
+                + (f"Details: {'; '.join(error_msgs)}" if error_msgs else "")
+            )
         pr = resp.json()
     return {"url": pr["html_url"], "number": pr["number"]}
 

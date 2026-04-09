@@ -36,13 +36,21 @@ async def load_messages(user_id: int, conv_id: int) -> list[dict]:
 
 
 async def save_message(user_id: int, conv_id: int, role: str, content: str):
-    """Save a single message to the conversation."""
+    """Save a single message to the conversation and embed it for semantic search."""
     async with aiosqlite.connect(config.db_path) as db:
-        await db.execute(
+        cursor = await db.execute(
             "INSERT INTO conversation_history (user_id, conversation_id, role, content) VALUES (?, ?, ?, ?)",
             (user_id, conv_id, role, content),
         )
         await db.commit()
+        message_id = cursor.lastrowid
+
+    # Embed in background for semantic search (non-blocking, best-effort)
+    try:
+        from services.rag import store_conversation_message
+        await store_conversation_message(user_id, conv_id, message_id, role, content)
+    except Exception:
+        pass
 
 
 async def update_conversation_title(conv_id: int, title: str):

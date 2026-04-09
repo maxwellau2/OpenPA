@@ -132,6 +132,7 @@ export async function chatStream(
   provider: string = "",
   model: string = "",
   signal?: AbortSignal,
+  conversationId?: number | null,
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/api/chat/stream`, {
     method: "POST",
@@ -139,7 +140,7 @@ export async function chatStream(
       "Content-Type": "application/json",
       ...authHeaders(),
     },
-    body: JSON.stringify({ message, provider, model }),
+    body: JSON.stringify({ message, provider, model, conversation_id: conversationId ?? undefined }),
     signal,
   });
 

@@ -8,7 +8,7 @@ PROVIDERS = {
     "ollama": {
         "label": "Ollama (Local)",
         "description": "Free, runs locally. Requires Ollama installed.",
-        "models": ["qwen3.5:9b", "llama3.1:8b", "mistral:7b"],
+        "models": ["gemma4:latest", "qwen3.5:9b", "llama3.1:8b", "mistral:7b"],
         "needs_api_key": False,
     },
     "gemini": {

@@ -16,6 +16,7 @@ from tools.youtube import mcp as youtube_mcp
 from tools.sandbox import mcp as sandbox_mcp
 from tools.web_scrape import mcp as web_scrape_mcp
 from tools.scheduler import mcp as scheduler_mcp
+from tools.workspace import mcp as workspace_mcp
 
 # Main MCP server that composes all sub-servers
 mcp = FastMCP("openpa")
@@ -34,3 +35,4 @@ mcp.mount(youtube_mcp, namespace="youtube")
 mcp.mount(sandbox_mcp, namespace="sandbox")
 mcp.mount(web_scrape_mcp, namespace="scrape")
 mcp.mount(scheduler_mcp, namespace="scheduler")
+mcp.mount(workspace_mcp, namespace="ws")

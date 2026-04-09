@@ -14,11 +14,14 @@ interface Message {
   content: string;
   thinking?: string;
   plan?: { step: number; description: string; tool?: string }[];
+  toolActivity?: ToolActivity[];
 }
 
 interface ToolActivity {
+  id: number;
   tool: string;
-  status: "calling" | "done";
+  status: "calling" | "done" | "error";
+  arguments?: Record<string, unknown>;
   preview?: string;
 }
 
@@ -94,6 +97,7 @@ export default function ChatPage() {
     let assistantResponse = "";
     let allThinking = "";
     let completedPlan: { step: number; description: string; tool?: string }[] = [];
+    let allToolActivity: ToolActivity[] = [];
 
     try {
       await chatStream(userMsg, (event: SSEEvent) => {
@@ -130,24 +134,36 @@ export default function ChatPage() {
               )
             );
             break;
-          case "tool_call":
-            setToolActivity((prev) => [
-              ...prev,
-              { tool: event.data.tool as string, status: "calling" },
-            ]);
+          case "tool_call": {
+            const newTool: ToolActivity = {
+              id: allToolActivity.length,
+              tool: event.data.tool as string,
+              status: "calling",
+              arguments: event.data.arguments as Record<string, unknown>,
+            };
+            allToolActivity = [...allToolActivity, newTool];
+            setToolActivity([...allToolActivity]);
             break;
-          case "tool_result":
-            setToolActivity((prev) =>
-              prev.map((t) =>
-                t.tool === event.data.tool
-                  ? { ...t, status: "done", preview: event.data.result_preview as string }
-                  : t
-              )
+          }
+          case "tool_result": {
+            const preview = event.data.result_preview as string;
+            const idx = [...allToolActivity].reverse().findIndex(
+              (t) => t.tool === event.data.tool && t.status === "calling"
             );
+            if (idx !== -1) {
+              const realIdx = allToolActivity.length - 1 - idx;
+              allToolActivity = allToolActivity.map((t, i) =>
+                i === realIdx
+                  ? { ...t, status: preview.startsWith("Error") ? "error" as const : "done" as const, preview }
+                  : t
+              );
+              setToolActivity([...allToolActivity]);
+            }
             setPlanSteps((prev) =>
               prev.map((s) => (s.status === "running" ? { ...s, status: "done" } : s))
             );
             break;
+          }
           case "done":
             assistantResponse = event.data.response as string;
             if (event.data.conversation_id) {
@@ -158,7 +174,7 @@ export default function ChatPage() {
             assistantResponse = `Error: ${event.data.error}`;
             break;
         }
-      }, "", "", controller.signal);
+      }, "", "", controller.signal, conversationId);
     } catch (err: any) {
       if (err.name === "AbortError") {
         assistantResponse = assistantResponse || "(Stopped by user)";
@@ -174,6 +190,7 @@ export default function ChatPage() {
         content: assistantResponse,
         thinking: allThinking || undefined,
         plan: completedPlan.length > 0 ? completedPlan : undefined,
+        toolActivity: allToolActivity.length > 0 ? allToolActivity : undefined,
       },
     ]);
     abortRef.current = null;
@@ -182,7 +199,7 @@ export default function ChatPage() {
     setStatus(null);
     setThinkingText("");
     setLoading(false);
-  }, [loading]);
+  }, [loading, conversationId]);
 
   function handleSidebarAction(prompt: string) {
     // If prompt ends with space, it's a partial prompt — put in input for user to complete
@@ -282,6 +299,11 @@ export default function ChatPage() {
                   {/* Plan steps (collapsible) */}
                   {msg.plan && <PlanBlock steps={msg.plan} />}
 
+                  {/* Tool activity (collapsible) */}
+                  {msg.toolActivity && msg.toolActivity.length > 0 && (
+                    <ToolActivityBlock tools={msg.toolActivity} />
+                  )}
+
                   {/* Message content */}
                   <div
                     className={`rounded-xl px-4 py-2.5 ${
@@ -376,23 +398,13 @@ export default function ChatPage() {
                     )}
 
                     {/* Tool calls */}
-                    {toolActivity.map((t, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm">
-                        {t.status === "calling" ? (
-                          <Loader2 className="w-3 h-3 animate-spin text-primary" />
-                        ) : (
-                          <Wrench className="w-3 h-3 text-primary" />
-                        )}
-                        <Badge variant="secondary" className="text-xs font-mono">
-                          {t.tool}
-                        </Badge>
-                        {t.status === "done" && (
-                          <span className="text-muted-foreground text-xs truncate max-w-[200px]">
-                            done
-                          </span>
-                        )}
+                    {toolActivity.length > 0 && (
+                      <div className="space-y-1 pt-1 border-t border-border">
+                        {toolActivity.map((t) => (
+                          <ToolCallEntry key={t.id} tool={t} live />
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
               </div>
@@ -494,6 +506,94 @@ function PlanBlock({ steps }: { steps: { step: number; description: string; tool
                 </Badge>
               )}
             </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolCallEntry({ tool, live = false }: { tool: ToolActivity; live?: boolean }) {
+  const [open, setOpen] = useState(false);
+
+  const statusIcon = tool.status === "calling" ? (
+    <Loader2 className="w-3 h-3 animate-spin text-primary" />
+  ) : tool.status === "error" ? (
+    <Circle className="w-3 h-3 text-red-500" />
+  ) : (
+    <CheckCircle2 className="w-3 h-3 text-primary" />
+  );
+
+  return (
+    <div className="text-xs">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2 py-1 hover:bg-muted/50 rounded px-1 transition-colors cursor-pointer"
+      >
+        {statusIcon}
+        <Badge variant="secondary" className="text-[10px] font-mono px-1.5 py-0">
+          {tool.tool}
+        </Badge>
+        {tool.status === "error" && (
+          <span className="text-red-500 text-[10px]">failed</span>
+        )}
+        <ChevronDown
+          className={`w-3 h-3 ml-auto text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="ml-5 mt-1 space-y-1.5 pb-1">
+          {tool.arguments && Object.keys(tool.arguments).length > 0 && (
+            <div>
+              <span className="text-muted-foreground font-medium">Args:</span>
+              <pre className="mt-0.5 p-2 rounded bg-muted/50 text-[11px] text-muted-foreground whitespace-pre-wrap max-h-[200px] overflow-y-auto leading-relaxed">
+                {JSON.stringify(tool.arguments, null, 2)}
+              </pre>
+            </div>
+          )}
+          {tool.preview && (
+            <div>
+              <span className={`font-medium ${tool.status === "error" ? "text-red-500" : "text-muted-foreground"}`}>
+                Result:
+              </span>
+              <pre className={`mt-0.5 p-2 rounded text-[11px] whitespace-pre-wrap max-h-[300px] overflow-y-auto leading-relaxed ${
+                tool.status === "error" ? "bg-red-500/10 text-red-400" : "bg-muted/50 text-muted-foreground"
+              }`}>
+                {tool.preview}
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolActivityBlock({ tools }: { tools: ToolActivity[] }) {
+  const [open, setOpen] = useState(false);
+  const errorCount = tools.filter((t) => t.status === "error").length;
+
+  return (
+    <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+      >
+        <Wrench className="w-3 h-3 text-primary" />
+        <span className="font-medium">
+          {tools.length} tool call{tools.length !== 1 ? "s" : ""}
+          {errorCount > 0 && (
+            <span className="text-red-500 ml-1">({errorCount} failed)</span>
+          )}
+        </span>
+        <ChevronDown
+          className={`w-3 h-3 ml-auto transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="px-2 pb-2 border-t border-border mt-1">
+          {tools.map((t) => (
+            <ToolCallEntry key={t.id} tool={t} />
           ))}
         </div>
       )}

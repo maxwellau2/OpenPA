@@ -14,10 +14,100 @@ from fastmcp import Client
 from llm.base import LLMProvider, LLMResponse, Message
 
 MAX_ITERATIONS = 30
+MAX_ITERATIONS_WORKSPACE = 50  # More room for coding tasks with test-fix loops
+
+# Tool categories for context-aware filtering
+TOOL_CATEGORIES = {
+    "core": {
+        "memory_get_preferences", "memory_set_preference", "memory_remember_about_user",
+        "memory_get_user_memories", "memory_forget_about_user", "memory_save_note",
+        "memory_search_history", "memory_get_recent_conversations",
+    },
+    "workspace": {
+        "ws_workspace_create", "ws_workspace_list_files", "ws_workspace_read_file",
+        "ws_workspace_write_file", "ws_workspace_edit_file", "ws_workspace_delete_file",
+        "ws_workspace_grep", "ws_workspace_find", "ws_workspace_run",
+        "ws_workspace_diff", "ws_workspace_commit_push", "ws_workspace_cleanup",
+        "ws_workspace_inspect", "ws_workspace_check_syntax", "ws_workspace_install",
+    },
+    "github": {
+        "github_create_repo", "github_list_repos", "github_list_prs", "github_get_pr_diff",
+        "github_create_issue", "github_create_pr", "github_create_branch",
+        "github_list_files", "github_get_file", "github_push_file",
+        "github_list_notifications",
+    },
+    "communication": {
+        "discord_list_servers", "discord_list_channels", "discord_send_message",
+        "discord_read_messages", "telegram_search_contacts", "telegram_send_message",
+        "telegram_list_chats", "telegram_read_messages",
+        "gmail_get_unread", "gmail_read_email", "gmail_send_email", "gmail_reply_email",
+    },
+    "media": {
+        "spotify_play", "spotify_pause", "spotify_current_track",
+        "spotify_search", "spotify_get_playlists",
+        "youtube_download_video", "youtube_get_video_info",
+    },
+    "web": {
+        "web_search", "scrape_fetch_page", "scrape_fetch_tables", "scrape_fetch_links",
+    },
+    "social": {
+        "mastodon_get_home_timeline", "mastodon_get_public_timeline",
+        "mastodon_get_trending_tags", "mastodon_get_trending_statuses",
+        "mastodon_search_posts", "mastodon_get_hashtag_timeline",
+        "mastodon_post_status", "mastodon_get_notifications", "mastodon_get_account_info",
+    },
+    "productivity": {
+        "calendar_list_events", "calendar_create_event", "calendar_delete_event",
+        "rss_fetch_feed", "rss_fetch_all_feeds", "rss_add_feed", "rss_list_feeds",
+        "scheduler_schedule_task", "scheduler_list_scheduled_tasks",
+        "scheduler_cancel_scheduled_task",
+    },
+    "sandbox": {
+        "sandbox_verify_python", "sandbox_verify_javascript",
+        "sandbox_run_python", "sandbox_run_javascript",
+        "sandbox_run_multi_file_test", "sandbox_run_shell", "sandbox_run_and_export",
+    },
+}
+
+# Keywords that hint which categories are needed
+CATEGORY_KEYWORDS = {
+    "workspace": ["add feature", "add a ", "fix bug", "modify", "refactor", "implement", "workspace", "branch", "vibe", "code", "build", "endpoint", "tool", "component"],
+    "github": ["pr", "pull request", "repo", "commit", "push", "issue", "github", "branch", "endpoint", "feature"],
+    "communication": ["send", "message", "discord", "telegram", "email", "gmail", "reply", "briefing", "notification"],
+    "media": ["play", "music", "spotify", "song", "youtube", "video", "download"],
+    "web": ["search", "find online", "look up", "web", "scrape", "fetch page", "website"],
+    "social": ["mastodon", "toot", "trending", "fediverse", "timeline"],
+    "productivity": ["calendar", "event", "schedule", "rss", "feed", "remind", "briefing", "daily"],
+    "sandbox": ["run code", "execute", "python", "javascript", "test code", "sandbox"],
+}
+
+
+def _select_tool_categories(user_message: str, tools_called: list[str]) -> set[str]:
+    """Select which tool categories to include based on context."""
+    categories = {"core"}  # Always include core/memory tools
+    msg_lower = user_message.lower()
+
+    # Match by keywords in user message
+    for cat, keywords in CATEGORY_KEYWORDS.items():
+        if any(kw in msg_lower for kw in keywords):
+            categories.add(cat)
+
+    # If workspace tools were already called, keep them + github for PR
+    if any(t.startswith("ws_") for t in tools_called):
+        categories.update({"workspace", "github", "web"})
+
+    # If no specific category matched, just use core — the LLM can still answer
+    # conversationally, and will request tools if it needs them
+
+    return categories
 
 PLANNER_PROMPT = """You are a task planner. Given the user's request and the available tools, decide if this needs multiple steps.
 
-If the request needs MULTIPLE steps, output a plan as a JSON array. Each step is either a tool call OR a text generation (for things like writing, summarizing, composing):
+If the request involves CODING, WORKSPACE, or VIBE-CODING (adding features, fixing bugs, modifying repos, writing code), ALWAYS output:
+{"simple": true}
+These tasks MUST use the adaptive loop so you can react to test failures and fix issues dynamically.
+
+If the request needs MULTIPLE steps and is NOT a coding task (e.g., fetch data then send it somewhere), output a plan as a JSON array:
 
 [
   {"step": 1, "description": "Fetch trending Mastodon tags", "tool": "mastodon_get_trending_tags", "args": {}},
@@ -62,45 +152,56 @@ class Agent:
         self._context_loaded = False
         self._system_prompt_built: str | None = None
 
-    async def _build_system_prompt(self) -> str:
-        """Build system prompt with auto-injected user context."""
-        if self._system_prompt_built:
-            return self._system_prompt_built
+    async def _build_system_prompt(self, user_message: str = "") -> str:
+        """Build system prompt with auto-injected user context and RAG-retrieved memories."""
+        # Base context (user info, services, preferences) is cached
+        if not self._system_prompt_built:
+            context_parts = []
 
-        context_parts = []
+            try:
+                from db.auth import get_all_user_credentials, get_user
+                user = await get_user(self.user_id)
+                if user:
+                    context_parts.append(f"Current user: {user['email']}")
 
-        try:
-            from db.auth import get_all_user_credentials, get_user
-            user = await get_user(self.user_id)
-            if user:
-                context_parts.append(f"Current user: {user['email']}")
+                services = await get_all_user_credentials(self.user_id)
+                connected = [s["service"] for s in services.get("services", [])]
+                if connected:
+                    context_parts.append(f"Connected services: {', '.join(connected)}")
+                else:
+                    context_parts.append("No services connected yet.")
+            except Exception:
+                pass
 
-            services = await get_all_user_credentials(self.user_id)
-            connected = [s["service"] for s in services.get("services", [])]
-            if connected:
-                context_parts.append(f"Connected services: {', '.join(connected)}")
+            try:
+                result = await self.mcp_client.call_tool(
+                    "memory_get_preferences", {"_user_id": self.user_id}
+                )
+                if hasattr(result, 'data') and result.data:
+                    prefs = result.data.get("preferences", [])
+                    if prefs:
+                        pref_lines = [f"  - {p['key']}: {p['value']}" for p in prefs[:20]]
+                        context_parts.append(f"User preferences:\n" + "\n".join(pref_lines))
+            except Exception:
+                pass
+
+            if context_parts:
+                context = "\n".join(context_parts)
+                self._system_prompt_built = f"{self.system_prompt}\n\n## Current User Context\n{context}"
             else:
-                context_parts.append("No services connected yet.")
-        except Exception:
-            pass
+                self._system_prompt_built = self.system_prompt
 
-        try:
-            result = await self.mcp_client.call_tool(
-                "memory_get_preferences", {"_user_id": self.user_id}
-            )
-            if hasattr(result, 'data') and result.data:
-                prefs = result.data.get("preferences", [])
-                if prefs:
-                    pref_lines = [f"  - {p['key']}: {p['value']}" for p in prefs[:20]]
-                    context_parts.append(f"User preferences:\n" + "\n".join(pref_lines))
-        except Exception:
-            pass
-
-        if context_parts:
-            context = "\n".join(context_parts)
-            self._system_prompt_built = f"{self.system_prompt}\n\n## Current User Context\n{context}"
-        else:
-            self._system_prompt_built = self.system_prompt
+        # RAG: retrieve relevant memories for this specific message
+        if user_message:
+            try:
+                from services.rag import retrieve_relevant_memories
+                memories = await retrieve_relevant_memories(self.user_id, user_message, top_k=10)
+                if memories:
+                    mem_lines = [f"  - [{m['category']}] {m['content']} (relevance: {m['relevance']})" for m in memories]
+                    memory_section = f"\n\n## What you know about this user (retrieved by relevance to current message)\n" + "\n".join(mem_lines)
+                    return self._system_prompt_built + memory_section
+            except Exception:
+                pass
 
         return self._system_prompt_built
 
@@ -135,6 +236,16 @@ class Agent:
 
         logger.info(f"Loaded {len(self._tools_cache)} tools from MCP server")
         return self._tools_cache
+
+    def _filter_tools(self, tools: list[dict], categories: set[str]) -> list[dict]:
+        """Filter tools to only include relevant categories."""
+        allowed = set()
+        for cat in categories:
+            allowed.update(TOOL_CATEGORIES.get(cat, set()))
+
+        filtered = [t for t in tools if t["name"] in allowed]
+        logger.info(f"Filtered tools: {len(filtered)}/{len(tools)} (categories: {categories})")
+        return filtered
 
     async def _call_tool(self, name: str, args: dict) -> str:
         """Execute a tool and return the result as text."""
@@ -215,8 +326,15 @@ class Agent:
         4. Final: LLM summarizes all results
         """
         self.conversation.append(Message(role="user", content=user_message))
-        tools = await self._get_tools()
-        system_prompt = await self._build_system_prompt()
+        all_tools = await self._get_tools()
+        system_prompt = await self._build_system_prompt(user_message)
+
+        # Filter tools based on task context to avoid overwhelming smaller models
+        categories = _select_tool_categories(user_message, [])
+        tools = self._filter_tools(all_tools, categories)
+        # Fallback: if filtering left too few tools, use all
+        if len(tools) < 3:
+            tools = all_tools
 
         # Step 1: Try to create a plan
         yield AgentEvent("thinking", {"iteration": 1})
@@ -333,23 +451,33 @@ class Agent:
             yield AgentEvent("done", {"response": final_text})
             return
 
-        # === SIMPLE EXECUTION (normal agent loop) ===
+        # === SIMPLE EXECUTION (adaptive agent loop) ===
         iterations = 0
         tools_called: list[str] = []  # Track what we've done to keep the agent focused
-        while iterations < MAX_ITERATIONS:
+        is_workspace_task = False  # Detected dynamically when workspace tools are called
+        while iterations < (MAX_ITERATIONS_WORKSPACE if is_workspace_task else MAX_ITERATIONS):
             iterations += 1
             if iterations > 1:
                 yield AgentEvent("thinking", {"iteration": iterations})
 
             # Inject a progress reminder every few iterations to prevent drift
+            max_iter = MAX_ITERATIONS_WORKSPACE if is_workspace_task else MAX_ITERATIONS
             effective_system = system_prompt
             if tools_called and iterations > 3 and iterations % 3 == 0:
                 progress = ", ".join(tools_called[-10:])
+                workspace_hint = ""
+                if is_workspace_task:
+                    workspace_hint = (
+                        "\nYou are in a WORKSPACE coding session. Follow the adaptive workflow: "
+                        "if tests/build fail, read the error, fix the code, and re-test. "
+                        "Do NOT give up or push broken code. Loop until green."
+                    )
                 effective_system = (
                     f"{system_prompt}\n\n## Progress so far\n"
                     f"Original request: {user_message}\n"
                     f"Tools called: {progress}\n"
-                    f"Iteration: {iterations}/{MAX_ITERATIONS} — stay focused on the original request."
+                    f"Iteration: {iterations}/{max_iter} — stay focused on the original request."
+                    f"{workspace_hint}"
                 )
 
             response: LLMResponse = await self.provider.chat(
@@ -371,6 +499,12 @@ class Agent:
                 for tool_call in response.tool_calls:
                     logger.info(f"Calling MCP tool: {tool_call.name}({tool_call.arguments})")
                     tools_called.append(tool_call.name)
+                    if tool_call.name.startswith("ws_") and not is_workspace_task:
+                        is_workspace_task = True
+                        # Re-filter tools to include workspace + github + web
+                        categories = _select_tool_categories(user_message, tools_called)
+                        tools = self._filter_tools(all_tools, categories)
+                        logger.info("Switched to workspace mode — expanded tool set")
 
                     yield AgentEvent("tool_call", {
                         "tool": tool_call.name,

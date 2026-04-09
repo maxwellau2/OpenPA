@@ -57,4 +57,4 @@ async def test_tools_have_schemas(mcp_client):
 async def test_tool_count(mcp_client):
     """Verify total tool count."""
     tools = await mcp_client.list_tools()
-    assert len(tools) == 33, f"Expected 33 tools, got {len(tools)}"
+    assert len(tools) == 83, f"Expected 83 tools, got {len(tools)}"
