@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Search, Send, Globe } from "lucide-react";
+import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Search, Send, Globe, Activity } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -55,6 +55,8 @@ export default function SettingsPage() {
   const searchParams = useSearchParams();
   const [connectedServices, setConnectedServices] = useState<string[]>([]);
   const [justConnected, setJustConnected] = useState<string | null>(null);
+  const [healthCheckData, setHealthCheckData] = useState<{ uptime: string; version: string } | null>(null);
+  const [healthCheckLoading, setHealthCheckLoading] = useState(false);
 
   // LLM state
   const [llmProviders, setLLMProviders] = useState<Record<string, LLMProviderInfo>>({});
@@ -99,6 +101,20 @@ export default function SettingsPage() {
       getLLMConfig().then((data) => setLLMConfig(data)).catch(() => {});
     } finally {
       setLLMSaving(false);
+    }
+  }
+
+  async function handleHealthCheck() {
+    setHealthCheckLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/health`);
+      const data = await res.json();
+      setHealthCheckData(data);
+    } catch (e) {
+      console.error("Health check failed:", e);
+      setHealthCheckData({ uptime: "Error", version: "Error" });
+    } finally {
+      setHealthCheckLoading(false);
     }
   }
 
@@ -219,6 +235,29 @@ export default function SettingsPage() {
               <Button onClick={handleSaveLLM} disabled={llmSaving} size="sm">
                 {llmSaved ? "Saved!" : llmSaving ? "Saving..." : "Save LLM Settings"}
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+                <Separator />
+
+        {/* Health Check Section */}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-3">
+            <Activity className="w-5 h-5 text-primary" />
+            Server Health
+          </h2>
+          <Card className="border-border">
+            <CardContent className="pt-6 space-y-4">
+              <Button onClick={handleHealthCheck} disabled={healthCheckLoading} size="sm">
+                {healthCheckLoading ? "Checking..." : "Run Health Check"}
+              </Button>
+              {healthCheckData && (
+                <div className="text-sm text-muted-foreground">
+                  <p>Uptime: {healthCheckData.uptime}</p>
+                  <p>Version: {healthCheckData.version}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
