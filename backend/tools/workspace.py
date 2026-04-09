@@ -95,9 +95,9 @@ async def workspace_create(_user_id: int, repo: str, branch: str = "") -> dict:
     workspace_dir = os.path.join(tempfile.gettempdir(), f"workspace_{workspace_id}")
     os.makedirs(workspace_dir, exist_ok=True)
 
-    # Clone with token in URL for auth
+    # Full clone (not shallow) so PRs work correctly
     clone_url = f"https://x-access-token:{token}@github.com/{repo}.git"
-    result = await _run(f"git clone --depth 50 '{clone_url}' repo", workspace_dir, timeout=60)
+    result = await _run(f"git clone '{clone_url}' repo", workspace_dir, timeout=120)
     if not result["passed"]:
         shutil.rmtree(workspace_dir, ignore_errors=True)
         return {"error": f"Clone failed: {result['stderr']}"}
@@ -126,14 +126,22 @@ async def workspace_create(_user_id: int, repo: str, branch: str = "") -> dict:
         "token": token,
     }
 
-    # Get basic repo info
+    # Get default branch name and basic repo info
+    default_br = await _run("git rev-parse --abbrev-ref HEAD", repo_dir)
+    default_branch = default_br["stdout"].strip() if not created_branch else ""
+    if not default_branch:
+        # If we created a branch, find the base branch
+        db = await _run("git remote show origin | grep 'HEAD branch' | awk '{print $NF}'", repo_dir)
+        default_branch = db["stdout"].strip() or "main"
+
     tree = await _run("find . -maxdepth 2 -not -path './.git/*' -not -path './.git' | head -50", repo_dir)
 
-    logger.info(f"Created workspace {workspace_id} for {repo} (branch: {created_branch or 'default'})")
+    logger.info(f"Created workspace {workspace_id} for {repo} (branch: {created_branch or default_branch}, default: {default_branch})")
     return {
         "workspace_id": workspace_id,
         "repo": repo,
-        "branch": created_branch or "default",
+        "branch": created_branch or default_branch,
+        "default_branch": default_branch,
         "structure": tree["stdout"],
     }
 

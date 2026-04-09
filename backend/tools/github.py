@@ -211,8 +211,8 @@ async def create_issue(_user_id: int, repo: str, title: str, body: str, labels: 
 
 
 @mcp.tool()
-async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, base: str = "main") -> dict:
-    """Create a new pull request.
+async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, base: str = "") -> dict:
+    """Create a new pull request. Auto-detects the default branch if base is not specified.
 
     Args:
         _user_id: User ID (injected automatically)
@@ -220,9 +220,14 @@ async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, 
         title: PR title
         body: PR description
         head: Branch with changes
-        base: Branch to merge into
+        base: Branch to merge into (auto-detected if empty — usually 'main' or 'master')
     """
     headers = await _headers(_user_id)
+
+    # Auto-detect default branch if not specified
+    if not base:
+        base = await _default_branch(_user_id, repo)
+
     async with httpx.AsyncClient() as client:
         resp = await client.post(
             f"{API_BASE}/repos/{repo}/pulls",
@@ -232,10 +237,14 @@ async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, 
         if resp.status_code >= 400:
             error_body = resp.json()
             errors = error_body.get("errors", [])
-            error_msgs = [e.get("message", "") for e in errors] if errors else []
+            # Extract all useful fields from error objects
+            error_details = []
+            for e in errors:
+                parts = [v for k, v in e.items() if isinstance(v, str) and v]
+                error_details.append("; ".join(parts) if parts else str(e))
             raise RuntimeError(
                 f"GitHub PR creation failed ({resp.status_code}): {error_body.get('message', 'Unknown error')}. "
-                + (f"Details: {'; '.join(error_msgs)}" if error_msgs else "")
+                + (f"Details: {' | '.join(error_details)}" if error_details else f"Raw: {error_body}")
             )
         pr = resp.json()
     return {"url": pr["html_url"], "number": pr["number"]}
