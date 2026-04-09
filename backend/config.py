@@ -86,6 +86,7 @@ class Config:
     port: int = int(os.getenv("PORT", "8000"))
     frontend_url: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
     telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    version: str = os.getenv("APP_VERSION", "0.1.0")
 
 
 config = Config()
