@@ -1,5 +1,7 @@
 """REST API — multi-tenant PA-as-a-Service with SSE streaming."""
 
+import time
+
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Header
@@ -9,6 +11,7 @@ from fastmcp import Client
 from loguru import logger
 from pydantic import BaseModel
 
+from config import config
 from db.auth import (
     authenticate_user,
     create_token,
@@ -40,16 +43,19 @@ from services.oauth import router as oauth_router
 app.include_router(oauth_router)
 
 _mcp_client: Client | None = None
+_startup_time: float = time.time()
 
 
 @app.on_event("startup")
 async def startup():
     global _mcp_client
+    global _startup_time
     await init_db()
     _mcp_client = Client(mcp_server)
     await _mcp_client.__aenter__()
     tools = await _mcp_client.list_tools()
     logger.info(f"API started with {len(tools)} MCP tools")
+    _startup_time = time.time()
 
     # Give the scheduler access to the MCP client so it can execute tools
     from tools.scheduler import set_mcp_client
@@ -60,6 +66,17 @@ async def startup():
 async def shutdown():
     if _mcp_client:
         await _mcp_client.__aexit__(None, None, None)
+
+
+@app.get("/api/health")
+async def health_check():
+    """Health check endpoint returning server uptime and version."""
+    uptime_seconds = time.time() - _startup_time
+    return {
+        "status": "ok",
+        "version": config.version,
+        "uptime": f"{uptime_seconds:.2f} seconds",
+    }
 
 
 # --- Auth dependency ---
