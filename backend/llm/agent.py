@@ -356,18 +356,24 @@ class Agent:
 
                 yield AgentEvent("step", {"step": step_num, "description": description, "tool": tool_name})
 
-                # Replace all template placeholders: {{step_N_result}}, {{depends_on.N}}, etc.
+                # Replace ALL template placeholders that reference a previous step number
+                # Catches: {{step_4_result}}, {{step_4.output}}, {{depends_on.4}}, {{result_4}}, etc.
                 import re
                 args_str = json.dumps(args)
                 for prev_step, prev_result in step_results.items():
                     short_result = prev_result[:4000]
                     safe_result = short_result.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", "")
-                    # Match {{step_N_result}}, {{step_N_result.anything}}, {{depends_on.N}}
-                    for pattern in [
-                        r"\{\{\s*step_" + str(prev_step) + r"_result(?:\.\w+)*\s*\}\}",
-                        r"\{\{\s*depends_on\." + str(prev_step) + r"\s*\}\}",
-                    ]:
-                        args_str = re.sub(pattern, safe_result, args_str)
+                    # Match any {{...}} that contains this step number
+                    pattern = r"\{\{[^}]*\b" + str(prev_step) + r"\b[^}]*\}\}"
+                    args_str = re.sub(pattern, safe_result, args_str)
+
+                # Safety net: replace ANY remaining {{...}} with the most recent step result
+                if "{{" in args_str and step_results:
+                    last_result = list(step_results.values())[-1][:4000]
+                    safe_last = last_result.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", "")
+                    args_str = re.sub(r"\{\{[^}]*\}\}", safe_last, args_str)
+                    logger.warning(f"Replaced leftover {{{{...}}}} templates with last step result")
+
                 try:
                     args = json.loads(args_str)
                 except json.JSONDecodeError:
