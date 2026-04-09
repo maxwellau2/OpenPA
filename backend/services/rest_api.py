@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, RedirectResponse
 from fastmcp import Client
 from loguru import logger
 from pydantic import BaseModel
@@ -68,6 +68,11 @@ async def shutdown():
         await _mcp_client.__aexit__(None, None, None)
 
 
+@app.get("/health")
+async def redirect_health():
+    """Redirects /health to /api/health."""
+    return RedirectResponse(url="/api/health")
+
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint returning server uptime and version."""
@@ -77,6 +82,7 @@ async def health_check():
         "version": config.version,
         "uptime": f"{uptime_seconds:.2f} seconds",
     }
+
 
 
 # --- Auth dependency ---
