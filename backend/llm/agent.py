@@ -248,7 +248,11 @@ class Agent:
         return filtered
 
     async def _call_tool(self, name: str, args: dict) -> str:
-        """Execute a tool and return the result as text."""
+        """Execute a tool and return the result as text.
+
+        Errors are returned as structured messages (not exceptions) so the LLM
+        can read them and recover — inspired by Pi's agent loop pattern.
+        """
         full_args = {**args, "_user_id": self.user_id}
         try:
             result = await self.mcp_client.call_tool(name, full_args)
@@ -259,7 +263,18 @@ class Agent:
             return str(result)
         except Exception as e:
             logger.opt(exception=True).error(f"Tool {name} failed")
-            return f"Error: {e}"
+            error_msg = str(e)
+            # Extract the most useful part of the error
+            if ":" in error_msg:
+                # Often errors are like "ToolError: Error calling tool 'x': actual message"
+                parts = error_msg.split(":", 2)
+                error_msg = parts[-1].strip()
+            return json.dumps({
+                "error": True,
+                "tool": name,
+                "message": error_msg,
+                "hint": "Read the error message, fix the issue, and try again.",
+            })
 
     async def _try_plan(self, user_message: str, tools: list[dict]) -> list[dict] | None:
         """Ask the LLM to create a plan. Returns list of steps or None if simple."""
