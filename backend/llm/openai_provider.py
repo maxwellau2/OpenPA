@@ -68,13 +68,15 @@ class OpenAICompatibleProvider(LLMProvider):
         tool_calls = []
         if message.tool_calls:
             for tc in message.tool_calls:
-                args = tc.function.arguments or "{}"
-                if isinstance(args, str):
-                    args = json.loads(args)
+                raw_args = tc.function.arguments or "{}"
+                try:
+                    args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+                except (json.JSONDecodeError, TypeError):
+                    args = {}
                 tool_calls.append(ToolCall(
                     id=tc.id or str(uuid.uuid4()),
                     name=tc.function.name,
-                    arguments=args,
+                    arguments=args if isinstance(args, dict) else {},
                 ))
 
         return LLMResponse(
@@ -98,4 +100,14 @@ class OpenRouterProvider(OpenAICompatibleProvider):
             model=model,
             base_url="https://openrouter.ai/api/v1",
             extra_headers={"HTTP-Referer": "http://localhost:3000", "X-Title": "OpenPA"},
+        )
+
+
+class GroqProvider(OpenAICompatibleProvider):
+    """Groq — ultra-fast inference for open models."""
+    def __init__(self, api_key: str, model: str = "llama-3.3-70b-versatile"):
+        super().__init__(
+            api_key=api_key,
+            model=model,
+            base_url="https://api.groq.com/openai/v1",
         )

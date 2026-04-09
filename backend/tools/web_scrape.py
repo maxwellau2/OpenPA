@@ -58,6 +58,21 @@ def _extract_links(html: str, base_url: str = "") -> list[dict]:
     return links[:100]  # Cap at 100 links
 
 
+async def _fetch_html(url: str) -> str:
+    """Fetch a URL and return HTML. Raises a readable error on failure."""
+    try:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
+            resp = await client.get(url, headers={"User-Agent": "OpenPA/1.0"})
+            resp.raise_for_status()
+            return resp.text
+    except httpx.ConnectError:
+        raise RuntimeError(f"Could not connect to {url} — check the URL is correct")
+    except httpx.TimeoutException:
+        raise RuntimeError(f"Request to {url} timed out")
+    except httpx.HTTPStatusError as e:
+        raise RuntimeError(f"HTTP {e.response.status_code} fetching {url}")
+
+
 @mcp.tool()
 async def fetch_page(_user_id: int, url: str) -> dict:
     """Fetch a web page and return its text content (HTML stripped). Good for reading articles, docs, wiki pages.
@@ -66,10 +81,7 @@ async def fetch_page(_user_id: int, url: str) -> dict:
         _user_id: User ID (injected automatically)
         url: URL of the page to fetch
     """
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-        resp = await client.get(url, headers={"User-Agent": "OpenPA/1.0"})
-        resp.raise_for_status()
-        html = resp.text
+    html = await _fetch_html(url)
 
     text = _strip_html(html)
     title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
@@ -91,10 +103,7 @@ async def fetch_tables(_user_id: int, url: str) -> dict:
         _user_id: User ID (injected automatically)
         url: URL of the page to fetch tables from
     """
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-        resp = await client.get(url, headers={"User-Agent": "OpenPA/1.0"})
-        resp.raise_for_status()
-        html = resp.text
+    html = await _fetch_html(url)
 
     tables = _extract_tables(html)
     title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
@@ -128,10 +137,7 @@ async def fetch_links(_user_id: int, url: str) -> dict:
         _user_id: User ID (injected automatically)
         url: URL of the page to extract links from
     """
-    async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-        resp = await client.get(url, headers={"User-Agent": "OpenPA/1.0"})
-        resp.raise_for_status()
-        html = resp.text
+    html = await _fetch_html(url)
 
     links = _extract_links(html, url)
 

@@ -35,6 +35,14 @@ PROVIDERS = {
         "key_field": "api_key",
         "get_key_url": "https://console.anthropic.com/settings/keys",
     },
+    "groq": {
+        "label": "Groq",
+        "description": "Ultra-fast inference. Free tier available.",
+        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"],
+        "needs_api_key": True,
+        "key_field": "api_key",
+        "get_key_url": "https://console.groq.com/keys",
+    },
     "openrouter": {
         "label": "OpenRouter",
         "description": "Access many models through one API. Some free models available.",
@@ -88,6 +96,13 @@ async def get_llm_provider(user_id: int, provider: str = "", model: str = "") ->
             raise ValueError("No Claude API key configured. Go to Settings → LLM Providers to add one.")
         from llm.claude_provider import ClaudeProvider
         return ClaudeProvider(api_key=api_key, model=model or "claude-sonnet-4-20250514")
+
+    elif provider == "groq":
+        api_key = llm_config.get("groq_api_key", "")
+        if not api_key:
+            raise ValueError("No Groq API key configured. Go to Settings → LLM Providers to add one.")
+        from llm.openai_provider import GroqProvider
+        return GroqProvider(api_key=api_key, model=model or "llama-3.3-70b-versatile")
 
     elif provider == "openrouter":
         api_key = llm_config.get("openrouter_api_key", "")

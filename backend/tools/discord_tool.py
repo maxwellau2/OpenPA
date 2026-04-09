@@ -114,13 +114,17 @@ async def send_message(_user_id: int, channel_name: str = "", channel_id: str = 
     if not channel_id:
         return {"error": "Provide either channel_name or channel_id."}
 
+    # Discord has a 2000 char limit — split long messages
+    chunks = [content[i:i+1990] for i in range(0, len(content), 1990)]
+    sent_ids = []
     async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{API_BASE}/channels/{channel_id}/messages", headers=headers, json={"content": content},
-        )
-        resp.raise_for_status()
-        msg = resp.json()
-    return {"message_id": msg["id"], "status": "sent", "channel_id": channel_id}
+        for chunk in chunks:
+            resp = await client.post(
+                f"{API_BASE}/channels/{channel_id}/messages", headers=headers, json={"content": chunk},
+            )
+            resp.raise_for_status()
+            sent_ids.append(resp.json()["id"])
+    return {"message_ids": sent_ids, "status": "sent", "parts": len(chunks), "channel_id": channel_id}
 
 
 @mcp.tool()

@@ -122,9 +122,14 @@ class Agent:
             elif "required" in schema:
                 del schema["required"]
 
+            # Trim description to first sentence to save tokens
+            desc = t.description or ""
+            first_sentence_end = desc.find(". ")
+            short_desc = desc[:first_sentence_end + 1] if first_sentence_end > 0 else desc[:150]
+
             self._tools_cache.append({
                 "name": t.name,
-                "description": t.description or "",
+                "description": short_desc,
                 "parameters": schema,
             })
 
@@ -147,8 +152,13 @@ class Agent:
 
     async def _try_plan(self, user_message: str, tools: list[dict]) -> list[dict] | None:
         """Ask the LLM to create a plan. Returns list of steps or None if simple."""
-        tool_names = [f"- {t['name']}: {t['description'][:80]}" for t in tools]
-        tool_list = "\n".join(tool_names)
+        tool_lines = []
+        for t in tools:
+            params = t.get("parameters", {}).get("properties", {})
+            param_names = [k for k in params.keys() if k != "_user_id"]
+            param_str = f"({', '.join(param_names)})" if param_names else "()"
+            tool_lines.append(f"- {t['name']}{param_str}: {t['description'][:80]}")
+        tool_list = "\n".join(tool_lines)
 
         # Include recent conversation context so the planner understands references like "it", "that", etc.
         context = ""
@@ -228,15 +238,18 @@ class Agent:
 
                 yield AgentEvent("step", {"step": step_num, "description": description, "tool": tool_name})
 
-                # Replace {{step_N_result}} and {{step_N_result.field}} placeholders
+                # Replace all template placeholders: {{step_N_result}}, {{depends_on.N}}, etc.
                 import re
                 args_str = json.dumps(args)
                 for prev_step, prev_result in step_results.items():
-                    short_result = prev_result[:500]
+                    short_result = prev_result[:4000]
                     safe_result = short_result.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", "")
-                    # Match {{step_N_result}} and {{step_N_result.anything}}
-                    pattern = r"\{\{\s*step_" + str(prev_step) + r"_result(?:\.\w+)*\s*\}\}"
-                    args_str = re.sub(pattern, safe_result, args_str)
+                    # Match {{step_N_result}}, {{step_N_result.anything}}, {{depends_on.N}}
+                    for pattern in [
+                        r"\{\{\s*step_" + str(prev_step) + r"_result(?:\.\w+)*\s*\}\}",
+                        r"\{\{\s*depends_on\." + str(prev_step) + r"\s*\}\}",
+                    ]:
+                        args_str = re.sub(pattern, safe_result, args_str)
                 try:
                     args = json.loads(args_str)
                 except json.JSONDecodeError:
@@ -255,8 +268,26 @@ class Agent:
                         prev = "\n\n".join(prev_parts)
                         if tool_name == "llm_generate":
                             args["prompt"] = args.get("prompt", "") + f"\n\nContext from previous steps:\n{prev}"
-                        elif "content" in args and args["content"] == "":
-                            args["content"] = prev[:500]
+                        else:
+                            # Clean up: if the result looks like JSON, skip it — only inject human-readable text
+                            clean_prev = prev.strip()
+                            if clean_prev.startswith("{") or clean_prev.startswith("["):
+                                # Try to extract a meaningful text field from JSON
+                                try:
+                                    import json as _json
+                                    parsed = _json.loads(clean_prev)
+                                    if isinstance(parsed, dict):
+                                        for key in ("content", "message", "text", "result", "summary"):
+                                            if key in parsed and isinstance(parsed[key], str):
+                                                clean_prev = parsed[key]
+                                                break
+                                except Exception:
+                                    pass
+                            # Inject into the first empty text-like field
+                            for field in ("content", "message", "body", "text", "prompt"):
+                                if field in args and args[field] == "":
+                                    args[field] = clean_prev[:4000]
+                                    break
 
                 yield AgentEvent("tool_call", {"tool": tool_name, "arguments": args})
 

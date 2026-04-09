@@ -354,19 +354,25 @@ class LLMConfigRequest(BaseModel):
     gemini_api_key: str = ""
     openai_api_key: str = ""
     claude_api_key: str = ""
+    groq_api_key: str = ""
     openrouter_api_key: str = ""
 
 
 @app.put("/api/llm/config")
 async def save_llm_config(req: LLMConfigRequest, user: dict = Depends(get_current_user)):
     """Save user's LLM provider config and API keys."""
-    # Merge with existing (don't overwrite keys that weren't provided)
     existing = await get_user_credentials(user["id"], "llm") or {}
     updates = req.model_dump(exclude_unset=False)
+    # Always update provider and model (even if switching to a different one)
+    for key in ("default_provider", "default_model"):
+        if updates.get(key):
+            existing[key] = updates[key]
+    # Only update API keys if a new value is provided (don't clear existing keys)
     for key, value in updates.items():
-        if value:  # Only update non-empty values
+        if key.endswith("_api_key") and value:
             existing[key] = value
     await set_user_credentials(user["id"], "llm", existing)
+    logger.info(f"LLM config saved: provider={existing.get('default_provider')}, model={existing.get('default_model')}")
     return {"status": "saved"}
 
 
