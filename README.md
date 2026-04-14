@@ -1,6 +1,6 @@
 # OpenPA — Personal Assistant-as-a-Service
 
-OpenPA is an open-source, multi-tenant Personal Assistant platform that decomposes PA capabilities into independent, API-driven services. It orchestrates 14+ services through a unified chat interface powered by an intelligent agent with multi-step planning, code execution, and self-evolution capabilities.
+OpenPA is an open-source, multi-tenant Personal Assistant platform that decomposes PA capabilities into independent, API-driven services. It orchestrates 15 services (83 tools) through a unified chat interface powered by an intelligent agent with multi-step planning, code execution, and self-evolution capabilities.
 
 Built for the Cloud Computing course project exploring **PA-as-a-Service** — where scheduling, task management, communication, and development workflows are decomposed into independent services communicating via well-defined RESTful API calls.
 
@@ -161,7 +161,7 @@ The agent can **write, verify, test, and push code**:
 
 ## Features
 
-### Service Integrations (14 services, 65+ tools)
+### Service Integrations (15 services, 83 tools)
 
 | Service | Tools | Auth |
 |---------|-------|------|
@@ -210,45 +210,117 @@ Generate downloadable files from any data:
 ## Getting Started
 
 ### Prerequisites
-- Python 3.14+
-- Node.js 22+
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
 
-### Installation
+| Tool | Version | Install |
+|------|---------|---------|
+| **Python** | 3.14+ | [python.org](https://www.python.org/downloads/) or `pyenv install 3.14` |
+| **Node.js** | 22+ | [nodejs.org](https://nodejs.org/) or `nvm install 22` |
+| **uv** | latest | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| **Ollama** (optional) | latest | [ollama.com](https://ollama.com/) — for free local LLM inference |
+
+### 1. Clone and install dependencies
+
 ```bash
+git clone https://github.com/maxwellau2/OpenPA.git
+cd OpenPA
+
+# Install backend (Python) and frontend (Node) dependencies
 make install
+
+# Or manually:
+cd backend && uv sync --dev   # installs Python deps + dev tools (pytest, ruff)
+cd frontend && npm ci          # installs Node deps from lockfile
 ```
 
-### Configuration
-Copy the example env file and fill in your OAuth credentials:
+### 2. Configure environment variables
+
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Required env vars for each service:
-- **Google**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-- **GitHub**: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
-- **Spotify**: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`
-- **Discord**: `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_BOT_TOKEN`
-- **Mastodon**: `MASTODON_CLIENT_ID`, `MASTODON_CLIENT_SECRET`, `MASTODON_INSTANCE_URL`
+Edit `backend/.env` with your credentials. **Only `JWT_SECRET` is required** to start — services are configured per-user in the Settings page.
 
-LLM API keys are configured per-user in the Settings page.
-
-### Running
 ```bash
-# Backend (port 8000) + Frontend (port 3000)
-make backend   # terminal 1
-make frontend  # terminal 2
+# Required
+JWT_SECRET=your-secret-key-here    # Change this! Used for JWT auth
 
-# Or run individually
+# Optional: Local LLM (free, no API key needed)
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen3.5:9b           # or gemma3:4b, llama3.1:8b, etc.
+```
+
+#### OAuth credentials (for service integrations)
+
+Each service needs OAuth app credentials set as environment variables on the **server**. Users then connect their accounts via the Settings page.
+
+| Service | Env Vars | Where to create |
+|---------|----------|-----------------|
+| **Google** (Gmail + Calendar) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | [Google Cloud Console](https://console.cloud.google.com/apis/credentials) |
+| **GitHub** | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | [GitHub Developer Settings](https://github.com/settings/developers) |
+| **Spotify** | `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) |
+| **Discord** | `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_BOT_TOKEN` | [Discord Developer Portal](https://discord.com/developers/applications) |
+| **Mastodon** | `MASTODON_CLIENT_ID`, `MASTODON_CLIENT_SECRET`, `MASTODON_INSTANCE_URL` | Your instance's Settings > Development > New Application |
+| **Telegram** | `TELEGRAM_BOT_TOKEN` | [BotFather on Telegram](https://t.me/BotFather) |
+
+**LLM API keys** (Anthropic, OpenAI, Google, Groq, OpenRouter) are configured **per-user** in the Settings page — the server stores no provider keys.
+
+### 3. Run the application
+
+```bash
+# Terminal 1: Backend (FastAPI on port 8000)
 make backend
+
+# Terminal 2: Frontend (Next.js on port 3000)
 make frontend
 ```
 
-### Testing
+Or without Make:
 ```bash
-make test   # Backend pytest
-make lint   # Frontend ESLint
+# Backend
+cd backend && uv run uvicorn services.rest_api:app --reload --host 0.0.0.0 --port 8000
+
+# Frontend
+cd frontend && npm run dev
+```
+
+Open **http://localhost:3000** in your browser. Sign up for an account, configure your LLM provider in Settings, and start chatting.
+
+### 4. (Optional) Set up Ollama for free local inference
+
+```bash
+# Install and start Ollama
+ollama serve
+
+# Pull a model (choose based on your hardware)
+ollama pull qwen3.5:9b      # 9B params, good tool-calling, needs ~6GB RAM
+ollama pull gemma3:4b        # 4B params, lighter, needs ~3GB RAM
+
+# Pull the embedding model (used for RAG memory)
+ollama pull nomic-embed-text
+```
+
+Then in the Settings page, select "Ollama" as your LLM provider — no API key needed.
+
+### 5. Running tests and linting
+
+```bash
+# Backend
+cd backend
+uv run pytest tests/ -v          # Run all tests
+uv run ruff check .              # Lint
+uv run ruff format --check .     # Format check
+
+# Frontend
+cd frontend
+npx vitest run                   # Unit tests
+npx eslint                       # Lint
+npx tsc --noEmit                 # Type check
+npm run build                    # Production build
+
+# Or use Make shortcuts
+make test    # Backend pytest
+make lint    # Frontend ESLint
+make build   # Frontend production build
 ```
 
 ## API Reference
