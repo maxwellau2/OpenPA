@@ -11,20 +11,43 @@ async def test_all_tools_loaded(mcp_client):
 
     expected = [
         # Memory
-        "memory_get_preferences", "memory_set_preference", "memory_search_history", "memory_save_note",
+        "memory_get_preferences",
+        "memory_set_preference",
+        "memory_search_history",
+        "memory_save_note",
         # RSS
-        "rss_fetch_feed", "rss_fetch_all_feeds", "rss_add_feed", "rss_list_feeds",
+        "rss_fetch_feed",
+        "rss_fetch_all_feeds",
+        "rss_add_feed",
+        "rss_list_feeds",
         # GitHub
-        "github_list_repos", "github_list_prs", "github_get_pr_diff",
-        "github_create_issue", "github_create_pr", "github_list_notifications", "github_push_file",
+        "github_list_repos",
+        "github_list_prs",
+        "github_get_pr_diff",
+        "github_create_issue",
+        "github_create_pr",
+        "github_list_notifications",
+        "github_push_file",
         # Gmail
-        "gmail_get_unread", "gmail_read_email", "gmail_send_email", "gmail_reply_email",
+        "gmail_get_unread",
+        "gmail_read_email",
+        "gmail_send_email",
+        "gmail_reply_email",
         # Calendar
-        "calendar_list_events", "calendar_create_event", "calendar_delete_event",
+        "calendar_list_events",
+        "calendar_create_event",
+        "calendar_delete_event",
         # Spotify
-        "spotify_play", "spotify_pause", "spotify_current_track", "spotify_search", "spotify_get_playlists",
+        "spotify_play",
+        "spotify_pause",
+        "spotify_current_track",
+        "spotify_search",
+        "spotify_get_playlists",
         # Discord
-        "discord_list_servers", "discord_list_channels", "discord_send_message", "discord_read_messages",
+        "discord_list_servers",
+        "discord_list_channels",
+        "discord_send_message",
+        "discord_read_messages",
         # Telegram
         "telegram_send_message",
         # Web search
@@ -57,4 +80,4 @@ async def test_tools_have_schemas(mcp_client):
 async def test_tool_count(mcp_client):
     """Verify total tool count."""
     tools = await mcp_client.list_tools()
-    assert len(tools) == 83, f"Expected 83 tools, got {len(tools)}"
+    assert len(tools) == 85, f"Expected 85 tools, got {len(tools)}"

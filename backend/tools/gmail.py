@@ -1,7 +1,6 @@
 """Gmail tools — self-resolving. reply_email can find emails by subject/sender, not just ID."""
 
 import base64
-import json
 from email.mime.text import MIMEText
 
 import httpx
@@ -19,11 +18,12 @@ async def _get_token(user_id: int) -> str:
 
     if creds.get("expiry") and creds.get("refresh_token"):
         from datetime import datetime, timezone
+
         try:
             expiry = datetime.fromisoformat(creds["expiry"].replace("Z", "+00:00"))
             if expiry < datetime.now(timezone.utc):
                 creds = await _refresh_token(user_id, creds)
-        except (ValueError, KeyError):
+        except ValueError, KeyError:
             pass
 
     return creds["token"]
@@ -31,22 +31,27 @@ async def _get_token(user_id: int) -> str:
 
 async def _refresh_token(user_id: int, creds: dict) -> dict:
     async with httpx.AsyncClient() as client:
-        resp = await client.post("https://oauth2.googleapis.com/token", data={
-            "client_id": creds["client_id"],
-            "client_secret": creds["client_secret"],
-            "refresh_token": creds["refresh_token"],
-            "grant_type": "refresh_token",
-        })
+        resp = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id": creds["client_id"],
+                "client_secret": creds["client_secret"],
+                "refresh_token": creds["refresh_token"],
+                "grant_type": "refresh_token",
+            },
+        )
         resp.raise_for_status()
         new_data = resp.json()
 
     creds["token"] = new_data["access_token"]
     if "expires_in" in new_data:
         from datetime import datetime, timedelta, timezone
+
         expiry = datetime.now(timezone.utc) + timedelta(seconds=new_data["expires_in"])
         creds["expiry"] = expiry.isoformat()
 
     from db.auth import set_user_credentials
+
     await set_user_credentials(user_id, "google", creds)
     return creds
 
@@ -71,7 +76,10 @@ async def _find_email(token: str, search: str) -> dict | None:
         msg_resp = await client.get(
             f"{API_BASE}/messages/{data['messages'][0]['id']}",
             headers=_auth_headers(token),
-            params={"format": "metadata", "metadataHeaders": ["From", "Subject", "Date", "Message-ID"]},
+            params={
+                "format": "metadata",
+                "metadataHeaders": ["From", "Subject", "Date", "Message-ID"],
+            },
         )
         msg_resp.raise_for_status()
         msg = msg_resp.json()
@@ -119,18 +127,25 @@ async def get_unread(_user_id: int, max_results: int = 10, query: str = "") -> d
             msg_resp = await client.get(
                 f"{API_BASE}/messages/{msg_ref['id']}",
                 headers=_auth_headers(token),
-                params={"format": "metadata", "metadataHeaders": ["From", "Subject", "Date"]},
+                params={
+                    "format": "metadata",
+                    "metadataHeaders": ["From", "Subject", "Date"],
+                },
             )
             msg_resp.raise_for_status()
             msg = msg_resp.json()
-            headers = {h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])}
-            emails.append({
-                "id": msg["id"],
-                "from": headers.get("From", ""),
-                "subject": headers.get("Subject", ""),
-                "snippet": msg.get("snippet", ""),
-                "date": headers.get("Date", ""),
-            })
+            headers = {
+                h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])
+            }
+            emails.append(
+                {
+                    "id": msg["id"],
+                    "from": headers.get("From", ""),
+                    "subject": headers.get("Subject", ""),
+                    "snippet": msg.get("snippet", ""),
+                    "date": headers.get("Date", ""),
+                }
+            )
 
     return {"emails": emails, "count": len(emails)}
 
@@ -169,11 +184,17 @@ async def read_email(_user_id: int, email_id: str = "", search: str = "") -> dic
     body = ""
     payload = msg.get("payload", {})
     if payload.get("body", {}).get("data"):
-        body = base64.urlsafe_b64decode(payload["body"]["data"]).decode("utf-8", errors="replace")
+        body = base64.urlsafe_b64decode(payload["body"]["data"]).decode(
+            "utf-8", errors="replace"
+        )
     elif payload.get("parts"):
         for part in payload["parts"]:
-            if part.get("mimeType") == "text/plain" and part.get("body", {}).get("data"):
-                body = base64.urlsafe_b64decode(part["body"]["data"]).decode("utf-8", errors="replace")
+            if part.get("mimeType") == "text/plain" and part.get("body", {}).get(
+                "data"
+            ):
+                body = base64.urlsafe_b64decode(part["body"]["data"]).decode(
+                    "utf-8", errors="replace"
+                )
                 break
 
     return {
@@ -216,7 +237,9 @@ async def send_email(_user_id: int, to: str, subject: str, body: str) -> dict:
 
 
 @mcp.tool()
-async def reply_email(_user_id: int, email_id: str = "", search: str = "", body: str = "") -> dict:
+async def reply_email(
+    _user_id: int, email_id: str = "", search: str = "", body: str = ""
+) -> dict:
     """Reply to an email. Can find the email by ID or by searching (subject, sender, etc.).
 
     Args:
@@ -242,12 +265,17 @@ async def reply_email(_user_id: int, email_id: str = "", search: str = "", body:
         orig_resp = await client.get(
             f"{API_BASE}/messages/{email_id}",
             headers=_auth_headers(token),
-            params={"format": "metadata", "metadataHeaders": ["From", "Subject", "Message-ID"]},
+            params={
+                "format": "metadata",
+                "metadataHeaders": ["From", "Subject", "Message-ID"],
+            },
         )
         orig_resp.raise_for_status()
         orig = orig_resp.json()
 
-    headers = {h["name"]: h["value"] for h in orig.get("payload", {}).get("headers", [])}
+    headers = {
+        h["name"]: h["value"] for h in orig.get("payload", {}).get("headers", [])
+    }
     thread_id = orig.get("threadId", "")
 
     message = MIMEText(body)
@@ -266,4 +294,8 @@ async def reply_email(_user_id: int, email_id: str = "", search: str = "", body:
         resp.raise_for_status()
         result = resp.json()
 
-    return {"status": "sent", "message_id": result["id"], "replied_to": headers.get("From", "")}
+    return {
+        "status": "sent",
+        "message_id": result["id"],
+        "replied_to": headers.get("From", ""),
+    }

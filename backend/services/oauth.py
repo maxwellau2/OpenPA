@@ -35,6 +35,7 @@ async def _get_user_from_state(state: str) -> dict:
 # Google OAuth
 # ============================================================
 
+
 @router.get("/google")
 async def google_start(token: str = Query(...)):
     """Start Google OAuth. Pass user JWT as ?token="""
@@ -51,7 +52,9 @@ async def google_start(token: str = Query(...)):
         "prompt": "consent",
         "state": token,
     }
-    return RedirectResponse(f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}")
+    return RedirectResponse(
+        f"https://accounts.google.com/o/oauth2/v2/auth?{urllib.parse.urlencode(params)}"
+    )
 
 
 @router.get("/google/callback")
@@ -59,26 +62,35 @@ async def google_callback(code: str = Query(...), state: str = Query("")):
     user = await _get_user_from_state(state)
 
     async with httpx.AsyncClient() as client:
-        resp = await client.post("https://oauth2.googleapis.com/token", data={
-            "code": code,
-            "client_id": cfg.google.client_id,
-            "client_secret": cfg.google.client_secret,
-            "redirect_uri": cfg.google.redirect_uri,
-            "grant_type": "authorization_code",
-        })
+        resp = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": cfg.google.client_id,
+                "client_secret": cfg.google.client_secret,
+                "redirect_uri": cfg.google.redirect_uri,
+                "grant_type": "authorization_code",
+            },
+        )
         if not resp.is_success:
             logger.error(f"Google token exchange failed: {resp.text}")
             raise HTTPException(400, "Failed to exchange code")
         data = resp.json()
 
-    expiry = datetime.now(timezone.utc) + timedelta(seconds=data.get("expires_in", 3600))
-    await set_user_credentials(user["id"], "google", {
-        "token": data["access_token"],
-        "refresh_token": data.get("refresh_token", ""),
-        "client_id": cfg.google.client_id,
-        "client_secret": cfg.google.client_secret,
-        "expiry": expiry.isoformat(),
-    })
+    expiry = datetime.now(timezone.utc) + timedelta(
+        seconds=data.get("expires_in", 3600)
+    )
+    await set_user_credentials(
+        user["id"],
+        "google",
+        {
+            "token": data["access_token"],
+            "refresh_token": data.get("refresh_token", ""),
+            "client_id": cfg.google.client_id,
+            "client_secret": cfg.google.client_secret,
+            "expiry": expiry.isoformat(),
+        },
+    )
     logger.info(f"Google OAuth done for {user['email']}")
     return RedirectResponse(f"{cfg.frontend_url}/settings?connected=google")
 
@@ -86,6 +98,7 @@ async def google_callback(code: str = Query(...), state: str = Query("")):
 # ============================================================
 # GitHub OAuth
 # ============================================================
+
 
 @router.get("/github")
 async def github_start(token: str = Query(...)):
@@ -100,7 +113,9 @@ async def github_start(token: str = Query(...)):
         "scope": " ".join(cfg.github.scopes),
         "state": token,
     }
-    return RedirectResponse(f"https://github.com/login/oauth/authorize?{urllib.parse.urlencode(params)}")
+    return RedirectResponse(
+        f"https://github.com/login/oauth/authorize?{urllib.parse.urlencode(params)}"
+    )
 
 
 @router.get("/github/callback")
@@ -126,11 +141,15 @@ async def github_callback(code: str = Query(...), state: str = Query("")):
     if "error" in data:
         raise HTTPException(400, data.get("error_description", data["error"]))
 
-    await set_user_credentials(user["id"], "github", {
-        "token": data["access_token"],
-        "token_type": data.get("token_type", "bearer"),
-        "scope": data.get("scope", ""),
-    })
+    await set_user_credentials(
+        user["id"],
+        "github",
+        {
+            "token": data["access_token"],
+            "token_type": data.get("token_type", "bearer"),
+            "scope": data.get("scope", ""),
+        },
+    )
     logger.info(f"GitHub OAuth done for {user['email']}")
     return RedirectResponse(f"{cfg.frontend_url}/settings?connected=github")
 
@@ -138,6 +157,7 @@ async def github_callback(code: str = Query(...), state: str = Query("")):
 # ============================================================
 # Spotify OAuth
 # ============================================================
+
 
 @router.get("/spotify")
 async def spotify_start(token: str = Query(...)):
@@ -153,7 +173,9 @@ async def spotify_start(token: str = Query(...)):
         "scope": " ".join(cfg.spotify.scopes),
         "state": token,
     }
-    return RedirectResponse(f"https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}")
+    return RedirectResponse(
+        f"https://accounts.spotify.com/authorize?{urllib.parse.urlencode(params)}"
+    )
 
 
 @router.get("/spotify/callback")
@@ -179,13 +201,17 @@ async def spotify_callback(code: str = Query(...), state: str = Query("")):
             raise HTTPException(400, "Failed to exchange code")
         data = resp.json()
 
-    await set_user_credentials(user["id"], "spotify", {
-        "access_token": data["access_token"],
-        "refresh_token": data.get("refresh_token", ""),
-        "client_id": cfg.spotify.client_id,
-        "client_secret": cfg.spotify.client_secret,
-        "expires_in": data.get("expires_in", 3600),
-    })
+    await set_user_credentials(
+        user["id"],
+        "spotify",
+        {
+            "access_token": data["access_token"],
+            "refresh_token": data.get("refresh_token", ""),
+            "client_id": cfg.spotify.client_id,
+            "client_secret": cfg.spotify.client_secret,
+            "expires_in": data.get("expires_in", 3600),
+        },
+    )
     logger.info(f"Spotify OAuth done for {user['email']}")
     return RedirectResponse(f"{cfg.frontend_url}/settings?connected=spotify")
 
@@ -196,6 +222,7 @@ async def spotify_callback(code: str = Query(...), state: str = Query("")):
 # so we use the bot token from server config + optionally an
 # OAuth2 flow for the user to add the bot to their server.
 # ============================================================
+
 
 @router.get("/discord")
 async def discord_start(token: str = Query(...)):
@@ -212,11 +239,15 @@ async def discord_start(token: str = Query(...)):
         "permissions": "274877975552",  # Send/Read messages, Read message history
         "state": token,
     }
-    return RedirectResponse(f"https://discord.com/oauth2/authorize?{urllib.parse.urlencode(params)}")
+    return RedirectResponse(
+        f"https://discord.com/oauth2/authorize?{urllib.parse.urlencode(params)}"
+    )
 
 
 @router.get("/discord/callback")
-async def discord_callback(code: str = Query(...), state: str = Query(""), guild_id: str = Query("")):
+async def discord_callback(
+    code: str = Query(...), state: str = Query(""), guild_id: str = Query("")
+):
     user = await _get_user_from_state(state)
 
     # Exchange code for user token (to get their identity + guilds)
@@ -237,11 +268,15 @@ async def discord_callback(code: str = Query(...), state: str = Query(""), guild
         data = resp.json()
 
     # Store the bot token (from server config) + user's guild info
-    await set_user_credentials(user["id"], "discord", {
-        "bot_token": cfg.discord.bot_token,
-        "user_access_token": data.get("access_token", ""),
-        "guild_id": guild_id or data.get("guild", {}).get("id", ""),
-    })
+    await set_user_credentials(
+        user["id"],
+        "discord",
+        {
+            "bot_token": cfg.discord.bot_token,
+            "user_access_token": data.get("access_token", ""),
+            "guild_id": guild_id or data.get("guild", {}).get("id", ""),
+        },
+    )
     logger.info(f"Discord OAuth done for {user['email']}")
     return RedirectResponse(f"{cfg.frontend_url}/settings?connected=discord")
 
@@ -249,6 +284,7 @@ async def discord_callback(code: str = Query(...), state: str = Query(""), guild
 # ============================================================
 # Mastodon OAuth
 # ============================================================
+
 
 @router.get("/mastodon")
 async def mastodon_start(token: str = Query(...)):
@@ -290,11 +326,15 @@ async def mastodon_callback(code: str = Query(...), state: str = Query("")):
             raise HTTPException(400, "Failed to exchange code")
         data = resp.json()
 
-    await set_user_credentials(user["id"], "mastodon", {
-        "token": data["access_token"],
-        "instance_url": base,
-        "scope": data.get("scope", ""),
-    })
+    await set_user_credentials(
+        user["id"],
+        "mastodon",
+        {
+            "token": data["access_token"],
+            "instance_url": base,
+            "scope": data.get("scope", ""),
+        },
+    )
     logger.info(f"Mastodon OAuth done for {user['email']}")
     return RedirectResponse(f"{cfg.frontend_url}/settings?connected=mastodon")
 
@@ -356,7 +396,9 @@ async def telegram_verify(
 
     pending = _telegram_pending.get(user["id"])
     if not pending:
-        raise HTTPException(400, "No pending Telegram auth. Call /auth/telegram/start first.")
+        raise HTTPException(
+            400, "No pending Telegram auth. Call /auth/telegram/start first."
+        )
 
     client = pending["client"]
 
@@ -368,14 +410,17 @@ async def telegram_verify(
         )
 
         # Save session string
-        from telethon.sessions import StringSession
         session_string = client.session.save()
 
-        await set_user_credentials(user["id"], "telegram", {
-            "api_id": pending["api_id"],
-            "api_hash": pending["api_hash"],
-            "session_string": session_string,
-        })
+        await set_user_credentials(
+            user["id"],
+            "telegram",
+            {
+                "api_id": pending["api_id"],
+                "api_hash": pending["api_hash"],
+                "session_string": session_string,
+            },
+        )
 
         logger.info(f"Telegram auth done for {user['email']}")
         return {"status": "connected"}

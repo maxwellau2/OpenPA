@@ -15,7 +15,11 @@ async def _get_client(user_id: int):
     from telethon.sessions import StringSession
 
     creds = await get_creds(user_id, "telegram")
-    client = TelegramClient(StringSession(creds.get("session_string", "")), int(creds["api_id"]), creds["api_hash"])
+    client = TelegramClient(
+        StringSession(creds.get("session_string", "")),
+        int(creds["api_id"]),
+        creds["api_hash"],
+    )
     await client.connect()
     return client
 
@@ -25,11 +29,14 @@ async def _resolve_recipient(client, name: str) -> tuple:
     # If it looks like a username or phone, use directly
     if name.startswith("@") or name.startswith("+"):
         entity = await client.get_entity(name)
-        display = getattr(entity, 'first_name', '') or getattr(entity, 'title', '') or name
+        display = (
+            getattr(entity, "first_name", "") or getattr(entity, "title", "") or name
+        )
         return entity, display
 
     # Search contacts first
     from telethon.tl.functions.contacts import SearchRequest
+
     result = await client(SearchRequest(q=name, limit=5))
     if result.users:
         user = result.users[0]
@@ -44,7 +51,7 @@ async def _resolve_recipient(client, name: str) -> tuple:
 
     # Last resort — try as-is
     entity = await client.get_entity(name)
-    display = getattr(entity, 'first_name', '') or getattr(entity, 'title', '') or name
+    display = getattr(entity, "first_name", "") or getattr(entity, "title", "") or name
     return entity, display
 
 
@@ -62,15 +69,18 @@ async def search_contacts(_user_id: int, query: str) -> dict:
 
         # Search contacts
         from telethon.tl.functions.contacts import SearchRequest
+
         contact_result = await client(SearchRequest(q=query, limit=10))
         for user in contact_result.users:
             name = f"{user.first_name or ''} {user.last_name or ''}".strip()
-            results.append({
-                "name": name,
-                "username": f"@{user.username}" if user.username else "",
-                "id": user.id,
-                "type": "user",
-            })
+            results.append(
+                {
+                    "name": name,
+                    "username": f"@{user.username}" if user.username else "",
+                    "id": user.id,
+                    "type": "user",
+                }
+            )
 
         # Also search dialogs
         dialogs = await client.get_dialogs(limit=50)
@@ -79,13 +89,19 @@ async def search_contacts(_user_id: int, query: str) -> dict:
             if query_lower in d.name.lower():
                 already = any(r["id"] == d.id for r in results)
                 if not already:
-                    results.append({
-                        "name": d.name,
-                        "username": "",
-                        "id": d.id,
-                        "type": "group" if d.is_group else "channel" if d.is_channel else "user",
-                        "unread_count": d.unread_count,
-                    })
+                    results.append(
+                        {
+                            "name": d.name,
+                            "username": "",
+                            "id": d.id,
+                            "type": "group"
+                            if d.is_group
+                            else "channel"
+                            if d.is_channel
+                            else "user",
+                            "unread_count": d.unread_count,
+                        }
+                    )
 
         return {"query": query, "results": results}
     finally:
@@ -108,7 +124,9 @@ async def send_message(_user_id: int, to: str, message: str) -> dict:
         result = await client.send_message(entity, message)
         return {"status": "sent", "message_id": result.id, "to": display_name}
     except Exception as e:
-        return {"error": f"Could not find '{to}': {e}. Try search_contacts first to find the right name."}
+        return {
+            "error": f"Could not find '{to}': {e}. Try search_contacts first to find the right name."
+        }
     finally:
         await client.disconnect()
 
@@ -124,15 +142,21 @@ async def list_chats(_user_id: int, limit: int = 20) -> dict:
     client = await _get_client(_user_id)
     try:
         dialogs = await client.get_dialogs(limit=limit)
-        return {"chats": [
-            {
-                "name": d.name,
-                "id": d.id,
-                "unread_count": d.unread_count,
-                "type": "group" if d.is_group else "channel" if d.is_channel else "user",
-            }
-            for d in dialogs
-        ]}
+        return {
+            "chats": [
+                {
+                    "name": d.name,
+                    "id": d.id,
+                    "unread_count": d.unread_count,
+                    "type": "group"
+                    if d.is_group
+                    else "channel"
+                    if d.is_channel
+                    else "user",
+                }
+                for d in dialogs
+            ]
+        }
     finally:
         await client.disconnect()
 
@@ -150,16 +174,22 @@ async def read_messages(_user_id: int, chat: str, limit: int = 20) -> dict:
     try:
         entity, display_name = await _resolve_recipient(client, chat)
         messages = await client.get_messages(entity, limit=limit)
-        return {"chat": display_name, "messages": [
-            {
-                "id": m.id,
-                "sender": getattr(m.sender, 'first_name', '') or getattr(m.sender, 'title', '') if m.sender else "Unknown",
-                "text": m.text or "",
-                "date": str(m.date),
-            }
-            for m in messages
-            if m.text
-        ]}
+        return {
+            "chat": display_name,
+            "messages": [
+                {
+                    "id": m.id,
+                    "sender": getattr(m.sender, "first_name", "")
+                    or getattr(m.sender, "title", "")
+                    if m.sender
+                    else "Unknown",
+                    "text": m.text or "",
+                    "date": str(m.date),
+                }
+                for m in messages
+                if m.text
+            ],
+        }
     except Exception as e:
         return {"error": f"Could not find chat '{chat}': {e}"}
     finally:

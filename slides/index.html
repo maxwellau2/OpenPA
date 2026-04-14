@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenPA — Personal Assistant-as-a-Service</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+  <style>
+    :root {
+      --r-background-color: #0a0a0f;
+      --r-main-color: #e0e0e0;
+      --r-heading-color: #ffffff;
+      --r-link-color: #6ee7b7;
+      --r-link-color-hover: #34d399;
+      --r-selection-background-color: #6ee7b780;
+      --r-heading-font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r-main-font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r-code-font: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    .reveal { font-weight: 300; }
+    .reveal h1, .reveal h2, .reveal h3 { font-weight: 700; letter-spacing: -0.02em; }
+    .reveal h1 { font-size: 2.4em; }
+    .reveal h2 { font-size: 1.6em; color: #6ee7b7; }
+    .reveal h3 { font-size: 1.2em; color: #a78bfa; }
+
+    .accent { color: #6ee7b7; }
+    .accent-purple { color: #a78bfa; }
+    .accent-orange { color: #fb923c; }
+    .accent-pink { color: #f472b6; }
+    .accent-blue { color: #60a5fa; }
+    .dim { color: #6b7280; }
+
+    .reveal .slides section { text-align: left; }
+    .reveal .slides section.center-slide { text-align: center; }
+
+    .pill {
+      display: inline-block;
+      padding: 0.15em 0.6em;
+      border-radius: 999px;
+      font-size: 0.55em;
+      font-weight: 500;
+      margin: 0.1em;
+      background: #1f2937;
+      border: 1px solid #374151;
+    }
+    .pill-green { background: #064e3b; border-color: #065f46; color: #6ee7b7; }
+    .pill-purple { background: #2e1065; border-color: #3b0764; color: #c4b5fd; }
+    .pill-blue { background: #1e3a5f; border-color: #1e40af; color: #93c5fd; }
+    .pill-orange { background: #431407; border-color: #7c2d12; color: #fdba74; }
+    .pill-pink { background: #500724; border-color: #831843; color: #f9a8d4; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2em; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1em; }
+
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 0.7em;
+    }
+    .card h3 { margin-top: 0; font-size: 0.8em; }
+    .card p, .card ul { font-size: 0.5em; margin: 0; }
+    .card ul { padding-left: 1.2em; }
+
+    .stat-box {
+      text-align: center;
+      padding: 0.8em;
+    }
+    .stat-box .number {
+      font-size: 2.5em;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #6ee7b7, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-box .label {
+      font-size: 0.5em;
+      color: #9ca3af;
+      margin-top: 0.3em;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.45em;
+    }
+    .comparison-table th {
+      background: #1f2937;
+      padding: 0.5em 0.6em;
+      text-align: center;
+      font-weight: 600;
+      color: #e5e7eb;
+      border-bottom: 2px solid #374151;
+    }
+    .comparison-table td {
+      padding: 0.4em 0.6em;
+      text-align: center;
+      border-bottom: 1px solid #1f2937;
+    }
+    .comparison-table tr:last-child {
+      background: #064e3b40;
+    }
+    .comparison-table tr:last-child td {
+      font-weight: 600;
+      color: #6ee7b7;
+      border-bottom: 2px solid #065f46;
+    }
+    .check { color: #34d399; }
+    .cross { color: #ef4444; }
+
+    .code-block {
+      background: #1e1e2e;
+      border: 1px solid #2d2d44;
+      border-radius: 8px;
+      padding: 0.8em;
+      font-size: 0.45em;
+      font-family: var(--r-code-font);
+      overflow-x: auto;
+    }
+
+    .flow-arrow {
+      font-size: 1.5em;
+      color: #6ee7b7;
+      text-align: center;
+    }
+
+    .meme-container {
+      text-align: center;
+      margin: 0.5em 0;
+    }
+    .meme-container img {
+      border-radius: 12px;
+      max-height: 350px;
+    }
+    .meme-caption {
+      font-size: 0.5em;
+      color: #6b7280;
+      font-style: italic;
+      margin-top: 0.3em;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 2em;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.5em;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #6ee7b7, #3b82f6, #a78bfa);
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 0.5em;
+      font-size: 0.5em;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.65em;
+      top: 0.4em;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #6ee7b7;
+      border: 2px solid #0a0a0f;
+    }
+
+    .big-quote {
+      font-size: 1.1em;
+      font-style: italic;
+      color: #d1d5db;
+      border-left: 4px solid #6ee7b7;
+      padding-left: 0.8em;
+      margin: 0.5em 0;
+    }
+
+    .service-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4em;
+      justify-content: center;
+    }
+    .service-tag {
+      padding: 0.3em 0.7em;
+      border-radius: 8px;
+      font-size: 0.5em;
+      font-weight: 500;
+      background: #1f2937;
+      border: 1px solid #374151;
+    }
+
+    .reveal ul { list-style: none; padding-left: 0; }
+    .reveal ul li::before {
+      content: '>';
+      color: #6ee7b7;
+      font-weight: 700;
+      font-family: var(--r-code-font);
+      margin-right: 0.5em;
+    }
+    .reveal ul li { margin-bottom: 0.3em; }
+    .card ul li::before { content: '~'; color: #a78bfa; }
+
+    .fragment.blur-in {
+      filter: blur(5px);
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+    .fragment.blur-in.visible {
+      filter: blur(0);
+      opacity: 1;
+    }
+
+    .arch-box {
+      border: 2px solid;
+      border-radius: 10px;
+      padding: 0.6em;
+      text-align: center;
+      font-size: 0.55em;
+      font-weight: 600;
+    }
+    .arch-frontend { border-color: #60a5fa; color: #60a5fa; background: #1e3a5f30; }
+    .arch-backend { border-color: #6ee7b7; color: #6ee7b7; background: #064e3b30; }
+    .arch-data { border-color: #a78bfa; color: #a78bfa; background: #2e106530; }
+
+    .ralf-step {
+      text-align: center;
+      padding: 0.6em;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .ralf-r { background: linear-gradient(135deg, #1e3a5f, #1e3a5f80); border: 1px solid #3b82f6; }
+    .ralf-a { background: linear-gradient(135deg, #431407, #43140780); border: 1px solid #f97316; }
+    .ralf-l { background: linear-gradient(135deg, #064e3b, #064e3b80); border: 1px solid #10b981; }
+    .ralf-f { background: linear-gradient(135deg, #500724, #50072480); border: 1px solid #ec4899; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ==================== TITLE ==================== -->
+<section class="center-slide" data-background-gradient="radial-gradient(circle at 30% 50%, #0f2027, #0a0a0f 70%)">
+  <h1 style="font-size:2.8em; line-height:1.1;">
+    <span class="accent">Open</span>PA
+  </h1>
+  <p style="font-size:0.7em; color:#9ca3af; margin-top:-0.2em;">
+    An Open-Source Personal Assistant-as-a-Service<br>
+    with LLM-Driven Tool Orchestration<br>
+    and Autonomous Code Generation
+  </p>
+  <p style="font-size:0.5em; color:#6b7280; margin-top:1.5em;">
+    Maxwell Au &middot; College of Computer and Data Science<br>
+    Nanyang Technological University &middot; April 2026
+  </p>
+</section>
+
+<!-- ==================== THE PROBLEM ==================== -->
+<section>
+  <h2>The Problem</h2>
+  <p class="big-quote" style="font-size:0.75em;">
+    The modern professional juggles 15+ fragmented services daily&mdash;<br>
+    each with its own interface, notifications, and workflow.
+  </p>
+  <div class="service-grid" style="margin-top:1em;">
+    <span class="service-tag">Gmail</span>
+    <span class="service-tag">GitHub</span>
+    <span class="service-tag">Spotify</span>
+    <span class="service-tag">Discord</span>
+    <span class="service-tag">Telegram</span>
+    <span class="service-tag">Calendar</span>
+    <span class="service-tag">Mastodon</span>
+    <span class="service-tag">RSS</span>
+    <span class="service-tag">YouTube</span>
+    <span class="service-tag">Slack</span>
+    <span class="service-tag">Notion</span>
+    <span class="service-tag">LinkedIn</span>
+  </div>
+  <div style="margin-top:1em;">
+    <p style="font-size:0.55em; color:#9ca3af;">Commercial assistants (Siri, Alexa, Google) are:</p>
+    <ul style="font-size:0.55em;">
+      <li>Vendor-locked &mdash; can't cross ecosystem boundaries</li>
+      <li>Shallow &mdash; single-step commands only ("set a timer")</li>
+      <li>Closed &mdash; no self-hosting, no code generation, no customisation</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ==================== THE MEME ==================== -->
+<section class="center-slide">
+  <h2>Meanwhile, developers every morning...</h2>
+  <div style="font-size: 3em; margin: 0.2em 0;">
+    <span title="Alt-Tab">&#x1F504;</span>
+  </div>
+  <p style="font-size: 0.75em; color: #e5e7eb;">
+    <span class="accent-orange">Alt+Tab</span> &rarr; Gmail &rarr; <span class="accent-orange">Alt+Tab</span> &rarr; GitHub &rarr; <span class="accent-orange">Alt+Tab</span> &rarr; Discord &rarr; <span class="accent-orange">Alt+Tab</span> &rarr; Spotify
+  </p>
+  <p style="font-size: 0.55em; color: #6b7280; margin-top: 0.6em;">
+    "Check my PRs, summarise them, and send the summary to my team on Discord"<br>
+    <span class="accent">&#8594; impossible with any existing assistant</span>
+  </p>
+</section>
+
+<!-- ==================== RESEARCH GAP ==================== -->
+<section>
+  <h2>Research Gap</h2>
+  <table class="comparison-table">
+    <tr>
+      <th style="text-align:left;">System</th>
+      <th>Multi-Svc</th>
+      <th>Code Gen</th>
+      <th>Self-Evolve</th>
+      <th>RAG Mem.</th>
+      <th>Self-Host</th>
+      <th>Multi-LLM</th>
+      <th>Multi-User</th>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Google Assistant</td>
+      <td class="dim">Partial</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Siri / Alexa</td>
+      <td class="dim">Partial</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Claude Code</td>
+      <td class="cross">&times;</td><td class="check">&check;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="cross">&times;</td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">Codex CLI</td>
+      <td class="cross">&times;</td><td class="check">&check;</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="check">&check;</td><td class="cross">&times;</td><td class="cross">&times;</td>
+    </tr>
+    <tr>
+      <td style="text-align:left;">LangChain / AutoGPT</td>
+      <td class="cross">&times;*</td><td class="cross">&times;</td><td class="cross">&times;</td><td class="dim">Partial</td><td class="check">&check;</td><td class="check">&check;</td><td class="cross">&times;</td>
+    </tr>
+    <tr>
+      <td style="text-align:left;"><strong>OpenPA</strong></td>
+      <td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td><td class="check">&check;</td>
+    </tr>
+  </table>
+  <p style="font-size:0.4em; color:#6b7280; margin-top:0.6em;">*Frameworks, not end-user applications; require custom integration per service.</p>
+</section>
+
+<!-- ==================== WHAT IS OPENPA ==================== -->
+<section class="center-slide" data-background-gradient="radial-gradient(circle at 70% 30%, #064e3b40, #0a0a0f 70%)">
+  <h1 style="font-size:2.2em;">
+    What is <span class="accent">OpenPA</span>?
+  </h1>
+  <p style="font-size:0.65em; color:#d1d5db; max-width:700px; margin:0.5em auto;">
+    An open-source, self-hosted personal assistant that orchestrates<br>
+    <span class="accent">15 services</span> through a single LLM-powered chat interface.
+  </p>
+  <div class="grid-3" style="margin-top:1.2em; max-width:850px; margin-left:auto; margin-right:auto;">
+    <div class="stat-box">
+      <div class="number">83</div>
+      <div class="label">MCP Tools</div>
+    </div>
+    <div class="stat-box">
+      <div class="number">15</div>
+      <div class="label">Integrated Services</div>
+    </div>
+    <div class="stat-box">
+      <div class="number">6</div>
+      <div class="label">LLM Providers</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== KEY CONTRIBUTIONS ==================== -->
+<section>
+  <h2>Key Contributions</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3><span class="accent">1.</span> Unified Multi-Service Orchestration</h3>
+      <p>83 MCP-compliant tools across 15 services, accessible through natural language with per-user credential isolation.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-purple">2.</span> RAG-Based Personalisation</h3>
+      <p>Learns about you over time using locally-hosted embeddings (Ollama) and ChromaDB. Injects relevant memories per conversation.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-orange">3.</span> Autonomous Vibe-Coding</h3>
+      <p>15 workspace tools: clone, edit, grep, test, fix, commit, push, PR &mdash; with adaptive test-fix loops.</p>
+    </div>
+    <div class="card">
+      <h3><span class="accent-pink">4.</span> Self-Evolving Architecture</h3>
+      <p>The agent can modify its <em>own</em> codebase. "Add a LinkedIn tool" &rarr; reads patterns, generates code, tests, PRs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ARCHITECTURE ==================== -->
+<section>
+  <h2>System Architecture</h2>
+  <div style="max-width:800px; margin:0 auto;">
+    <div class="arch-box arch-frontend" style="margin-bottom:0.5em;">
+      <span style="font-size:1.3em;">Frontend</span><br>
+      <span style="font-size:0.8em; font-weight:400;">Next.js 16 &middot; React 19 &middot; SSE Streaming &middot; Settings UI</span>
+    </div>
+    <div class="flow-arrow">&darr; REST + SSE &darr;</div>
+    <div class="arch-box arch-backend" style="margin:0.5em 0;">
+      <span style="font-size:1.3em;">Backend</span><br>
+      <span style="font-size:0.8em; font-weight:400;">FastAPI &middot; Agent Loop &middot; LLM Providers &middot; MCP Tool Registry &middot; RAG</span>
+    </div>
+    <div class="flow-arrow">&darr; SQLite + ChromaDB &darr;</div>
+    <div class="arch-box arch-data">
+      <span style="font-size:1.3em;">Data Layer</span><br>
+      <span style="font-size:0.8em; font-weight:400;">Users &middot; Conversations &middot; Credentials &middot; Vector Embeddings &middot; Semantic Memory</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== MCP TOOL ARCHITECTURE ==================== -->
+<section>
+  <h2>MCP Tool Architecture</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">Each service = self-contained FastMCP server, mounted into a composite registry with namespaces.</p>
+  <div class="code-block" style="margin:0.6em 0;">
+<pre style="margin:0;"><code class="language-python">mcp = FastMCP("openpa")
+mcp.mount(gmail_mcp,     namespace="gmail")      # gmail_send_email, gmail_get_unread, ...
+mcp.mount(github_mcp,    namespace="github")     # github_create_pr, github_list_issues, ...
+mcp.mount(workspace_mcp, namespace="ws")         # ws_workspace_run, ws_workspace_edit, ...
+mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search, ...
+# ... 11 more services</code></pre>
+  </div>
+  <div style="display:flex; flex-wrap:wrap; gap:0.3em; margin-top:0.5em;">
+    <span class="pill pill-green">GitHub (11)</span>
+    <span class="pill pill-green">Workspace (15)</span>
+    <span class="pill pill-purple">Memory (8)</span>
+    <span class="pill pill-blue">Gmail (4)</span>
+    <span class="pill pill-pink">Mastodon (9)</span>
+    <span class="pill pill-orange">Spotify (5)</span>
+    <span class="pill pill-blue">Discord (4)</span>
+    <span class="pill pill-blue">Telegram (4)</span>
+    <span class="pill pill-purple">Calendar (3)</span>
+    <span class="pill pill-orange">Sandbox (7)</span>
+    <span class="pill pill-green">Scheduler (3)</span>
+    <span class="pill pill-blue">Web Scrape (3)</span>
+    <span class="pill pill-purple">RSS (4)</span>
+    <span class="pill pill-pink">YouTube (2)</span>
+    <span class="pill pill-green">Web Search (1)</span>
+  </div>
+</section>
+
+<!-- ==================== AGENT LOOP ==================== -->
+<section>
+  <h2>Adaptive Agent Loop</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color:#6ee7b7;">Mode A: Plan-Then-Execute</h3>
+      <p>For multi-service orchestration tasks.</p>
+      <div class="code-block" style="margin-top:0.5em; font-size:0.9em;">
+<pre style="margin:0;"><code>[
+  {step: 1, tool: "web_search"},
+  {step: 2, tool: "llm_generate",
+   depends_on: 1},
+  {step: 3, tool: "telegram_send",
+   depends_on: 2}
+]</code></pre>
+      </div>
+      <p style="margin-top:0.5em;">Steps with <code>depends_on</code> receive outputs from referenced steps.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#a78bfa;">Mode B: Adaptive Loop</h3>
+      <p>For coding tasks and iterative workflows.</p>
+      <div class="code-block" style="margin-top:0.5em; font-size:0.9em;">
+<pre style="margin:0;"><code>while iterations < max:
+  response = llm.chat(
+    messages, tools, system
+  )
+  if response.has_tool_calls:
+    result = call_tool(...)
+    # LLM sees result next turn
+  else:
+    break  # done</code></pre>
+      </div>
+      <p style="margin-top:0.5em;">50 iterations for code &middot; 30 for general tasks</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== TOOL FILTERING ==================== -->
+<section>
+  <h2>Context-Aware Tool Filtering</h2>
+  <p style="font-size:0.6em; color:#9ca3af;">
+    83 tools overwhelm small models. OpenPA dynamically filters by task context.
+  </p>
+  <div style="margin:0.8em 0;">
+    <div style="display:flex; align-items:center; gap:0.5em; margin-bottom:0.5em;">
+      <span style="font-size:0.55em; color:#9ca3af; width:280px;">"Add a health check endpoint"</span>
+      <span style="font-size:0.55em;">&rarr;</span>
+      <span class="pill pill-green">workspace</span>
+      <span class="pill pill-green">github</span>
+      <span class="pill pill-purple">core</span>
+      <span style="font-size:0.55em; color:#6ee7b7; font-weight:600;">= 34 tools</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.5em; margin-bottom:0.5em;">
+      <span style="font-size:0.55em; color:#9ca3af; width:280px;">"Play some jazz"</span>
+      <span style="font-size:0.55em;">&rarr;</span>
+      <span class="pill pill-orange">media</span>
+      <span class="pill pill-purple">core</span>
+      <span style="font-size:0.55em; color:#6ee7b7; font-weight:600;">= 15 tools</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:0.5em;">
+      <span style="font-size:0.55em; color:#9ca3af; width:280px;">"Who am I?"</span>
+      <span style="font-size:0.55em;">&rarr;</span>
+      <span class="pill pill-purple">core</span>
+      <span style="font-size:0.55em; color:#6ee7b7; font-weight:600;">= 8 tools</span>
+    </div>
+  </div>
+  <div style="background:#111827; border:1px solid #1f2937; border-radius:12px; padding:0.8em; margin-top:0.8em; text-align:center;">
+    <span style="font-size:2em; font-weight:800; color:#ef4444;">83</span>
+    <span style="font-size:1em; color:#6b7280; margin:0 0.5em;">&rarr;</span>
+    <span style="font-size:2em; font-weight:800; color:#6ee7b7;">8</span>
+    <p style="font-size:0.5em; color:#9ca3af; margin-top:0.3em;">Enables 7&ndash;9B local models (Gemma, Qwen, Llama) to function effectively</p>
+  </div>
+</section>
+
+<!-- ==================== RAG PERSONALISATION ==================== -->
+<section>
+  <h2>RAG-Based Personalisation</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">Not just preferences &mdash; a semantic understanding that grows over time.</p>
+  <div class="grid-2" style="margin-top:0.6em;">
+    <div>
+      <h3 style="font-size:0.7em;">How it works</h3>
+      <div class="timeline">
+        <div class="timeline-item"><strong class="accent">Acquire</strong> &mdash; LLM calls <code>remember_about_user</code> proactively</div>
+        <div class="timeline-item"><strong class="accent-purple">Embed</strong> &mdash; <code>nomic-embed-text</code> via Ollama (local, free)</div>
+        <div class="timeline-item"><strong class="accent-blue">Store</strong> &mdash; ChromaDB with user ID + category metadata</div>
+        <div class="timeline-item"><strong class="accent-orange">Retrieve</strong> &mdash; Top-10 by cosine similarity per message</div>
+        <div class="timeline-item"><strong class="accent-pink">Inject</strong> &mdash; Appended to system prompt with relevance scores</div>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:0.7em;">Example</h3>
+      <div class="code-block" style="font-size:0.9em;">
+<pre style="margin:0;"><code>User (day 1): "I'm a software dev
+who loves hiking and Italian food."
+
+&rarr; Saves 2 memories (work, interests)
+
+User (day 7): "Who am I?"
+
+&rarr; RAG retrieves:
+  [work] Software developer (0.87)
+  [interests] Hiking, Italian food (0.82)
+
+&rarr; Agent recalls everything</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== BYOK ==================== -->
+<section>
+  <h2>Multi-Provider LLM Support</h2>
+  <p style="font-size:0.6em; color:#9ca3af;">Bring Your Own Key &mdash; the server stores <strong>no</strong> provider credentials.</p>
+  <div class="grid-3" style="margin-top:0.6em; gap:0.5em;">
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#6ee7b7;">Anthropic</h3>
+      <p>Claude Sonnet 4, Haiku</p>
+    </div>
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#60a5fa;">Google</h3>
+      <p>Gemini 2.5 Flash / Pro</p>
+    </div>
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#f472b6;">OpenAI</h3>
+      <p>GPT-4o, 4o-mini</p>
+    </div>
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#fb923c;">Groq</h3>
+      <p>Llama 3.3 70B (fast)</p>
+    </div>
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#a78bfa;">Ollama</h3>
+      <p>Local: Gemma, Qwen, Llama</p>
+    </div>
+    <div class="card" style="text-align:center; padding:0.5em;">
+      <h3 style="color:#fbbf24;">OpenRouter</h3>
+      <p>200+ models, single key</p>
+    </div>
+  </div>
+  <p style="font-size:0.45em; color:#6b7280; text-align:center; margin-top:0.4em;">
+    Users pay their own bills &middot; No vendor lock-in &middot; Privacy with local models
+  </p>
+</section>
+
+<!-- ==================== VIBE CODING ==================== -->
+<section>
+  <h2>Vibe-Coding Workspace</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">The agent autonomously clones, reads, edits, tests, fixes, and ships code.</p>
+  <div class="grid-2" style="margin-top:0.5em;">
+    <div>
+      <h3 style="font-size:0.65em; color:#6ee7b7;">15 Workspace Tools</h3>
+      <div style="font-size:0.5em;">
+        <p><span class="accent">Explore:</span> list_files, read_file, grep, find, inspect (AST)</p>
+        <p><span class="accent-purple">Modify:</span> write_file, edit_file, delete_file, install</p>
+        <p><span class="accent-orange">Verify:</span> run (pytest, npm build), check_syntax</p>
+        <p><span class="accent-blue">Git:</span> diff, commit_push, create, cleanup</p>
+      </div>
+    </div>
+    <div>
+      <h3 style="font-size:0.65em; color:#a78bfa;">4-Phase Adaptive Workflow</h3>
+      <div class="timeline" style="font-size:0.95em;">
+        <div class="timeline-item"><strong>Understand</strong> &mdash; Clone, explore, grep patterns</div>
+        <div class="timeline-item"><strong>Research</strong> &mdash; Web search for unfamiliar APIs</div>
+        <div class="timeline-item"><strong>Implement</strong> &mdash; Edit code, check syntax</div>
+        <div class="timeline-item"><strong>Verify (loop)</strong> &mdash; Run tests; if fail &rarr; fix &rarr; retest</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== VIBE CODING EXAMPLE ==================== -->
+<section>
+  <h2>Example: Vibe-Coding in Action</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">User: <em>"Add a health check endpoint to the REST API."</em></p>
+  <div class="timeline" style="margin-top:0.3em; font-size:0.85em;">
+    <div class="timeline-item" style="margin-bottom:0.3em;"><code>ws_workspace_create</code> &mdash; Clone repo, branch <code>feature/health-check</code></div>
+    <div class="timeline-item fragment" style="margin-bottom:0.3em;"><code>list_files</code> + <code>read_file</code> + <code>grep</code> &mdash; Explore codebase, learn conventions</div>
+    <div class="timeline-item fragment" style="margin-bottom:0.3em;"><code>edit_file</code> &mdash; Add <code>/api/health</code> endpoint</div>
+    <div class="timeline-item fragment" style="margin-bottom:0.3em;"><code>check_syntax</code> &mdash; py_compile + ruff &check;</div>
+    <div class="timeline-item fragment" style="margin-bottom:0.3em;"><code>run</code> &mdash; <code>pytest tests/ -v</code> &rarr; 32/32 pass &check; &nbsp; <code>npm run build</code> &rarr; &check;</div>
+    <div class="timeline-item fragment" style="margin-bottom:0.3em;"><code>commit_push</code> + <code>github_create_pr</code> &mdash; Ship it!</div>
+  </div>
+  <p class="fragment" style="font-size:0.45em; color:#6ee7b7; text-align:center; margin-top:0.3em;">
+    Fully autonomous &middot; if tests fail, it reads the error, fixes, and re-runs
+  </p>
+</section>
+
+<!-- ==================== SELF EVOLUTION ==================== -->
+<section class="center-slide" data-background-gradient="radial-gradient(circle at 50% 50%, #2e106540, #0a0a0f 70%)">
+  <h2 style="color:#f472b6;">The Assistant That Extends Itself</h2>
+  <p style="font-size:0.7em; color:#d1d5db; max-width:700px; margin:0.5em auto;">
+    OpenPA's source code is on GitHub.<br>
+    The vibe-coding system can modify <span class="accent-pink">its own codebase</span>.
+  </p>
+  <div style="font-size: 3em; margin: 0.3em 0;">&#x1F92F;</div>
+  <div style="background:#111827; border:1px solid #374151; border-radius:12px; padding:0.8em; max-width:650px; margin:0.5em auto; text-align:left;">
+    <p style="font-size:0.55em; color:#9ca3af; margin:0;">User says:</p>
+    <p style="font-size:0.7em; color:#e5e7eb; margin:0.2em 0; font-style:italic;">
+      "Add a LinkedIn tool to OpenPA."
+    </p>
+    <p style="font-size:0.5em; color:#9ca3af; margin-top:0.5em; margin-bottom:0;">Agent autonomously:</p>
+    <p style="font-size:0.5em; margin:0.2em 0;">
+      <span class="accent">1.</span> Clones itself &rarr;
+      <span class="accent-purple">2.</span> Reads existing tool patterns &rarr;
+      <span class="accent-orange">3.</span> Generates new tool &rarr;
+      <span class="accent-blue">4.</span> Registers in registry &rarr;
+      <span class="accent-pink">5.</span> Writes tests &rarr;
+      <span class="accent">6.</span> Runs test suite &rarr;
+      <span class="accent-purple">7.</span> Opens PR for review
+    </p>
+  </div>
+</section>
+
+<!-- ==================== SAFETY ==================== -->
+<section>
+  <h2>Self-Evolution Safety</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">Not as scary as it sounds. &#x1F6E1;&#xFE0F;</p>
+  <div class="grid-2">
+    <div class="card">
+      <h3 style="color:#6ee7b7;">Pull Requests, Not Merges</h3>
+      <p>Changes are submitted as PRs. A human reviews before deployment.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#60a5fa;">Full Test Suite Must Pass</h3>
+      <p>Broken code is never shipped. CI validates every push.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#a78bfa;">Isolated Workspace</h3>
+      <p>Agent works on a cloned copy, not the live deployment.</p>
+    </div>
+    <div class="card">
+      <h3 style="color:#fb923c;">Auto-Cleanup</h3>
+      <p>Workspace is deleted after push. No resource leakage.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CROSS-SERVICE EXAMPLE ==================== -->
+<section>
+  <h2>Example: Cross-Service Workflow</h2>
+  <p style="font-size:0.5em; color:#9ca3af;">
+    "My friend Alex wants to open a coffee roastery. Research the best specialty coffee shops<br>
+    globally, pick up the naming trend, propose 10 names, and message him on Telegram."
+  </p>
+  <div class="timeline" style="margin-top:0.6em;">
+    <div class="timeline-item">
+      <span class="pill pill-purple" style="font-size:0.9em;">memory</span>
+      <code style="font-size:0.9em;">remember_about_user</code> &mdash; Save "friend Alex wants coffee roastery"
+    </div>
+    <div class="timeline-item fragment">
+      <span class="pill pill-blue" style="font-size:0.9em;">web</span>
+      <code style="font-size:0.9em;">web_search</code> &times;2 &mdash; Best specialty coffee shops SG + globally
+    </div>
+    <div class="timeline-item fragment">
+      <span class="pill pill-green" style="font-size:0.9em;">llm</span>
+      <code style="font-size:0.9em;">llm_generate</code> &mdash; Analyse trends, propose 10 original names
+    </div>
+    <div class="timeline-item fragment">
+      <span class="pill pill-pink" style="font-size:0.9em;">telegram</span>
+      <code style="font-size:0.9em;">telegram_send_message</code> &mdash; Send to Alex
+    </div>
+  </div>
+  <p class="fragment" style="font-size:0.5em; color:#6ee7b7; text-align:center; margin-top:0.6em;">
+    Memory + Web Research + Text Generation + Messaging &mdash; one natural language request
+  </p>
+</section>
+
+<!-- ==================== DAILY BRIEFING MEME ==================== -->
+<section class="center-slide">
+  <h2>"Give me a daily briefing"</h2>
+  <div style="font-size:3.5em; margin:0.2em 0;">&#x2615;</div>
+  <div class="grid-2" style="max-width:700px; margin:0 auto; text-align:left;">
+    <div style="font-size:0.5em;">
+      <p><span class="accent">Step 1</span> (parallel):</p>
+      <p style="margin-left:1em;">
+        <code>gmail_get_unread()</code> &rarr; 3 emails<br>
+        <code>calendar_list_events()</code> &rarr; 2 meetings<br>
+        <code>github_list_notifications()</code> &rarr; 5 PRs<br>
+        <code>rss_fetch_all_feeds()</code> &rarr; 12 articles
+      </p>
+    </div>
+    <div style="font-size:0.5em;">
+      <p><span class="accent-purple">Step 2</span>:</p>
+      <p style="margin-left:1em;">
+        <code>llm_generate()</code><br>
+        "Summarise into a concise briefing"
+      </p>
+      <p style="margin-top:0.8em; color:#6ee7b7; font-weight:600;">
+        &rarr; One summary from 4 services<br>
+        &rarr; One turn of conversation
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FUTURE: RALF LOOP ==================== -->
+<section>
+  <h2>Future: The RALF Loop</h2>
+  <p style="font-size:0.55em; color:#9ca3af;">From evolving <em>on demand</em> to evolving <em>proactively</em>.</p>
+  <div style="display:flex; gap:0.5em; margin-top:0.8em; align-items:center; justify-content:center;">
+    <div class="ralf-step ralf-r" style="width:150px;">
+      <div style="font-size:1.8em;">R</div>
+      <div style="font-size:0.5em; font-weight:400;">Research</div>
+      <div style="font-size:0.4em; font-weight:300; color:#93c5fd;">Scrape trends,<br>monitor issues</div>
+    </div>
+    <div style="font-size:1.5em; color:#6b7280;">&rarr;</div>
+    <div class="ralf-step ralf-a" style="width:150px;">
+      <div style="font-size:1.8em;">A</div>
+      <div style="font-size:0.5em; font-weight:400;">Assess</div>
+      <div style="font-size:0.4em; font-weight:300; color:#fdba74;">Rank by feasibility,<br>demand, value</div>
+    </div>
+    <div style="font-size:1.5em; color:#6b7280;">&rarr;</div>
+    <div class="ralf-step ralf-l" style="width:150px;">
+      <div style="font-size:1.8em;">L</div>
+      <div style="font-size:0.5em; font-weight:400;">Launch</div>
+      <div style="font-size:0.4em; font-weight:300; color:#6ee7b7;">Vibe-code it,<br>test, ship PR</div>
+    </div>
+    <div style="font-size:1.5em; color:#6b7280;">&rarr;</div>
+    <div class="ralf-step ralf-f" style="width:150px;">
+      <div style="font-size:1.8em;">F</div>
+      <div style="font-size:0.5em; font-weight:400;">Feedback</div>
+      <div style="font-size:0.4em; font-weight:300; color:#f9a8d4;">Monitor usage,<br>iterate</div>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:0.8em;">
+    <svg width="200" height="30" style="display:inline-block;">
+      <path d="M 180 15 C 180 25, 20 25, 20 15" stroke="#6b7280" stroke-width="1.5" fill="none" stroke-dasharray="4,4" marker-end="url(#arrowhead)"/>
+      <defs><marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#6b7280"/></marker></defs>
+    </svg>
+  </div>
+  <p style="font-size:0.5em; color:#6b7280; text-align:center;">
+    A continuously self-improving assistant that discovers, builds, and refines new capabilities autonomously.
+  </p>
+</section>
+
+<!-- ==================== LIMITATIONS ==================== -->
+<section>
+  <h2>Limitations</h2>
+  <ul style="font-size:0.6em;">
+    <li><strong>SQLite</strong> limits horizontal scaling &mdash; needs PostgreSQL for production</li>
+    <li class="fragment"><strong>Local models</strong> (7&ndash;9B) still struggle with complex multi-step tool-calling</li>
+    <li class="fragment"><strong>No containerisation</strong> yet &mdash; Docker/K8s configs are future work</li>
+    <li class="fragment"><strong>Security</strong> &mdash; OAuth tokens stored without encryption at rest</li>
+    <li class="fragment"><strong>Test coverage</strong> &mdash; core tests exist, but no full end-to-end agent loop tests</li>
+  </ul>
+</section>
+
+<!-- ==================== TECH STACK SUMMARY ==================== -->
+<section class="center-slide">
+  <h2>Tech Stack</h2>
+  <div style="display:flex; flex-wrap:wrap; gap:0.5em; justify-content:center; margin-top:1em;">
+    <span class="pill pill-green" style="font-size:0.6em;">Python 3.14</span>
+    <span class="pill pill-blue" style="font-size:0.6em;">FastAPI</span>
+    <span class="pill pill-green" style="font-size:0.6em;">FastMCP</span>
+    <span class="pill pill-purple" style="font-size:0.6em;">ChromaDB</span>
+    <span class="pill pill-orange" style="font-size:0.6em;">SQLite</span>
+    <span class="pill pill-blue" style="font-size:0.6em;">Next.js 16</span>
+    <span class="pill pill-pink" style="font-size:0.6em;">React 19</span>
+    <span class="pill pill-green" style="font-size:0.6em;">Tailwind CSS</span>
+    <span class="pill pill-purple" style="font-size:0.6em;">Ollama</span>
+    <span class="pill pill-orange" style="font-size:0.6em;">SSE Streaming</span>
+    <span class="pill pill-blue" style="font-size:0.6em;">OAuth 2.0</span>
+    <span class="pill pill-pink" style="font-size:0.6em;">JWT Auth</span>
+  </div>
+  <div style="margin-top:1.5em;">
+    <p style="font-size:0.6em; color:#6b7280;">
+      <a href="https://github.com/maxwellau2/OpenPA" style="color:#6ee7b7;">github.com/maxwellau2/OpenPA</a>
+    </p>
+  </div>
+</section>
+
+<!-- ==================== THANK YOU ==================== -->
+<section class="center-slide" data-background-gradient="radial-gradient(circle at 50% 50%, #064e3b30, #0a0a0f 70%)">
+  <h1 style="font-size:2.5em;">
+    Thank You
+  </h1>
+  <p style="font-size:0.8em; color:#9ca3af; margin-top:0.5em;">Questions?</p>
+  <div style="margin-top:2em;">
+    <p style="font-size:0.55em; color:#6b7280;">
+      Maxwell Au &middot; NTU CCDS &middot; April 2026<br>
+      <a href="https://github.com/maxwellau2/OpenPA" style="color:#6ee7b7;">github.com/maxwellau2/OpenPA</a>
+    </p>
+  </div>
+  <div style="font-size:3em; margin-top:0.3em;">&#x1F916;</div>
+</section>
+
+</div><!-- /.slides -->
+</div><!-- /.reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: true,
+    width: 1280,
+    height: 720,
+    margin: 0.08,
+    transition: 'slide',
+    transitionSpeed: 'default',
+    plugins: [RevealHighlight],
+    highlight: { highlightOnLoad: true }
+  });
+</script>
+</body>
+</html>

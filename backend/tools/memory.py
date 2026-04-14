@@ -27,14 +27,17 @@ async def get_preferences(_user_id: int, category: str = "") -> dict:
             )
         else:
             cursor = await db.execute(
-                "SELECT key, value, category FROM preferences WHERE user_id = ?", (_user_id,)
+                "SELECT key, value, category FROM preferences WHERE user_id = ?",
+                (_user_id,),
             )
         rows = await cursor.fetchall()
         return {"preferences": [{k: row[k] for k in row.keys()} for row in rows]}
 
 
 @mcp.tool()
-async def set_preference(_user_id: int, key: str, value: str, category: str = "general") -> dict:
+async def set_preference(
+    _user_id: int, key: str, value: str, category: str = "general"
+) -> dict:
     """Store or update a user preference.
 
     Args:
@@ -81,12 +84,16 @@ async def get_recent_conversations(_user_id: int, count: int = 1) -> dict:
                 (_user_id, conv["id"]),
             )
             messages = await cursor.fetchall()
-            result.append({
-                "conversation_id": conv["id"],
-                "title": conv["title"],
-                "updated_at": conv["updated_at"],
-                "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
-            })
+            result.append(
+                {
+                    "conversation_id": conv["id"],
+                    "title": conv["title"],
+                    "updated_at": conv["updated_at"],
+                    "messages": [
+                        {"role": m["role"], "content": m["content"]} for m in messages
+                    ],
+                }
+            )
         return {"conversations": result}
 
 
@@ -120,7 +127,9 @@ async def search_history(_user_id: int, query: str, limit: int = 10) -> dict:
 
 
 @mcp.tool()
-async def remember_about_user(_user_id: int, content: str, category: str = "general") -> dict:
+async def remember_about_user(
+    _user_id: int, content: str, category: str = "general"
+) -> dict:
     """Save a long-term memory about the user. Use this to remember personality traits,
     preferences, habits, interests, communication style, or any personal details the user
     shares. These memories persist across conversations and help you personalize future interactions.
@@ -141,7 +150,10 @@ async def remember_about_user(_user_id: int, content: str, category: str = "gene
         existing = await cursor.fetchall()
         # Simple dedup: if content is very similar to existing, update instead
         for row in existing:
-            if content.lower().strip() in row[1].lower() or row[1].lower() in content.lower().strip():
+            if (
+                content.lower().strip() in row[1].lower()
+                or row[1].lower() in content.lower().strip()
+            ):
                 await db.execute(
                     "UPDATE user_memories SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
                     (content, row[0]),

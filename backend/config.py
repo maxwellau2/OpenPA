@@ -24,34 +24,46 @@ class LLMConfig:
 class GoogleOAuthConfig:
     client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
     client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
-    redirect_uri: str = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
-    scopes: list[str] = field(default_factory=lambda: [
-        "https://www.googleapis.com/auth/gmail.readonly",
-        "https://www.googleapis.com/auth/gmail.send",
-        "https://www.googleapis.com/auth/calendar",
-    ])
+    redirect_uri: str = os.getenv(
+        "GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback"
+    )
+    scopes: list[str] = field(
+        default_factory=lambda: [
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.send",
+            "https://www.googleapis.com/auth/calendar",
+        ]
+    )
 
 
 @dataclass
 class GitHubOAuthConfig:
     client_id: str = os.getenv("GITHUB_CLIENT_ID", "")
     client_secret: str = os.getenv("GITHUB_CLIENT_SECRET", "")
-    redirect_uri: str = os.getenv("GITHUB_REDIRECT_URI", "http://localhost:8000/auth/github/callback")
-    scopes: list[str] = field(default_factory=lambda: ["repo", "notifications", "read:user"])
+    redirect_uri: str = os.getenv(
+        "GITHUB_REDIRECT_URI", "http://localhost:8000/auth/github/callback"
+    )
+    scopes: list[str] = field(
+        default_factory=lambda: ["repo", "notifications", "read:user"]
+    )
 
 
 @dataclass
 class SpotifyOAuthConfig:
     client_id: str = os.getenv("SPOTIFY_CLIENT_ID", "")
     client_secret: str = os.getenv("SPOTIFY_CLIENT_SECRET", "")
-    redirect_uri: str = os.getenv("SPOTIFY_REDIRECT_URI", "http://127.0.0.1:8000/auth/spotify/callback")
-    scopes: list[str] = field(default_factory=lambda: [
-        "user-read-playback-state",
-        "user-modify-playback-state",
-        "user-read-currently-playing",
-        "playlist-read-private",
-        "streaming",
-    ])
+    redirect_uri: str = os.getenv(
+        "SPOTIFY_REDIRECT_URI", "http://127.0.0.1:8000/auth/spotify/callback"
+    )
+    scopes: list[str] = field(
+        default_factory=lambda: [
+            "user-read-playback-state",
+            "user-modify-playback-state",
+            "user-read-currently-playing",
+            "playlist-read-private",
+            "streaming",
+        ]
+    )
 
 
 @dataclass
@@ -59,7 +71,9 @@ class DiscordOAuthConfig:
     client_id: str = os.getenv("DISCORD_CLIENT_ID", "")
     client_secret: str = os.getenv("DISCORD_CLIENT_SECRET", "")
     bot_token: str = os.getenv("DISCORD_BOT_TOKEN", "")
-    redirect_uri: str = os.getenv("DISCORD_REDIRECT_URI", "http://localhost:8000/auth/discord/callback")
+    redirect_uri: str = os.getenv(
+        "DISCORD_REDIRECT_URI", "http://localhost:8000/auth/discord/callback"
+    )
     scopes: list[str] = field(default_factory=lambda: ["identify", "guilds", "bot"])
 
 
@@ -68,7 +82,9 @@ class MastodonOAuthConfig:
     client_id: str = os.getenv("MASTODON_CLIENT_ID", "")
     client_secret: str = os.getenv("MASTODON_CLIENT_SECRET", "")
     instance_url: str = os.getenv("MASTODON_INSTANCE_URL", "https://mastodon.social")
-    redirect_uri: str = os.getenv("MASTODON_REDIRECT_URI", "http://localhost:8000/auth/mastodon/callback")
+    redirect_uri: str = os.getenv(
+        "MASTODON_REDIRECT_URI", "http://localhost:8000/auth/mastodon/callback"
+    )
     scopes: list[str] = field(default_factory=lambda: ["read", "write", "push"])
 
 

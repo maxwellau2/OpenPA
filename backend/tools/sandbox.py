@@ -25,7 +25,9 @@ EXPIRY_SECONDS = 1200  # 20 minutes
 
 def _cleanup_expired():
     now = time.time()
-    expired = [k for k, v in _sandbox_files.items() if now - v["created_at"] > EXPIRY_SECONDS]
+    expired = [
+        k for k, v in _sandbox_files.items() if now - v["created_at"] > EXPIRY_SECONDS
+    ]
     for k in expired:
         path = _sandbox_files[k]["path"]
         if os.path.exists(path):
@@ -39,7 +41,9 @@ def get_sandbox_file(download_id: str) -> dict | None:
     return _sandbox_files.get(download_id)
 
 
-async def _run_subprocess(cmd: list[str] | str, cwd: str | None = None, shell: bool = False) -> dict:
+async def _run_subprocess(
+    cmd: list[str] | str, cwd: str | None = None, shell: bool = False
+) -> dict:
     """Run a subprocess with timeout and output capture."""
     try:
         if shell:
@@ -58,7 +62,9 @@ async def _run_subprocess(cmd: list[str] | str, cwd: str | None = None, shell: b
                 cwd=cwd or tempfile.gettempdir(),
                 env=_safe_env(),
             )
-        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=TIMEOUT_SECONDS)
+        stdout, stderr = await asyncio.wait_for(
+            proc.communicate(), timeout=TIMEOUT_SECONDS
+        )
         return {
             "exit_code": proc.returncode,
             "passed": proc.returncode == 0,
@@ -66,16 +72,30 @@ async def _run_subprocess(cmd: list[str] | str, cwd: str | None = None, shell: b
             "stderr": stderr.decode(errors="replace")[:MAX_OUTPUT_CHARS],
         }
     except asyncio.TimeoutError:
-        return {"exit_code": -1, "passed": False, "stdout": "", "stderr": f"Timed out after {TIMEOUT_SECONDS}s"}
+        return {
+            "exit_code": -1,
+            "passed": False,
+            "stdout": "",
+            "stderr": f"Timed out after {TIMEOUT_SECONDS}s",
+        }
     except FileNotFoundError as e:
-        return {"exit_code": -1, "passed": False, "stdout": "", "stderr": f"Command not found: {e}"}
+        return {
+            "exit_code": -1,
+            "passed": False,
+            "stdout": "",
+            "stderr": f"Command not found: {e}",
+        }
     except Exception as e:
         return {"exit_code": -1, "passed": False, "stdout": "", "stderr": str(e)}
 
 
-async def _write_and_run(code: str, cmd_prefix: list[str], suffix: str, cwd: str | None = None) -> dict:
+async def _write_and_run(
+    code: str, cmd_prefix: list[str], suffix: str, cwd: str | None = None
+) -> dict:
     """Write code to a temp file and execute it."""
-    with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, delete=False, dir=cwd) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=suffix, delete=False, dir=cwd
+    ) as f:
         f.write(code)
         f.flush()
         try:
@@ -98,8 +118,8 @@ async def verify_python(_user_id: int, code: str) -> dict:
     issues = []
 
     # 1. Syntax check (always available — uses Python's built-in compiler)
-    syntax_result = await _write_and_run(
-        f"import py_compile, sys\ntry:\n    py_compile.compile(sys.argv[1], doraise=True)\n    print('Syntax OK')\nexcept py_compile.PyCompileError as e:\n    print(f'SYNTAX ERROR: {{e}}', file=sys.stderr)\n    sys.exit(1)\n",
+    await _write_and_run(
+        "import py_compile, sys\ntry:\n    py_compile.compile(sys.argv[1], doraise=True)\n    print('Syntax OK')\nexcept py_compile.PyCompileError as e:\n    print(f'SYNTAX ERROR: {e}', file=sys.stderr)\n    sys.exit(1)\n",
         ["python3"],
         suffix=".py",
     )
@@ -112,20 +132,42 @@ async def verify_python(_user_id: int, code: str) -> dict:
     try:
         syntax = await _run_subprocess(["python3", "-m", "py_compile", target])
         if not syntax["passed"]:
-            issues.append({"check": "syntax", "passed": False, "details": syntax["stderr"]})
+            issues.append(
+                {"check": "syntax", "passed": False, "details": syntax["stderr"]}
+            )
         else:
-            issues.append({"check": "syntax", "passed": True, "details": "No syntax errors"})
+            issues.append(
+                {"check": "syntax", "passed": True, "details": "No syntax errors"}
+            )
 
         # 2. Ruff lint (if available — catches undefined names, unused imports, etc.)
-        ruff_path = shutil.which("ruff") or shutil.which("ruff", path=os.path.dirname(os.sys.executable))
+        ruff_path = shutil.which("ruff") or shutil.which(
+            "ruff", path=os.path.dirname(os.sys.executable)
+        )
         if ruff_path:
-            ruff = await _run_subprocess([ruff_path, "check", "--select", "E,F,W", "--no-fix", target])
+            ruff = await _run_subprocess(
+                [ruff_path, "check", "--select", "E,F,W", "--no-fix", target]
+            )
             if not ruff["passed"]:
-                issues.append({"check": "ruff_lint", "passed": False, "details": ruff["stdout"] or ruff["stderr"]})
+                issues.append(
+                    {
+                        "check": "ruff_lint",
+                        "passed": False,
+                        "details": ruff["stdout"] or ruff["stderr"],
+                    }
+                )
             else:
-                issues.append({"check": "ruff_lint", "passed": True, "details": "No lint issues"})
+                issues.append(
+                    {"check": "ruff_lint", "passed": True, "details": "No lint issues"}
+                )
         else:
-            issues.append({"check": "ruff_lint", "passed": True, "details": "ruff not installed, skipped"})
+            issues.append(
+                {
+                    "check": "ruff_lint",
+                    "passed": True,
+                    "details": "ruff not installed, skipped",
+                }
+            )
     finally:
         os.unlink(target)
 
@@ -152,17 +194,37 @@ async def verify_javascript(_user_id: int, code: str) -> dict:
         # Node --check does a syntax-only parse
         syntax = await _run_subprocess(["node", "--check", target])
         if not syntax["passed"]:
-            issues.append({"check": "syntax", "passed": False, "details": syntax["stderr"]})
+            issues.append(
+                {"check": "syntax", "passed": False, "details": syntax["stderr"]}
+            )
         else:
-            issues.append({"check": "syntax", "passed": True, "details": "No syntax errors"})
+            issues.append(
+                {"check": "syntax", "passed": True, "details": "No syntax errors"}
+            )
 
         # ESLint if available
         if shutil.which("eslint"):
-            lint = await _run_subprocess(["eslint", "--no-eslintrc", "--rule", '{"no-undef": "error", "no-unused-vars": "warn"}', target])
+            lint = await _run_subprocess(
+                [
+                    "eslint",
+                    "--no-eslintrc",
+                    "--rule",
+                    '{"no-undef": "error", "no-unused-vars": "warn"}',
+                    target,
+                ]
+            )
             if not lint["passed"]:
-                issues.append({"check": "eslint", "passed": False, "details": lint["stdout"] or lint["stderr"]})
+                issues.append(
+                    {
+                        "check": "eslint",
+                        "passed": False,
+                        "details": lint["stdout"] or lint["stderr"],
+                    }
+                )
             else:
-                issues.append({"check": "eslint", "passed": True, "details": "No lint issues"})
+                issues.append(
+                    {"check": "eslint", "passed": True, "details": "No lint issues"}
+                )
     finally:
         os.unlink(target)
 
@@ -241,7 +303,9 @@ async def run_multi_file_test(_user_id: int, files: dict, entry_command: str) ->
 
 
 @mcp.tool()
-async def run_and_export(_user_id: int, code: str, output_filename: str, language: str = "python") -> dict:
+async def run_and_export(
+    _user_id: int, code: str, output_filename: str, language: str = "python"
+) -> dict:
     """Run code that produces an output file (CSV, JSON, TXT, etc.) and return a download link.
 
     The code should write its output to the filename specified by output_filename in the current directory.
@@ -266,7 +330,9 @@ async def run_and_export(_user_id: int, code: str, output_filename: str, languag
 
         output_path = Path(tmpdir) / output_filename
         if not output_path.exists():
-            result["file_error"] = f"Code ran but did not create '{output_filename}'. Check your code writes to this exact filename."
+            result["file_error"] = (
+                f"Code ran but did not create '{output_filename}'. Check your code writes to this exact filename."
+            )
             return result
 
         # Move file to a persistent location for download
@@ -302,7 +368,10 @@ def _safe_env() -> dict:
     """Create a restricted environment for subprocess execution."""
     env = os.environ.copy()
     for key in list(env.keys()):
-        if any(s in key.upper() for s in ["SECRET", "TOKEN", "PASSWORD", "API_KEY", "CREDENTIAL"]):
+        if any(
+            s in key.upper()
+            for s in ["SECRET", "TOKEN", "PASSWORD", "API_KEY", "CREDENTIAL"]
+        ):
             del env[key]
     env["HOME"] = tempfile.gettempdir()
     return env

@@ -1,0 +1,120 @@
+\section{Illustrative Examples}
+\label{sec:examples}
+
+This section demonstrates OpenPA's capabilities through four real-world scenarios, each exercising different aspects of the system.
+
+\subsection{Example 1: Daily Briefing (Multi-Service Orchestration)}
+
+\textbf{User}: \textit{``Give me a daily briefing.''}
+
+\textbf{Tool filtering}: The keywords ``daily'' and ``briefing'' activate the \textit{communication} and \textit{productivity} categories, exposing 30 tools (from a total of 83).
+
+\textbf{Execution}: The agent generates a plan with parallel tool calls:
+
+\begin{lstlisting}[language=Python, caption={Daily briefing plan execution}]
+Step 1 (parallel):
+  - gmail_get_unread()          -> 3 unread emails
+  - calendar_list_events()      -> 2 meetings today
+  - github_list_notifications() -> 5 PR reviews pending
+  - rss_fetch_all_feeds()       -> 12 new articles
+Step 2: llm_generate("Summarise these into a concise briefing")
+\end{lstlisting}
+
+\textbf{Result}: The user receives a single summary covering email highlights, today's schedule, pending code reviews, and top RSS articles---drawn from four different services in one turn.
+
+\subsection{Example 2: Semantic Memory and RAG (Personalisation)}
+
+\textbf{Conversation 1} (previous session):
+
+\textit{User}: ``I'm a software developer who loves hiking and Italian food. My friend Alex is into specialty coffee.''
+
+\textit{Agent}: Calls \texttt{remember\_about\_user} three times:
+\begin{itemize}
+  \item Category \textit{work}: ``Software developer''
+  \item Category \textit{interests}: ``Loves hiking and Italian food''
+  \item Category \textit{relationships}: ``Friend Alex is into specialty coffee''
+\end{itemize}
+
+Each memory is embedded via \texttt{nomic-embed-text} and stored in ChromaDB.
+
+\textbf{Conversation 2} (new session, different day):
+
+\textit{User}: ``Who am I?''
+
+\textbf{RAG retrieval}: The query ``who am I'' is embedded. The top-10 most relevant memories are retrieved by cosine similarity, filtered by user ID. The system prompt is augmented with:
+
+\begin{lstlisting}[caption={RAG-injected context}]
+## What you know about this user (retrieved by relevance)
+  - [work] Software developer (relevance: 0.87)
+  - [interests] Loves hiking and Italian food (relevance: 0.82)
+  - [relationships] Friend Alex, into specialty coffee (relevance: 0.79)
+\end{lstlisting}
+
+\textit{Agent}: ``You're a software developer who loves hiking and Italian food. Your friend Alex is into specialty coffee.''
+
+The agent recalls this information \textit{without} accessing the previous conversation---the RAG system retrieves it semantically from the persistent memory store.
+
+\subsection{Example 3: Vibe-Coding (Autonomous Code Generation)}
+
+\textbf{User}: \textit{``Add a health check endpoint to the REST API that returns the server uptime and version.''}
+
+\textbf{Tool filtering}: Keywords ``add'' and ``endpoint'' activate \textit{workspace} + \textit{github} + \textit{core} (34 tools). The planner routes this to the adaptive loop.
+
+\textbf{Execution trace} (15 tool calls):
+
+\begin{enumerate}[leftmargin=*]
+  \item \texttt{ws\_workspace\_create(repo="maxwellau2/OpenPA", branch="feature/health-check")}\\
+    \textrightarrow\ Clones repo, creates branch. Returns workspace ID and default branch (``master'').
+
+  \item \texttt{ws\_workspace\_list\_files(workspace\_id, path="backend/services")}\\
+    \textrightarrow\ Identifies \texttt{rest\_api.py} as the target file.
+
+  \item \texttt{ws\_workspace\_read\_file(workspace\_id, path="backend/services/rest\_api.py")}\\
+    \textrightarrow\ Reads existing endpoints to understand patterns and conventions.
+
+  \item \texttt{ws\_workspace\_grep(workspace\_id, pattern="@app\\.(get|post)", include="*.py")}\\
+    \textrightarrow\ Finds all route definitions to follow existing style.
+
+  \item \texttt{ws\_workspace\_edit\_file(workspace\_id, path="backend/services/rest\_api.py", old\_text="...", new\_text="...")}\\
+    \textrightarrow\ Adds \texttt{/api/health} endpoint returning uptime and version.
+
+  \item \texttt{ws\_workspace\_check\_syntax(workspace\_id, path="backend/services/rest\_api.py")}\\
+    \textrightarrow\ \texttt{py\_compile} + \texttt{ruff} pass.
+
+  \item \texttt{ws\_workspace\_run(workspace\_id, "cd backend \&\& python -m pytest tests/ -x -v")}\\
+    \textrightarrow\ All 32 tests pass.
+
+  \item \texttt{ws\_workspace\_run(workspace\_id, "cd frontend \&\& npm run build")}\\
+    \textrightarrow\ Build succeeds.
+
+  \item \texttt{ws\_workspace\_commit\_push(workspace\_id, "feat: add health check endpoint")}\\
+    \textrightarrow\ Commits, pushes to \texttt{feature/health-check}. Workspace auto-cleaned.
+
+  \item \texttt{github\_create\_pr(repo="maxwellau2/OpenPA", head="feature/health-check", title="feat: Add health check endpoint")}\\
+    \textrightarrow\ PR created. Base branch auto-detected as ``master''.
+\end{enumerate}
+
+The agent explored the codebase, understood conventions (via grep), made targeted changes, verified syntax, ran the full test suite and frontend build, and submitted a pull request---all autonomously. Had tests failed, the adaptive loop would have read the error output, fixed the code, and re-run the tests.
+
+\subsection{Example 4: Cross-Service Workflow (Plan-Then-Execute)}
+
+\textbf{User}: \textit{``My friend Alex wants to open a specialty coffee roastery. Do research online to see what the best specialty coffee shops in Singapore and globally are called, pick up the trend, and propose 10 names based on that trend. Keep it original and message him on Telegram about it.''}
+
+\textbf{Execution plan} (5 steps with dependencies):
+
+\begin{enumerate}[leftmargin=*]
+  \item \texttt{memory\_remember\_about\_user(content="Friend Alex wants to open specialty coffee roastery", category="relationships")}
+
+  \item \texttt{web\_search(query="best specialty coffee shops Singapore")} \textrightarrow\ Returns top results.
+
+  \item \texttt{web\_search(query="famous specialty coffee roasters globally")} \textrightarrow\ Returns global brands.
+
+  \item \texttt{llm\_generate(prompt="Analyse the naming trends... propose 10 original names...")}\\
+    \texttt{depends\_on: [2, 3]} \textrightarrow\ Receives search results as context.\\
+    Generates: Origin Story, Bean Dialect, First Pour, Ember Roast Co., Altitude Coffee, Ground Theory, The Slow Extract, Copper Kettle, Basecamp Beans, Torrefazione.
+
+  \item \texttt{telegram\_send\_message(to="Alex", message=\{step 4 output\})}\\
+    \texttt{depends\_on: 4} \textrightarrow\ Sends the generated names via Telegram.
+\end{enumerate}
+
+This example demonstrates: memory acquisition (step 1), web research (steps 2--3), text generation with context injection (step 4), and cross-service delivery (step 5)---all from a single natural language request.

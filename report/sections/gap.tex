@@ -1,0 +1,45 @@
+\section{Research Gap}
+\label{sec:gap}
+
+The literature reveals a fragmented landscape where different systems address different aspects of the personal assistant problem, but no existing solution combines all of them. Table~\ref{tab:gap} summarises the capabilities of existing systems against the requirements of a comprehensive personal assistant.
+
+\begin{table}[H]
+\centering
+\caption{Capability comparison of existing systems}
+\label{tab:gap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c c c}
+\toprule
+\textbf{System} & \textbf{Multi-Svc} & \textbf{Code Gen} & \textbf{Self-Evolve} & \textbf{RAG Mem.} & \textbf{Self-Host} & \textbf{Multi-LLM} & \textbf{Multi-User} \\
+\midrule
+Google Assistant   & Partial & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+Siri / Alexa       & Partial & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+Claude Code        & \ding{55} & \checkmark & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+Codex CLI          & \ding{55} & \checkmark & \ding{55} & \ding{55} & \checkmark & \ding{55} & \ding{55} \\
+Pi Agent           & \ding{55} & \checkmark & \ding{55} & \ding{55} & \checkmark & Partial & \ding{55} \\
+LangChain/AutoGPT  & \ding{55}\textsuperscript{*} & \ding{55} & \ding{55} & Partial & \checkmark & \checkmark & \ding{55} \\
+\midrule
+\textbf{OpenPA}    & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{0.3em}
+
+\footnotesize{\textsuperscript{*}Frameworks, not end-user applications; require custom integration per service.}
+\end{table}
+
+The following specific gaps are identified:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{No unified multi-service orchestration in open-source}: No existing open-source system provides integrated access to email, code hosting, messaging, music, social media, calendars, and RSS through a single agent. Users must switch between multiple applications and interfaces.
+
+  \item \textbf{Coding agents are isolated from digital life}: Claude Code, Codex CLI, and Pi are powerful coding tools, but they cannot send the results of their work to teammates on Discord, schedule follow-up tasks on a calendar, or notify stakeholders via email. The coding workflow is disconnected from the communication workflow.
+
+  \item \textbf{No self-evolving personal assistants}: No existing PA can modify its own codebase. When a user needs a new integration or feature, they must wait for a developer to implement it. A truly autonomous assistant should be able to extend its own capabilities---reading its source code, generating new tools following established patterns, testing the changes, and deploying them---all from a natural language request. This ``self-evolution'' capability would transform the PA from a static product into a living system that grows with its users' needs.
+
+  \item \textbf{Shallow personalisation}: Commercial assistants store explicit preferences (``preferred temperature unit'') but do not build a semantic understanding of the user over time. No system uses RAG to retrieve personality traits, interests, and relationships by relevance to the current conversation.
+
+  \item \textbf{Vendor-locked LLM selection}: Most agents are tied to a single LLM provider. Users cannot choose between a free local model (Ollama) for casual tasks and a high-quality cloud model (Claude, GPT-4o) for complex tasks.
+
+  \item \textbf{Tool overload for small models}: When 80+ tools are exposed to a small local model (7--9B parameters), the model's context window is consumed by tool definitions, and tool-calling accuracy degrades. No existing open-source agent dynamically filters tools based on task context.
+\end{enumerate}

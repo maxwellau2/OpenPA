@@ -1,7 +1,5 @@
 """Conversation persistence and compaction."""
 
-import json
-
 import aiosqlite
 from loguru import logger
 
@@ -10,7 +8,9 @@ from config import config
 COMPACTION_THRESHOLD = 30  # Compact after this many messages
 
 
-async def get_or_create_conversation(user_id: int, conv_id: int | None, title: str = "New Chat") -> int:
+async def get_or_create_conversation(
+    user_id: int, conv_id: int | None, title: str = "New Chat"
+) -> int:
     """Get existing conversation or create a new one."""
     if conv_id:
         return conv_id
@@ -48,6 +48,7 @@ async def save_message(user_id: int, conv_id: int, role: str, content: str):
     # Embed in background for semantic search (non-blocking, best-effort)
     try:
         from services.rag import store_conversation_message
+
         await store_conversation_message(user_id, conv_id, message_id, role, content)
     except Exception:
         pass
@@ -89,8 +90,11 @@ async def compact_conversation(user_id: int, conv_id: int, provider) -> bool:
 
     # Ask LLM to summarize
     from llm.base import Message
+
     summary_messages = [
-        Message(role="user", content=f"Summarize this conversation concisely:\n{old_text}")
+        Message(
+            role="user", content=f"Summarize this conversation concisely:\n{old_text}"
+        )
     ]
 
     try:
@@ -126,5 +130,7 @@ async def compact_conversation(user_id: int, conv_id: int, provider) -> bool:
 
         await db.commit()
 
-    logger.info(f"Compacted conversation {conv_id}: {len(messages)} → {len(recent_messages) + 1} messages")
+    logger.info(
+        f"Compacted conversation {conv_id}: {len(messages)} → {len(recent_messages) + 1} messages"
+    )
     return True

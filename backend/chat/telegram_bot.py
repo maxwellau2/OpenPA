@@ -7,10 +7,16 @@ After linking, all messages go through the agent loop with their user context.
 from loguru import logger
 from fastmcp import Client
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
 from config import config
-from db.auth import authenticate_user, create_token, set_user_credentials, get_user_credentials
+from db.auth import authenticate_user, set_user_credentials
 from llm.agent import Agent
 from llm.base import LLMProvider
 from prompts.system import SYSTEM_PROMPT
@@ -123,7 +129,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response = await agent.run(user_text)
         if len(response) > 4000:
             for i in range(0, len(response), 4000):
-                await update.message.reply_text(response[i:i + 4000])
+                await update.message.reply_text(response[i : i + 4000])
         else:
             await update.message.reply_text(response)
     except Exception as e:

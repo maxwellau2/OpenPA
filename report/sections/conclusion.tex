@@ -1,0 +1,57 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+\subsection{Summary}
+
+This project presented OpenPA, an open-source Personal Assistant-as-a-Service platform that unifies 15 digital services through a single LLM-powered chat interface. The system addresses five key challenges: multi-service orchestration via MCP-based tool architecture (83 tools), adaptive agent execution with dual-mode planning, RAG-based personalisation using locally-hosted embeddings, autonomous code generation through a workspace-based development environment, and multi-provider LLM support with context-aware tool filtering.
+
+The design draws inspiration from multiple sources: the MCP tool protocol and streaming execution patterns from Claude Code \cite{anthropic2025claudecode, claudecodesrc2025}; the minimal tool philosophy and errors-as-results pattern from the Pi coding agent \cite{badlogic2025pi}; the terminal-based coding paradigm from OpenAI Codex CLI \cite{openai2025codexcli}; and the need for a unified digital life manager from the author's daily experience of context-switching between fragmented services.
+
+\subsection{Limitations}
+
+Several limitations should be acknowledged:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Database scalability}: SQLite limits horizontal scaling. A multi-instance deployment would require migration to PostgreSQL or a similar production database.
+
+  \item \textbf{Local model quality}: While tool filtering significantly improves small model performance (reducing the tool set from 83 to 8--34 per query), local models (7--9B parameters) still struggle with complex multi-step tool-calling compared to cloud models such as Claude Sonnet or Gemini Flash.
+
+  \item \textbf{No containerisation}: The project currently lacks Docker or Kubernetes deployment configurations, limiting reproducibility and cloud deployment readiness.
+
+  \item \textbf{Security hardening}: The system stores OAuth tokens and API keys in SQLite without encryption at rest. A production deployment would require a secrets manager or encrypted storage.
+
+  \item \textbf{Test coverage}: While the test suite covers core functionality (32 tests across authentication, memory, RSS, web search, and tool registration), integration tests for the full agent loop and end-to-end service workflows are not yet implemented.
+\end{enumerate}
+
+\subsection{Future Work}
+
+Several directions for future development are identified:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Containerised deployment}: Dockerise both the backend and frontend, with Docker Compose for local development and Kubernetes manifests for cloud deployment.
+
+  \item \textbf{PostgreSQL migration}: Replace SQLite with PostgreSQL for multi-instance scaling, connection pooling, and row-level security for multi-tenant isolation.
+
+  \item \textbf{Fine-tuned tool-calling models}: Fine-tune small open-source models (Qwen, Gemma) specifically on OpenPA's tool schemas to improve local model tool-calling accuracy.
+
+  \item \textbf{Multi-agent collaboration}: Enable multiple agent instances to collaborate on complex tasks---for example, a ``research agent'' gathering information while a ``coding agent'' implements changes, coordinated by an orchestrator.
+
+  \item \textbf{Voice interface}: Add speech-to-text and text-to-speech capabilities for hands-free interaction, building on the existing SSE streaming architecture.
+
+  \item \textbf{Plugin marketplace}: Leverage the MCP-based architecture to allow users to install third-party tool packages, extending the system's capabilities without modifying the core codebase.
+
+  \item \textbf{The RALF Loop---fully autonomous self-evolution}: The most ambitious future direction is a closed-loop autonomous evolution cycle we term \textbf{RALF} (\textit{Research, Assess, Launch, Feedback}):
+
+  \begin{enumerate}[label=\alph*)]
+    \item \textbf{Research}: The agent periodically scrapes the internet---tech blogs, Hacker News, Product Hunt, GitHub trending, Reddit---for emerging tools, APIs, and user-requested integrations. It also monitors its own GitHub issues and community feature requests.
+    \item \textbf{Assess}: Collected ideas are ranked by a scoring function that considers implementation feasibility (estimated complexity based on similar existing tools), user demand (frequency of related requests in conversation history and GitHub issues), and strategic value (does this fill a gap in the current service coverage?).
+    \item \textbf{Launch}: The highest-ranked idea is automatically implemented via the vibe-coding workspace: the agent clones itself, reads existing tool patterns, generates the new integration, writes tests, verifies the build, and submits a pull request.
+    \item \textbf{Feedback}: After deployment, the agent monitors usage of the new tool (call frequency, error rates, user satisfaction from conversation context). Underperforming tools are flagged for improvement in the next cycle; successful patterns inform future assessments.
+  \end{enumerate}
+
+  The RALF loop would transform OpenPA from a system that evolves \textit{on demand} (when a user asks) to one that evolves \textit{proactively}---continuously discovering, prioritising, implementing, and refining new capabilities without human initiation. This represents a step toward truly autonomous software systems that maintain and improve themselves over time.
+\end{enumerate}
+
+\subsection{Closing Remarks}
+
+OpenPA demonstrates that an open-source, self-hosted personal assistant can achieve service breadth and agentic capabilities competitive with commercial offerings, while providing LLM provider flexibility, persistent personalisation, and autonomous code generation. By building on open standards (MCP) and open-source components (FastMCP, ChromaDB, Ollama), the system ensures that users retain full control over their data, their choice of AI model, and the evolution of their assistant.

@@ -1,0 +1,592 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{yao2023react}{inproceedings}{}{}
+      \name{author}{7}{}{%
+        {{hash=5c1b62cbd4e181d818b927549813cf73}{%
+           family={Yao},
+           familyi={Y\bibinitperiod},
+           given={Shunyu},
+           giveni={S\bibinitperiod}}}%
+        {{hash=4fc64f0dbaf7cb8f21c7c85d580cdb15}{%
+           family={Zhao},
+           familyi={Z\bibinitperiod},
+           given={Jeffrey},
+           giveni={J\bibinitperiod}}}%
+        {{hash=2cb7d2d6e42d109fa2c5086d6c8f6a63}{%
+           family={Yu},
+           familyi={Y\bibinitperiod},
+           given={Dian},
+           giveni={D\bibinitperiod}}}%
+        {{hash=a926c34a0eebdaaa30da36b46bd2192c}{%
+           family={Du},
+           familyi={D\bibinitperiod},
+           given={Nan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=20b3779bbd037bbfdd1ffd3967624997}{%
+           family={Shafran},
+           familyi={S\bibinitperiod},
+           given={Izhak},
+           giveni={I\bibinitperiod}}}%
+        {{hash=997c3143c2e5d593e816d2ff704fbf98}{%
+           family={Narasimhan},
+           familyi={N\bibinitperiod},
+           given={Karthik},
+           giveni={K\bibinitperiod}}}%
+        {{hash=2923de2da7f9b32b957552e414b6bc16}{%
+           family={Cao},
+           familyi={C\bibinitperiod},
+           given={Yuan},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{4ae4be538df04cfc1571685175562cad}
+      \strng{fullhash}{6f22c9f891fbcfb7465b1c3157b57023}
+      \strng{fullhashraw}{6f22c9f891fbcfb7465b1c3157b57023}
+      \strng{bibnamehash}{4ae4be538df04cfc1571685175562cad}
+      \strng{authorbibnamehash}{4ae4be538df04cfc1571685175562cad}
+      \strng{authornamehash}{4ae4be538df04cfc1571685175562cad}
+      \strng{authorfullhash}{6f22c9f891fbcfb7465b1c3157b57023}
+      \strng{authorfullhashraw}{6f22c9f891fbcfb7465b1c3157b57023}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{International Conference on Learning Representations}
+      \field{title}{{ReAct}: Synergizing Reasoning and Acting in Language Models}
+      \field{year}{2023}
+    \endentry
+    \entry{schick2023toolformer}{article}{}{}
+      \name{author}{9}{}{%
+        {{hash=cc3adfa0ec8180459be4de68ba1b83cd}{%
+           family={Schick},
+           familyi={S\bibinitperiod},
+           given={Timo},
+           giveni={T\bibinitperiod}}}%
+        {{hash=0bb901d943bc0a6e21f09a9e49ff10b6}{%
+           family={Dwivedi-Yu},
+           familyi={D\bibinithyphendelim Y\bibinitperiod},
+           given={Jane},
+           giveni={J\bibinitperiod}}}%
+        {{hash=d7d39f837de6903c9086c744e8c09544}{%
+           family={Dessı̀},
+           familyi={D\bibinitperiod},
+           given={Roberto},
+           giveni={R\bibinitperiod}}}%
+        {{hash=6f4fcbeef9e0ff74d528e953d5c5f6c7}{%
+           family={Raileanu},
+           familyi={R\bibinitperiod},
+           given={Roberta},
+           giveni={R\bibinitperiod}}}%
+        {{hash=bf1c252caab6616dc5c18fee05edd006}{%
+           family={Lomeli},
+           familyi={L\bibinitperiod},
+           given={Maria},
+           giveni={M\bibinitperiod}}}%
+        {{hash=00ce63f55ae2ce6ea638e5f991996584}{%
+           family={Hambro},
+           familyi={H\bibinitperiod},
+           given={Eric},
+           giveni={E\bibinitperiod}}}%
+        {{hash=1dbd3a5b42828fb2cebd7786488ba425}{%
+           family={Zettlemoyer},
+           familyi={Z\bibinitperiod},
+           given={Luke},
+           giveni={L\bibinitperiod}}}%
+        {{hash=ffdf27711872d4e38ec8e24641c7a717}{%
+           family={Cancedda},
+           familyi={C\bibinitperiod},
+           given={Nicola},
+           giveni={N\bibinitperiod}}}%
+        {{hash=3669dc61c228df3d7b95b1306107fa82}{%
+           family={Scialom},
+           familyi={S\bibinitperiod},
+           given={Thomas},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{1c7bad5da70178a9b108151a83138342}
+      \strng{fullhash}{3a8659a200a32ea77b517a8f2342a32c}
+      \strng{fullhashraw}{3a8659a200a32ea77b517a8f2342a32c}
+      \strng{bibnamehash}{1c7bad5da70178a9b108151a83138342}
+      \strng{authorbibnamehash}{1c7bad5da70178a9b108151a83138342}
+      \strng{authornamehash}{1c7bad5da70178a9b108151a83138342}
+      \strng{authorfullhash}{3a8659a200a32ea77b517a8f2342a32c}
+      \strng{authorfullhashraw}{3a8659a200a32ea77b517a8f2342a32c}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Toolformer: Language Models Can Teach Themselves to Use Tools}
+      \field{volume}{36}
+      \field{year}{2023}
+    \endentry
+    \entry{anthropic2025claudecode}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=f431db65cea024a5f19eab835afefee2}{%
+           family={{Anthropic}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhashraw}{f431db65cea024a5f19eab835afefee2}
+      \strng{bibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorbibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authornamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhashraw}{f431db65cea024a5f19eab835afefee2}
+      \field{extraname}{1}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://docs.anthropic.com/en/docs/claude-code}}
+      \field{note}{Terminal-based AI coding agent with tool use, context management, and streaming execution}
+      \field{title}{Claude Code: Agentic Coding Tool}
+      \field{year}{2025}
+    \endentry
+    \entry{openai2025codexcli}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=0523b13262b12c215d8009938f5c14f1}{%
+           family={{OpenAI}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhashraw}{0523b13262b12c215d8009938f5c14f1}
+      \strng{bibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorbibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authornamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhashraw}{0523b13262b12c215d8009938f5c14f1}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/openai/codex}}
+      \field{note}{Terminal-based code generation and execution agent}
+      \field{title}{Codex {CLI}: Open-Source Coding Agent}
+      \field{year}{2025}
+    \endentry
+    \entry{badlogic2025pi}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=b97ed493bc4c907c13b0409b541970c7}{%
+           family={Zechner},
+           familyi={Z\bibinitperiod},
+           given={Mario},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{fullhash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{fullhashraw}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{bibnamehash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{authorbibnamehash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{authornamehash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{authorfullhash}{b97ed493bc4c907c13b0409b541970c7}
+      \strng{authorfullhashraw}{b97ed493bc4c907c13b0409b541970c7}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/badlogic/pi-mono}}
+      \field{note}{Open-source coding agent with extensible tool system and prompt template architecture}
+      \field{title}{Pi: A Minimal Terminal Coding Harness}
+      \field{year}{2025}
+    \endentry
+    \entry{anthropic2024mcp}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=f431db65cea024a5f19eab835afefee2}{%
+           family={{Anthropic}},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhashraw}{f431db65cea024a5f19eab835afefee2}
+      \strng{bibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorbibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authornamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhashraw}{f431db65cea024a5f19eab835afefee2}
+      \field{extraname}{2}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://modelcontextprotocol.io}}
+      \field{note}{Open standard for connecting AI assistants to external tools and data sources}
+      \field{title}{Model Context Protocol}
+      \field{year}{2024}
+    \endentry
+    \entry{chromadb2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=12f586b0171cf0f06960a27796d811d6}{%
+           family={{Chroma}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{fullhash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{fullhashraw}{12f586b0171cf0f06960a27796d811d6}
+      \strng{bibnamehash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{authorbibnamehash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{authornamehash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{authorfullhash}{12f586b0171cf0f06960a27796d811d6}
+      \strng{authorfullhashraw}{12f586b0171cf0f06960a27796d811d6}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://www.trychroma.com}}
+      \field{note}{Open-source vector database for AI applications}
+      \field{title}{Chroma: The Open-Source Embedding Database}
+      \field{year}{2024}
+    \endentry
+    \entry{claudecodesrc2025}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=e9f3349f74aabebbe413e8effa4217f0}{%
+           family={{codeaashu}},
+           familyi={c\bibinitperiod}}}%
+      }
+      \strng{namehash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{fullhash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{fullhashraw}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{bibnamehash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{authorbibnamehash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{authornamehash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{authorfullhash}{e9f3349f74aabebbe413e8effa4217f0}
+      \strng{authorfullhashraw}{e9f3349f74aabebbe413e8effa4217f0}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/codeaashu/claude-code}}
+      \field{note}{Deobfuscated source code of Anthropic's Claude Code agent, used for architectural analysis}
+      \field{title}{Claude Code Source Code (Leaked)}
+      \field{year}{2025}
+    \endentry
+    \entry{chase2022langchain}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=c6b41fd745709d65ec7ab70864b8b466}{%
+           family={Chase},
+           familyi={C\bibinitperiod},
+           given={Harrison},
+           giveni={H\bibinitperiod}}}%
+      }
+      \strng{namehash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{fullhash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{fullhashraw}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{bibnamehash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{authorbibnamehash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{authornamehash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{authorfullhash}{c6b41fd745709d65ec7ab70864b8b466}
+      \strng{authorfullhashraw}{c6b41fd745709d65ec7ab70864b8b466}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/langchain-ai/langchain}}
+      \field{note}{Framework for developing applications powered by language models}
+      \field{title}{Lang{C}hain}
+      \field{year}{2022}
+    \endentry
+    \entry{significantgravitas2023autogpt}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=94dafdef3e4722934dd1dd361a35c500}{%
+           family={{Significant Gravitas}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{fullhash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{fullhashraw}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{bibnamehash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{authorbibnamehash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{authornamehash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{authorfullhash}{94dafdef3e4722934dd1dd361a35c500}
+      \strng{authorfullhashraw}{94dafdef3e4722934dd1dd361a35c500}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/Significant-Gravitas/AutoGPT}}
+      \field{note}{Autonomous AI agent framework}
+      \field{title}{Auto-{GPT}: An Autonomous {GPT}-4 Experiment}
+      \field{year}{2023}
+    \endentry
+    \entry{github2024copilot}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=d3b7c913cd04ebfec0e9ec32cb6fd58c}{%
+           family={{GitHub}},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{fullhash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{fullhashraw}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{bibnamehash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{authorbibnamehash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{authornamehash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{authorfullhash}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \strng{authorfullhashraw}{d3b7c913cd04ebfec0e9ec32cb6fd58c}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/features/copilot}}
+      \field{note}{AI-powered code completion and suggestion tool}
+      \field{title}{GitHub Copilot}
+      \field{year}{2024}
+    \endentry
+    \entry{lewis2020rag}{inproceedings}{}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{10}{}{%
+        {{hash=ecbe786a5668bf643d74bb24fe1c3cfe}{%
+           family={Lewis},
+           familyi={L\bibinitperiod},
+           given={Patrick},
+           giveni={P\bibinitperiod}}}%
+        {{hash=79978685fd7b37606022b06c0f6419a1}{%
+           family={Perez},
+           familyi={P\bibinitperiod},
+           given={Ethan},
+           giveni={E\bibinitperiod}}}%
+        {{hash=d205faec67355b6e0ec49f82a492324c}{%
+           family={Piktus},
+           familyi={P\bibinitperiod},
+           given={Aleksandra},
+           giveni={A\bibinitperiod}}}%
+        {{hash=e1c32989a78998fe3c03c981d0da2dc7}{%
+           family={Petroni},
+           familyi={P\bibinitperiod},
+           given={Fabio},
+           giveni={F\bibinitperiod}}}%
+        {{hash=b24392ebfb2c0a35979fc689c389c649}{%
+           family={Karpukhin},
+           familyi={K\bibinitperiod},
+           given={Vladimir},
+           giveni={V\bibinitperiod}}}%
+        {{hash=78a420900f50a8470ad085fb05231bf6}{%
+           family={Goyal},
+           familyi={G\bibinitperiod},
+           given={Naman},
+           giveni={N\bibinitperiod}}}%
+        {{hash=4eadcf26f55e11fe4be834b52d9b7fdf}{%
+           family={Küttler},
+           familyi={K\bibinitperiod},
+           given={Heinrich},
+           giveni={H\bibinitperiod}}}%
+        {{hash=c97f53fdeeb04c28de19e3324cb4bc0a}{%
+           family={Lewis},
+           familyi={L\bibinitperiod},
+           given={Mike},
+           giveni={M\bibinitperiod}}}%
+        {{hash=d4d56d3d370b3afd4ad2ebf985fbd3f8}{%
+           family={Yih},
+           familyi={Y\bibinitperiod},
+           given={Wen-tau},
+           giveni={W\bibinithyphendelim t\bibinitperiod}}}%
+        {{hash=b3ff4029884ead9928954ea33714192c}{%
+           family={Rocktäschel},
+           familyi={R\bibinitperiod},
+           given={Tim},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{f238c3bfc4b30650dd17e65c4aadfc66}
+      \strng{fullhash}{97db8540ab61ae50151af631b9f14faa}
+      \strng{fullhashraw}{97db8540ab61ae50151af631b9f14faa}
+      \strng{bibnamehash}{f238c3bfc4b30650dd17e65c4aadfc66}
+      \strng{authorbibnamehash}{f238c3bfc4b30650dd17e65c4aadfc66}
+      \strng{authornamehash}{f238c3bfc4b30650dd17e65c4aadfc66}
+      \strng{authorfullhash}{97db8540ab61ae50151af631b9f14faa}
+      \strng{authorfullhashraw}{97db8540ab61ae50151af631b9f14faa}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks}
+      \field{volume}{33}
+      \field{year}{2020}
+      \field{pages}{9459\bibrangedash 9474}
+      \range{pages}{16}
+    \endentry
+    \entry{wei2022chainofthought}{inproceedings}{}{}
+      \name{author}{9}{}{%
+        {{hash=61331a11b490f3d927555985facd25b3}{%
+           family={Wei},
+           familyi={W\bibinitperiod},
+           given={Jason},
+           giveni={J\bibinitperiod}}}%
+        {{hash=27d22d8f05f44b47f7dcfe9b7fb85584}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Xuezhi},
+           giveni={X\bibinitperiod}}}%
+        {{hash=fc76f5fb256da4d423554f8e629b4321}{%
+           family={Schuurmans},
+           familyi={S\bibinitperiod},
+           given={Dale},
+           giveni={D\bibinitperiod}}}%
+        {{hash=3fd5b56bfa48546f2caae7b4aa56a29f}{%
+           family={Bosma},
+           familyi={B\bibinitperiod},
+           given={Maarten},
+           giveni={M\bibinitperiod}}}%
+        {{hash=a096e9107f0463212211c4510c6fa470}{%
+           family={Ichter},
+           familyi={I\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod}}}%
+        {{hash=61e00ed0c44b8bddb9077a74a4ac1167}{%
+           family={Xia},
+           familyi={X\bibinitperiod},
+           given={Fei},
+           giveni={F\bibinitperiod}}}%
+        {{hash=4c62c73d10bbf27f93c07774d30f647c}{%
+           family={Chi},
+           familyi={C\bibinitperiod},
+           given={Ed},
+           giveni={E\bibinitperiod}}}%
+        {{hash=c636f146591d51579a8119b777394878}{%
+           family={Le},
+           familyi={L\bibinitperiod},
+           given={Quoc\bibnamedelima V},
+           giveni={Q\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+        {{hash=797f9a226fd7356db5edc6feba1a0e87}{%
+           family={Zhou},
+           familyi={Z\bibinitperiod},
+           given={Denny},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{7e5e566ee8f47df717196e96221e7705}
+      \strng{fullhash}{0a6023425e9f1a427e86985342d6f7ef}
+      \strng{fullhashraw}{0a6023425e9f1a427e86985342d6f7ef}
+      \strng{bibnamehash}{7e5e566ee8f47df717196e96221e7705}
+      \strng{authorbibnamehash}{7e5e566ee8f47df717196e96221e7705}
+      \strng{authornamehash}{7e5e566ee8f47df717196e96221e7705}
+      \strng{authorfullhash}{0a6023425e9f1a427e86985342d6f7ef}
+      \strng{authorfullhashraw}{0a6023425e9f1a427e86985342d6f7ef}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems}
+      \field{title}{Chain-of-Thought Prompting Elicits Reasoning in Large Language Models}
+      \field{volume}{35}
+      \field{year}{2022}
+      \field{pages}{24824\bibrangedash 24837}
+      \range{pages}{14}
+    \endentry
+    \entry{nextjs2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=dc173d57136dbe619cbccee88ee6421c}{%
+           family={{Vercel}},
+           familyi={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{fullhash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{fullhashraw}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{bibnamehash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{authorbibnamehash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{authornamehash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{authorfullhash}{dc173d57136dbe619cbccee88ee6421c}
+      \strng{authorfullhashraw}{dc173d57136dbe619cbccee88ee6421c}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://nextjs.org}}
+      \field{note}{Full-stack React framework with server-side rendering}
+      \field{title}{Next.js: The React Framework for the Web}
+      \field{year}{2024}
+    \endentry
+    \entry{fastapi2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=f5305ee02dd2a5c6215b53401b4a10b0}{%
+           family={Ramírez},
+           familyi={R\bibinitperiod},
+           given={Sebastián},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{fullhash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{fullhashraw}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{bibnamehash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{authorbibnamehash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{authornamehash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{authorfullhash}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \strng{authorfullhashraw}{f5305ee02dd2a5c6215b53401b4a10b0}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://fastapi.tiangolo.com}}
+      \field{note}{High-performance Python web framework based on standard type hints}
+      \field{title}{Fast{API}: Modern, Fast Web Framework for Building {API}s with {P}ython}
+      \field{year}{2024}
+    \endentry
+    \entry{fastmcp2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=b164cd5ebc68868bd8974db9992ecef5}{%
+           family={{FastMCP Contributors}},
+           familyi={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{fullhash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{fullhashraw}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{bibnamehash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{authorbibnamehash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{authornamehash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{authorfullhash}{b164cd5ebc68868bd8974db9992ecef5}
+      \strng{authorfullhashraw}{b164cd5ebc68868bd8974db9992ecef5}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/jlowin/fastmcp}}
+      \field{note}{High-performance Python framework for building MCP-compliant tool servers}
+      \field{title}{Fast{MCP}: Python {MCP} Server Framework}
+      \field{year}{2024}
+    \endentry
+    \entry{ollama2024}{misc}{}{}
+      \name{author}{1}{}{%
+        {{hash=c23e8db458397f37c8e8d98e94e55a18}{%
+           family={{Ollama}},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{fullhash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{fullhashraw}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{bibnamehash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{authorbibnamehash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{authornamehash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{authorfullhash}{c23e8db458397f37c8e8d98e94e55a18}
+      \strng{authorfullhashraw}{c23e8db458397f37c8e8d98e94e55a18}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://ollama.com}}
+      \field{note}{Local LLM inference platform supporting multiple open-source models}
+      \field{title}{Ollama: Run Large Language Models Locally}
+      \field{year}{2024}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

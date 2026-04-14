@@ -19,65 +19,172 @@ MAX_ITERATIONS_WORKSPACE = 50  # More room for coding tasks with test-fix loops
 # Tool categories for context-aware filtering
 TOOL_CATEGORIES = {
     "core": {
-        "memory_get_preferences", "memory_set_preference", "memory_remember_about_user",
-        "memory_get_user_memories", "memory_forget_about_user", "memory_save_note",
-        "memory_search_history", "memory_get_recent_conversations",
+        "memory_get_preferences",
+        "memory_set_preference",
+        "memory_remember_about_user",
+        "memory_get_user_memories",
+        "memory_forget_about_user",
+        "memory_save_note",
+        "memory_search_history",
+        "memory_get_recent_conversations",
     },
     "workspace": {
-        "ws_workspace_create", "ws_workspace_list_files", "ws_workspace_read_file",
-        "ws_workspace_write_file", "ws_workspace_edit_file", "ws_workspace_delete_file",
-        "ws_workspace_grep", "ws_workspace_find", "ws_workspace_run",
-        "ws_workspace_diff", "ws_workspace_commit_push", "ws_workspace_cleanup",
-        "ws_workspace_inspect", "ws_workspace_check_syntax", "ws_workspace_install",
+        "ws_workspace_create",
+        "ws_workspace_list_files",
+        "ws_workspace_read_file",
+        "ws_workspace_write_file",
+        "ws_workspace_edit_file",
+        "ws_workspace_delete_file",
+        "ws_workspace_grep",
+        "ws_workspace_find",
+        "ws_workspace_run",
+        "ws_workspace_diff",
+        "ws_workspace_commit_push",
+        "ws_workspace_cleanup",
+        "ws_workspace_inspect",
+        "ws_workspace_check_syntax",
+        "ws_workspace_install",
     },
     "github": {
-        "github_create_repo", "github_list_repos", "github_list_prs", "github_get_pr_diff",
-        "github_create_issue", "github_create_pr", "github_create_branch",
-        "github_list_files", "github_get_file", "github_push_file",
+        "github_create_repo",
+        "github_list_repos",
+        "github_list_prs",
+        "github_get_pr_diff",
+        "github_create_issue",
+        "github_list_issues",
+        "github_get_issue",
+        "github_create_pr",
+        "github_create_branch",
+        "github_list_files",
+        "github_get_file",
+        "github_push_file",
         "github_list_notifications",
     },
     "communication": {
-        "discord_list_servers", "discord_list_channels", "discord_send_message",
-        "discord_read_messages", "telegram_search_contacts", "telegram_send_message",
-        "telegram_list_chats", "telegram_read_messages",
-        "gmail_get_unread", "gmail_read_email", "gmail_send_email", "gmail_reply_email",
+        "discord_list_servers",
+        "discord_list_channels",
+        "discord_send_message",
+        "discord_read_messages",
+        "telegram_search_contacts",
+        "telegram_send_message",
+        "telegram_list_chats",
+        "telegram_read_messages",
+        "gmail_get_unread",
+        "gmail_read_email",
+        "gmail_send_email",
+        "gmail_reply_email",
     },
     "media": {
-        "spotify_play", "spotify_pause", "spotify_current_track",
-        "spotify_search", "spotify_get_playlists",
-        "youtube_download_video", "youtube_get_video_info",
+        "spotify_play",
+        "spotify_pause",
+        "spotify_current_track",
+        "spotify_search",
+        "spotify_get_playlists",
+        "youtube_download_video",
+        "youtube_get_video_info",
     },
     "web": {
-        "web_search", "scrape_fetch_page", "scrape_fetch_tables", "scrape_fetch_links",
+        "web_search",
+        "scrape_fetch_page",
+        "scrape_fetch_tables",
+        "scrape_fetch_links",
     },
     "social": {
-        "mastodon_get_home_timeline", "mastodon_get_public_timeline",
-        "mastodon_get_trending_tags", "mastodon_get_trending_statuses",
-        "mastodon_search_posts", "mastodon_get_hashtag_timeline",
-        "mastodon_post_status", "mastodon_get_notifications", "mastodon_get_account_info",
+        "mastodon_get_home_timeline",
+        "mastodon_get_public_timeline",
+        "mastodon_get_trending_tags",
+        "mastodon_get_trending_statuses",
+        "mastodon_search_posts",
+        "mastodon_get_hashtag_timeline",
+        "mastodon_post_status",
+        "mastodon_get_notifications",
+        "mastodon_get_account_info",
     },
     "productivity": {
-        "calendar_list_events", "calendar_create_event", "calendar_delete_event",
-        "rss_fetch_feed", "rss_fetch_all_feeds", "rss_add_feed", "rss_list_feeds",
-        "scheduler_schedule_task", "scheduler_list_scheduled_tasks",
+        "calendar_list_events",
+        "calendar_create_event",
+        "calendar_delete_event",
+        "rss_fetch_feed",
+        "rss_fetch_all_feeds",
+        "rss_add_feed",
+        "rss_list_feeds",
+        "scheduler_schedule_task",
+        "scheduler_list_scheduled_tasks",
         "scheduler_cancel_scheduled_task",
     },
     "sandbox": {
-        "sandbox_verify_python", "sandbox_verify_javascript",
-        "sandbox_run_python", "sandbox_run_javascript",
-        "sandbox_run_multi_file_test", "sandbox_run_shell", "sandbox_run_and_export",
+        "sandbox_verify_python",
+        "sandbox_verify_javascript",
+        "sandbox_run_python",
+        "sandbox_run_javascript",
+        "sandbox_run_multi_file_test",
+        "sandbox_run_shell",
+        "sandbox_run_and_export",
     },
 }
 
 # Keywords that hint which categories are needed
 CATEGORY_KEYWORDS = {
-    "workspace": ["add feature", "add a ", "fix bug", "modify", "refactor", "implement", "workspace", "branch", "vibe", "code", "build", "endpoint", "tool", "component"],
-    "github": ["pr", "pull request", "repo", "commit", "push", "issue", "github", "branch", "endpoint", "feature"],
-    "communication": ["send", "message", "discord", "telegram", "email", "gmail", "reply", "briefing", "notification"],
+    "workspace": [
+        "add feature",
+        "add a ",
+        "fix bug",
+        "modify",
+        "refactor",
+        "implement",
+        "workspace",
+        "branch",
+        "vibe",
+        "code",
+        "build",
+        "endpoint",
+        "tool",
+        "component",
+    ],
+    "github": [
+        "pr",
+        "pull request",
+        "repo",
+        "commit",
+        "push",
+        "issue",
+        "github",
+        "branch",
+        "endpoint",
+        "feature",
+    ],
+    "communication": [
+        "send",
+        "message",
+        "discord",
+        "telegram",
+        "email",
+        "gmail",
+        "reply",
+        "briefing",
+        "notification",
+    ],
     "media": ["play", "music", "spotify", "song", "youtube", "video", "download"],
-    "web": ["search", "find online", "look up", "web", "scrape", "fetch page", "website"],
+    "web": [
+        "search",
+        "find online",
+        "look up",
+        "web",
+        "scrape",
+        "fetch page",
+        "website",
+    ],
     "social": ["mastodon", "toot", "trending", "fediverse", "timeline"],
-    "productivity": ["calendar", "event", "schedule", "rss", "feed", "remind", "briefing", "daily"],
+    "productivity": [
+        "calendar",
+        "event",
+        "schedule",
+        "rss",
+        "feed",
+        "remind",
+        "briefing",
+        "daily",
+    ],
     "sandbox": ["run code", "execute", "python", "javascript", "test code", "sandbox"],
 }
 
@@ -100,6 +207,7 @@ def _select_tool_categories(user_message: str, tools_called: list[str]) -> set[s
     # conversationally, and will request tools if it needs them
 
     return categories
+
 
 PLANNER_PROMPT = """You are a task planner. Given the user's request and the available tools, decide if this needs multiple steps.
 
@@ -132,6 +240,7 @@ ONLY output valid JSON, nothing else."""
 @dataclass
 class AgentEvent:
     """An event emitted during the agent loop for SSE streaming."""
+
     type: str  # "thinking", "tool_call", "tool_result", "planning", "step", "done", "error"
     data: dict
 
@@ -142,7 +251,13 @@ class AgentEvent:
 class Agent:
     """Agent that loops between LLM reasoning and MCP tool execution."""
 
-    def __init__(self, provider: LLMProvider, system_prompt: str, mcp_client: Client, user_id: int):
+    def __init__(
+        self,
+        provider: LLMProvider,
+        system_prompt: str,
+        mcp_client: Client,
+        user_id: int,
+    ):
         self.provider = provider
         self.system_prompt = system_prompt
         self.mcp_client = mcp_client
@@ -160,6 +275,7 @@ class Agent:
 
             try:
                 from db.auth import get_all_user_credentials, get_user
+
                 user = await get_user(self.user_id)
                 if user:
                     context_parts.append(f"Current user: {user['email']}")
@@ -177,17 +293,23 @@ class Agent:
                 result = await self.mcp_client.call_tool(
                     "memory_get_preferences", {"_user_id": self.user_id}
                 )
-                if hasattr(result, 'data') and result.data:
+                if hasattr(result, "data") and result.data:
                     prefs = result.data.get("preferences", [])
                     if prefs:
-                        pref_lines = [f"  - {p['key']}: {p['value']}" for p in prefs[:20]]
-                        context_parts.append(f"User preferences:\n" + "\n".join(pref_lines))
+                        pref_lines = [
+                            f"  - {p['key']}: {p['value']}" for p in prefs[:20]
+                        ]
+                        context_parts.append(
+                            "User preferences:\n" + "\n".join(pref_lines)
+                        )
             except Exception:
                 pass
 
             if context_parts:
                 context = "\n".join(context_parts)
-                self._system_prompt_built = f"{self.system_prompt}\n\n## Current User Context\n{context}"
+                self._system_prompt_built = (
+                    f"{self.system_prompt}\n\n## Current User Context\n{context}"
+                )
             else:
                 self._system_prompt_built = self.system_prompt
 
@@ -195,10 +317,19 @@ class Agent:
         if user_message:
             try:
                 from services.rag import retrieve_relevant_memories
-                memories = await retrieve_relevant_memories(self.user_id, user_message, top_k=10)
+
+                memories = await retrieve_relevant_memories(
+                    self.user_id, user_message, top_k=10
+                )
                 if memories:
-                    mem_lines = [f"  - [{m['category']}] {m['content']} (relevance: {m['relevance']})" for m in memories]
-                    memory_section = f"\n\n## What you know about this user (retrieved by relevance to current message)\n" + "\n".join(mem_lines)
+                    mem_lines = [
+                        f"  - [{m['category']}] {m['content']} (relevance: {m['relevance']})"
+                        for m in memories
+                    ]
+                    memory_section = (
+                        "\n\n## What you know about this user (retrieved by relevance to current message)\n"
+                        + "\n".join(mem_lines)
+                    )
                     return self._system_prompt_built + memory_section
             except Exception:
                 pass
@@ -213,7 +344,11 @@ class Agent:
         mcp_tools = await self.mcp_client.list_tools()
         self._tools_cache = []
         for t in mcp_tools:
-            schema = dict(t.inputSchema) if t.inputSchema else {"type": "object", "properties": {}}
+            schema = (
+                dict(t.inputSchema)
+                if t.inputSchema
+                else {"type": "object", "properties": {}}
+            )
             props = dict(schema.get("properties", {}))
             props.pop("_user_id", None)
             schema["properties"] = props
@@ -226,13 +361,17 @@ class Agent:
             # Trim description to first sentence to save tokens
             desc = t.description or ""
             first_sentence_end = desc.find(". ")
-            short_desc = desc[:first_sentence_end + 1] if first_sentence_end > 0 else desc[:150]
+            short_desc = (
+                desc[: first_sentence_end + 1] if first_sentence_end > 0 else desc[:150]
+            )
 
-            self._tools_cache.append({
-                "name": t.name,
-                "description": short_desc,
-                "parameters": schema,
-            })
+            self._tools_cache.append(
+                {
+                    "name": t.name,
+                    "description": short_desc,
+                    "parameters": schema,
+                }
+            )
 
         logger.info(f"Loaded {len(self._tools_cache)} tools from MCP server")
         return self._tools_cache
@@ -244,7 +383,9 @@ class Agent:
             allowed.update(TOOL_CATEGORIES.get(cat, set()))
 
         filtered = [t for t in tools if t["name"] in allowed]
-        logger.info(f"Filtered tools: {len(filtered)}/{len(tools)} (categories: {categories})")
+        logger.info(
+            f"Filtered tools: {len(filtered)}/{len(tools)} (categories: {categories})"
+        )
         return filtered
 
     async def _call_tool(self, name: str, args: dict) -> str:
@@ -256,10 +397,10 @@ class Agent:
         full_args = {**args, "_user_id": self.user_id}
         try:
             result = await self.mcp_client.call_tool(name, full_args)
-            if hasattr(result, 'data') and result.data is not None:
+            if hasattr(result, "data") and result.data is not None:
                 return json.dumps(result.data, indent=2, default=str)
-            elif hasattr(result, 'content') and result.content:
-                return "\n".join(c.text for c in result.content if hasattr(c, 'text'))
+            elif hasattr(result, "content") and result.content:
+                return "\n".join(c.text for c in result.content if hasattr(c, "text"))
             return str(result)
         except Exception as e:
             logger.opt(exception=True).error(f"Tool {name} failed")
@@ -269,14 +410,18 @@ class Agent:
                 # Often errors are like "ToolError: Error calling tool 'x': actual message"
                 parts = error_msg.split(":", 2)
                 error_msg = parts[-1].strip()
-            return json.dumps({
-                "error": True,
-                "tool": name,
-                "message": error_msg,
-                "hint": "Read the error message, fix the issue, and try again.",
-            })
+            return json.dumps(
+                {
+                    "error": True,
+                    "tool": name,
+                    "message": error_msg,
+                    "hint": "Read the error message, fix the issue, and try again.",
+                }
+            )
 
-    async def _try_plan(self, user_message: str, tools: list[dict]) -> list[dict] | None:
+    async def _try_plan(
+        self, user_message: str, tools: list[dict]
+    ) -> list[dict] | None:
         """Ask the LLM to create a plan. Returns list of steps or None if simple."""
         tool_lines = []
         for t in tools:
@@ -288,7 +433,11 @@ class Agent:
 
         # Include recent conversation context so the planner understands references like "it", "that", etc.
         context = ""
-        recent = [m for m in self.conversation[-6:] if m.role in ("user", "assistant") and m.content]
+        recent = [
+            m
+            for m in self.conversation[-6:]
+            if m.role in ("user", "assistant") and m.content
+        ]
         if len(recent) > 1:  # Only if there's actual history
             context = "Recent conversation:\n"
             for m in recent[:-1]:  # Exclude current message
@@ -296,7 +445,10 @@ class Agent:
             context += "\n"
 
         plan_messages = [
-            Message(role="user", content=f"Available tools:\n{tool_list}\n\n{context}User request: {user_message}")
+            Message(
+                role="user",
+                content=f"Available tools:\n{tool_list}\n\n{context}User request: {user_message}",
+            )
         ]
 
         response = await self.provider.chat(
@@ -308,7 +460,10 @@ class Agent:
         text = (response.content or "").strip()
         # Strip think tags
         import re
-        text = re.sub(r"<think(?:ing)?>.*?</think(?:ing)?>", "", text, flags=re.DOTALL).strip()
+
+        text = re.sub(
+            r"<think(?:ing)?>.*?</think(?:ing)?>", "", text, flags=re.DOTALL
+        ).strip()
 
         try:
             parsed = json.loads(text)
@@ -316,7 +471,7 @@ class Agent:
                 return None
             if isinstance(parsed, list) and len(parsed) > 1:
                 return parsed
-        except (json.JSONDecodeError, KeyError):
+        except json.JSONDecodeError, KeyError:
             pass
 
         return None
@@ -357,9 +512,18 @@ class Agent:
 
         if plan and len(plan) > 1:
             # === PLANNED EXECUTION ===
-            yield AgentEvent("planning", {
-                "steps": [{"step": s.get("step", i+1), "description": s.get("description", "")} for i, s in enumerate(plan)]
-            })
+            yield AgentEvent(
+                "planning",
+                {
+                    "steps": [
+                        {
+                            "step": s.get("step", i + 1),
+                            "description": s.get("description", ""),
+                        }
+                        for i, s in enumerate(plan)
+                    ]
+                },
+            )
 
             step_results: dict[int, str] = {}
 
@@ -369,15 +533,24 @@ class Agent:
                 args = step.get("args", {})
                 description = step.get("description", f"Step {step_num}")
 
-                yield AgentEvent("step", {"step": step_num, "description": description, "tool": tool_name})
+                yield AgentEvent(
+                    "step",
+                    {"step": step_num, "description": description, "tool": tool_name},
+                )
 
                 # Replace ALL template placeholders that reference a previous step number
                 # Catches: {{step_4_result}}, {{step_4.output}}, {{depends_on.4}}, {{result_4}}, etc.
                 import re
+
                 args_str = json.dumps(args)
                 for prev_step, prev_result in step_results.items():
                     short_result = prev_result[:4000]
-                    safe_result = short_result.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", "")
+                    safe_result = (
+                        short_result.replace("\\", "\\\\")
+                        .replace('"', '\\"')
+                        .replace("\n", " ")
+                        .replace("\r", "")
+                    )
                     # Match any {{...}} that contains this step number
                     pattern = r"\{\{[^}]*\b" + str(prev_step) + r"\b[^}]*\}\}"
                     args_str = re.sub(pattern, safe_result, args_str)
@@ -385,9 +558,16 @@ class Agent:
                 # Safety net: replace ANY remaining {{...}} with the most recent step result
                 if "{{" in args_str and step_results:
                     last_result = list(step_results.values())[-1][:4000]
-                    safe_last = last_result.replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").replace("\r", "")
+                    safe_last = (
+                        last_result.replace("\\", "\\\\")
+                        .replace('"', '\\"')
+                        .replace("\n", " ")
+                        .replace("\r", "")
+                    )
                     args_str = re.sub(r"\{\{[^}]*\}\}", safe_last, args_str)
-                    logger.warning(f"Replaced leftover {{{{...}}}} templates with last step result")
+                    logger.warning(
+                        "Replaced leftover {{...}} templates with last step result"
+                    )
 
                 try:
                     args = json.loads(args_str)
@@ -398,7 +578,9 @@ class Agent:
                 depends_on = step.get("depends_on")
                 if depends_on is not None:
                     # Normalize to list of step numbers
-                    dep_list = depends_on if isinstance(depends_on, list) else [depends_on]
+                    dep_list = (
+                        depends_on if isinstance(depends_on, list) else [depends_on]
+                    )
                     prev_parts = []
                     for dep in dep_list:
                         if dep in step_results:
@@ -406,7 +588,10 @@ class Agent:
                     if prev_parts:
                         prev = "\n\n".join(prev_parts)
                         if tool_name == "llm_generate":
-                            args["prompt"] = args.get("prompt", "") + f"\n\nContext from previous steps:\n{prev}"
+                            args["prompt"] = (
+                                args.get("prompt", "")
+                                + f"\n\nContext from previous steps:\n{prev}"
+                            )
                         else:
                             # Clean up: if the result looks like JSON, skip it — only inject human-readable text
                             clean_prev = prev.strip()
@@ -414,16 +599,31 @@ class Agent:
                                 # Try to extract a meaningful text field from JSON
                                 try:
                                     import json as _json
+
                                     parsed = _json.loads(clean_prev)
                                     if isinstance(parsed, dict):
-                                        for key in ("content", "message", "text", "result", "summary"):
-                                            if key in parsed and isinstance(parsed[key], str):
+                                        for key in (
+                                            "content",
+                                            "message",
+                                            "text",
+                                            "result",
+                                            "summary",
+                                        ):
+                                            if key in parsed and isinstance(
+                                                parsed[key], str
+                                            ):
                                                 clean_prev = parsed[key]
                                                 break
                                 except Exception:
                                     pass
                             # Inject into the first empty text-like field
-                            for field in ("content", "message", "body", "text", "prompt"):
+                            for field in (
+                                "content",
+                                "message",
+                                "body",
+                                "text",
+                                "prompt",
+                            ):
                                 if field in args and args[field] == "":
                                     args[field] = clean_prev[:4000]
                                     break
@@ -444,18 +644,29 @@ class Agent:
 
                 step_results[step_num] = result_text
 
-                logger.info(f"Plan step {step_num} ({tool_name}): {result_text[:200]}...")
-                yield AgentEvent("tool_result", {"tool": tool_name, "result_preview": result_text[:300]})
+                logger.info(
+                    f"Plan step {step_num} ({tool_name}): {result_text[:200]}..."
+                )
+                yield AgentEvent(
+                    "tool_result",
+                    {"tool": tool_name, "result_preview": result_text[:300]},
+                )
 
             # Final: ask LLM to summarize all results
             summary_content = "I executed the following plan:\n"
             for i, step in enumerate(plan):
                 step_num = step.get("step", i + 1)
                 summary_content += f"\nStep {step_num}: {step.get('description', '')}\n"
-                summary_content += f"Result: {step_results.get(step_num, 'No result')[:500]}\n"
+                summary_content += (
+                    f"Result: {step_results.get(step_num, 'No result')[:500]}\n"
+                )
 
             self.conversation.append(Message(role="assistant", content=summary_content))
-            self.conversation.append(Message(role="user", content="Now summarize the results concisely for me."))
+            self.conversation.append(
+                Message(
+                    role="user", content="Now summarize the results concisely for me."
+                )
+            )
 
             yield AgentEvent("thinking", {"iteration": 2})
             response = await self.provider.chat(
@@ -475,8 +686,12 @@ class Agent:
         # === SIMPLE EXECUTION (adaptive agent loop) ===
         iterations = 0
         tools_called: list[str] = []  # Track what we've done to keep the agent focused
-        is_workspace_task = False  # Detected dynamically when workspace tools are called
-        while iterations < (MAX_ITERATIONS_WORKSPACE if is_workspace_task else MAX_ITERATIONS):
+        is_workspace_task = (
+            False  # Detected dynamically when workspace tools are called
+        )
+        while iterations < (
+            MAX_ITERATIONS_WORKSPACE if is_workspace_task else MAX_ITERATIONS
+        ):
             iterations += 1
             if iterations > 1:
                 yield AgentEvent("thinking", {"iteration": iterations})
@@ -511,14 +726,18 @@ class Agent:
                 yield AgentEvent("thinking_text", {"text": response.thinking})
 
             if response.has_tool_calls:
-                self.conversation.append(Message(
-                    role="assistant",
-                    content=response.content or "",
-                    tool_calls=response.tool_calls,
-                ))
+                self.conversation.append(
+                    Message(
+                        role="assistant",
+                        content=response.content or "",
+                        tool_calls=response.tool_calls,
+                    )
+                )
 
                 for tool_call in response.tool_calls:
-                    logger.info(f"Calling MCP tool: {tool_call.name}({tool_call.arguments})")
+                    logger.info(
+                        f"Calling MCP tool: {tool_call.name}({tool_call.arguments})"
+                    )
                     tools_called.append(tool_call.name)
                     if tool_call.name.startswith("ws_") and not is_workspace_task:
                         is_workspace_task = True
@@ -527,53 +746,79 @@ class Agent:
                         tools = self._filter_tools(all_tools, categories)
                         logger.info("Switched to workspace mode — expanded tool set")
 
-                    yield AgentEvent("tool_call", {
-                        "tool": tool_call.name,
-                        "arguments": tool_call.arguments,
-                    })
+                    yield AgentEvent(
+                        "tool_call",
+                        {
+                            "tool": tool_call.name,
+                            "arguments": tool_call.arguments,
+                        },
+                    )
 
-                    result_text = await self._call_tool(tool_call.name, tool_call.arguments)
+                    result_text = await self._call_tool(
+                        tool_call.name, tool_call.arguments
+                    )
 
                     logger.info(f"Tool result: {result_text[:200]}...")
-                    yield AgentEvent("tool_result", {
-                        "tool": tool_call.name,
-                        "result_preview": result_text[:300],
-                    })
+                    yield AgentEvent(
+                        "tool_result",
+                        {
+                            "tool": tool_call.name,
+                            "result_preview": result_text[:300],
+                        },
+                    )
 
-                    self.conversation.append(Message(
-                        role="tool",
-                        content=result_text,
-                        tool_call_id=tool_call.id,
-                    ))
+                    self.conversation.append(
+                        Message(
+                            role="tool",
+                            content=result_text,
+                            tool_call_id=tool_call.id,
+                        )
+                    )
 
                 continue
 
             final_text = response.content
             if not final_text:
                 # LLM returned empty after tool calls — nudge it to summarize
-                self.conversation.append(Message(role="user", content="Please summarize the tool results above concisely for the user."))
+                self.conversation.append(
+                    Message(
+                        role="user",
+                        content="Please summarize the tool results above concisely for the user.",
+                    )
+                )
                 try:
                     nudge_response = await self.provider.chat(
-                        messages=self.conversation, tools=None, system=system_prompt,
+                        messages=self.conversation,
+                        tools=None,
+                        system=system_prompt,
                     )
                     final_text = nudge_response.content
                 except Exception as e:
                     logger.error(f"Nudge failed: {e}")
 
             if not final_text:
-                # Fall back to the last tool result if LLM still returned nothing
                 for msg in reversed(self.conversation):
                     if msg.role == "tool" and msg.content:
-                        final_text = msg.content
+                        content = msg.content
+                        try:
+                            parsed = json.loads(content)
+                            if parsed.get("error"):
+                                final_text = f"The tool returned an error: {parsed.get('message', content)}"
+                            else:
+                                final_text = content
+                        except (json.JSONDecodeError, AttributeError):
+                            final_text = content
                         logger.info("Falling back to raw tool result")
                         break
 
-            final_text = final_text or "(No response)"
+            final_text = final_text or "Something went wrong — the model returned no response. Please try again."
             self.conversation.append(Message(role="assistant", content=final_text))
             yield AgentEvent("done", {"response": final_text})
             return
 
-        yield AgentEvent("done", {"response": "I've reached the maximum number of steps."})
+        yield AgentEvent(
+            "done", {"response": "I've reached the maximum number of steps."}
+        )
 
     def reset(self):
         """Clear conversation history."""

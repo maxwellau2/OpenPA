@@ -8,6 +8,7 @@ from typing import Any
 @dataclass
 class ToolCall:
     """A tool call requested by the LLM."""
+
     id: str
     name: str
     arguments: dict[str, Any]
@@ -16,6 +17,7 @@ class ToolCall:
 @dataclass
 class LLMResponse:
     """Response from an LLM provider."""
+
     content: str | None = None
     thinking: str | None = None
     tool_calls: list[ToolCall] = field(default_factory=list)
@@ -29,6 +31,7 @@ class LLMResponse:
 @dataclass
 class Message:
     """A conversation message."""
+
     role: str  # "user", "assistant", "tool"
     content: str
     tool_call_id: str | None = None

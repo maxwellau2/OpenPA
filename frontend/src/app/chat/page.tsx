@@ -42,7 +42,7 @@ export default function ChatPage() {
   const [hasServices, setHasServices] = useState(true);
   const [conversationId, setConversationId] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
@@ -175,11 +175,11 @@ export default function ChatPage() {
             break;
         }
       }, "", "", controller.signal, conversationId);
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") {
         assistantResponse = assistantResponse || "(Stopped by user)";
       } else {
-        assistantResponse = `Connection error: ${err.message}`;
+        assistantResponse = `Connection error: ${err instanceof Error ? err.message : "Unknown error"}`;
       }
     }
 
@@ -211,8 +211,8 @@ export default function ChatPage() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleSubmit(e?: { preventDefault?: () => void }) {
+    e?.preventDefault?.();
     await sendMessage(input.trim());
   }
 
@@ -401,7 +401,7 @@ export default function ChatPage() {
                     {toolActivity.length > 0 && (
                       <div className="space-y-1 pt-1 border-t border-border">
                         {toolActivity.map((t) => (
-                          <ToolCallEntry key={t.id} tool={t} live />
+                          <ToolCallEntry key={t.id} tool={t} />
                         ))}
                       </div>
                     )}
@@ -418,7 +418,7 @@ export default function ChatPage() {
         <div className="border-t border-border bg-card p-4">
           <div className="max-w-3xl mx-auto flex gap-2 items-end">
             <textarea
-              ref={inputRef as any}
+              ref={inputRef}
               value={input}
               onChange={(e) => {
                 setInput(e.target.value);
@@ -429,7 +429,7 @@ export default function ChatPage() {
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  handleSubmit(e as any);
+                  handleSubmit(e);
                 }
               }}
               placeholder="Ask your assistant... (Shift+Enter for new line)"
@@ -442,7 +442,7 @@ export default function ChatPage() {
                 <Square className="w-4 h-4" />
               </Button>
             ) : (
-              <Button type="button" onClick={(e) => handleSubmit(e as any)} disabled={!input.trim()} size="icon" className="shrink-0">
+              <Button type="button" onClick={(e) => handleSubmit(e)} disabled={!input.trim()} size="icon" className="shrink-0">
                 <Send className="w-4 h-4" />
               </Button>
             )}
@@ -513,7 +513,7 @@ function PlanBlock({ steps }: { steps: { step: number; description: string; tool
   );
 }
 
-function ToolCallEntry({ tool, live = false }: { tool: ToolActivity; live?: boolean }) {
+function ToolCallEntry({ tool }: { tool: ToolActivity }) {
   const [open, setOpen] = useState(false);
 
   const statusIcon = tool.status === "calling" ? (

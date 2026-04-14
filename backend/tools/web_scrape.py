@@ -13,7 +13,9 @@ MAX_CONTENT_CHARS = 50000
 def _strip_html(html: str) -> str:
     """Strip HTML tags, scripts, styles, and normalize whitespace."""
     # Remove script and style blocks
-    text = re.sub(r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(
+        r"<script[^>]*>.*?</script>", "", html, flags=re.DOTALL | re.IGNORECASE
+    )
     text = re.sub(r"<style[^>]*>.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
     # Convert common block elements to newlines
     text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
@@ -33,12 +35,20 @@ def _strip_html(html: str) -> str:
 def _extract_tables(html: str) -> list[list[list[str]]]:
     """Extract HTML tables as lists of rows, each row a list of cell texts."""
     tables = []
-    for table_match in re.finditer(r"<table[^>]*>(.*?)</table>", html, flags=re.DOTALL | re.IGNORECASE):
+    for table_match in re.finditer(
+        r"<table[^>]*>(.*?)</table>", html, flags=re.DOTALL | re.IGNORECASE
+    ):
         table_html = table_match.group(1)
         rows = []
-        for row_match in re.finditer(r"<tr[^>]*>(.*?)</tr>", table_html, flags=re.DOTALL | re.IGNORECASE):
+        for row_match in re.finditer(
+            r"<tr[^>]*>(.*?)</tr>", table_html, flags=re.DOTALL | re.IGNORECASE
+        ):
             cells = []
-            for cell_match in re.finditer(r"<t[dh][^>]*>(.*?)</t[dh]>", row_match.group(1), flags=re.DOTALL | re.IGNORECASE):
+            for cell_match in re.finditer(
+                r"<t[dh][^>]*>(.*?)</t[dh]>",
+                row_match.group(1),
+                flags=re.DOTALL | re.IGNORECASE,
+            ):
                 cell_text = re.sub(r"<[^>]+>", "", cell_match.group(1)).strip()
                 cells.append(cell_text)
             if cells:
@@ -51,7 +61,11 @@ def _extract_tables(html: str) -> list[list[list[str]]]:
 def _extract_links(html: str, base_url: str = "") -> list[dict]:
     """Extract links from HTML."""
     links = []
-    for match in re.finditer(r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', html, flags=re.DOTALL | re.IGNORECASE):
+    for match in re.finditer(
+        r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+        html,
+        flags=re.DOTALL | re.IGNORECASE,
+    ):
         href, text = match.group(1), re.sub(r"<[^>]+>", "", match.group(2)).strip()
         if text and href and not href.startswith(("#", "javascript:")):
             links.append({"url": href, "text": text[:200]})
@@ -84,7 +98,9 @@ async def fetch_page(_user_id: int, url: str) -> dict:
     html = await _fetch_html(url)
 
     text = _strip_html(html)
-    title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
+    title_match = re.search(
+        r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL
+    )
     title = re.sub(r"<[^>]+>", "", title_match.group(1)).strip() if title_match else ""
 
     return {
@@ -106,7 +122,9 @@ async def fetch_tables(_user_id: int, url: str) -> dict:
     html = await _fetch_html(url)
 
     tables = _extract_tables(html)
-    title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
+    title_match = re.search(
+        r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL
+    )
     title = re.sub(r"<[^>]+>", "", title_match.group(1)).strip() if title_match else ""
 
     # Format tables for readability
@@ -114,12 +132,14 @@ async def fetch_tables(_user_id: int, url: str) -> dict:
     for i, table in enumerate(tables):
         if len(table) < 2:  # Skip trivial tables
             continue
-        formatted.append({
-            "table_index": i,
-            "header": table[0] if table else [],
-            "rows": table[1:50],  # Cap at 50 rows
-            "total_rows": len(table) - 1,
-        })
+        formatted.append(
+            {
+                "table_index": i,
+                "header": table[0] if table else [],
+                "rows": table[1:50],  # Cap at 50 rows
+                "total_rows": len(table) - 1,
+            }
+        )
 
     return {
         "url": url,

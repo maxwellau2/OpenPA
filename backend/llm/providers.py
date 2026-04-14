@@ -8,7 +8,13 @@ PROVIDERS = {
     "ollama": {
         "label": "Ollama (Local)",
         "description": "Free, runs locally. Requires Ollama installed.",
-        "models": ["gemma4:latest", "qwen3.5:9b", "llama3.1:8b", "mistral:7b"],
+        "models": [
+            "gemma4:e4b-256k",
+            "gemma4:latest",
+            "qwen3.5:9b",
+            "llama3.1:8b",
+            "mistral:7b",
+        ],
         "needs_api_key": False,
     },
     "gemini": {
@@ -38,7 +44,12 @@ PROVIDERS = {
     "groq": {
         "label": "Groq",
         "description": "Ultra-fast inference. Free tier available.",
-        "models": ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"],
+        "models": [
+            "llama-3.3-70b-versatile",
+            "llama-3.1-8b-instant",
+            "mixtral-8x7b-32768",
+            "gemma2-9b-it",
+        ],
         "needs_api_key": True,
         "key_field": "api_key",
         "get_key_url": "https://console.groq.com/keys",
@@ -46,7 +57,11 @@ PROVIDERS = {
     "openrouter": {
         "label": "OpenRouter",
         "description": "Access many models through one API. Some free models available.",
-        "models": ["google/gemini-2.0-flash-exp:free", "meta-llama/llama-3.3-70b-instruct:free", "qwen/qwen3-8b:free"],
+        "models": [
+            "google/gemini-2.0-flash-exp:free",
+            "meta-llama/llama-3.3-70b-instruct:free",
+            "qwen/qwen3-8b:free",
+        ],
         "needs_api_key": True,
         "key_field": "api_key",
         "get_key_url": "https://openrouter.ai/keys",
@@ -54,7 +69,9 @@ PROVIDERS = {
 }
 
 
-async def get_llm_provider(user_id: int, provider: str = "", model: str = "") -> LLMProvider:
+async def get_llm_provider(
+    user_id: int, provider: str = "", model: str = ""
+) -> LLMProvider:
     """Create an LLM provider based on user's choice and stored credentials.
 
     Args:
@@ -70,46 +87,67 @@ async def get_llm_provider(user_id: int, provider: str = "", model: str = "") ->
         provider = llm_config.get("default_provider", "")
     if not provider:
         from config import config
+
         provider = config.llm.default_provider
 
     if provider == "ollama":
         from llm.ollama_provider import OllamaProvider
+
         return OllamaProvider(model=model)
 
     elif provider == "gemini":
         api_key = llm_config.get("gemini_api_key", "")
         if not api_key:
-            raise ValueError("No Gemini API key configured. Go to Settings → LLM Providers to add one.")
+            raise ValueError(
+                "No Gemini API key configured. Go to Settings → LLM Providers to add one."
+            )
         from llm.gemini_provider import GeminiProvider
+
         return GeminiProvider(api_key=api_key, model=model or "gemini-2.5-flash")
 
     elif provider == "openai":
         api_key = llm_config.get("openai_api_key", "")
         if not api_key:
-            raise ValueError("No OpenAI API key configured. Go to Settings → LLM Providers to add one.")
+            raise ValueError(
+                "No OpenAI API key configured. Go to Settings → LLM Providers to add one."
+            )
         from llm.openai_provider import OpenAIProvider
+
         return OpenAIProvider(api_key=api_key, model=model or "gpt-4o-mini")
 
     elif provider == "claude":
         api_key = llm_config.get("claude_api_key", "")
         if not api_key:
-            raise ValueError("No Claude API key configured. Go to Settings → LLM Providers to add one.")
+            raise ValueError(
+                "No Claude API key configured. Go to Settings → LLM Providers to add one."
+            )
         from llm.claude_provider import ClaudeProvider
-        return ClaudeProvider(api_key=api_key, model=model or "claude-sonnet-4-20250514")
+
+        return ClaudeProvider(
+            api_key=api_key, model=model or "claude-sonnet-4-20250514"
+        )
 
     elif provider == "groq":
         api_key = llm_config.get("groq_api_key", "")
         if not api_key:
-            raise ValueError("No Groq API key configured. Go to Settings → LLM Providers to add one.")
+            raise ValueError(
+                "No Groq API key configured. Go to Settings → LLM Providers to add one."
+            )
         from llm.openai_provider import GroqProvider
+
         return GroqProvider(api_key=api_key, model=model or "llama-3.3-70b-versatile")
 
     elif provider == "openrouter":
         api_key = llm_config.get("openrouter_api_key", "")
         if not api_key:
-            raise ValueError("No OpenRouter API key configured. Go to Settings → LLM Providers to add one.")
+            raise ValueError(
+                "No OpenRouter API key configured. Go to Settings → LLM Providers to add one."
+            )
         from llm.openrouter_provider import OpenRouterProvider
-        return OpenRouterProvider(api_key=api_key, model=model or "google/gemini-2.0-flash-exp:free")
+
+        return OpenRouterProvider(
+            api_key=api_key, model=model or "google/gemini-2.0-flash-exp:free"
+        )
 
     else:
         raise ValueError(f"Unknown provider: {provider}")

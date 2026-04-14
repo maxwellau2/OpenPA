@@ -21,6 +21,7 @@ def _get_chroma() -> chromadb.ClientAPI:
     global _chroma_client
     if _chroma_client is None:
         from pathlib import Path
+
         chroma_dir = str(Path(config.db_path).parent / "chroma_data")
         _chroma_client = chromadb.PersistentClient(path=chroma_dir)
         logger.info(f"ChromaDB initialized at {chroma_dir}")
@@ -69,7 +70,9 @@ async def delete_memory(user_id: int, memory_id: int):
         pass
 
 
-async def retrieve_relevant_memories(user_id: int, query: str, top_k: int = 10) -> list[dict]:
+async def retrieve_relevant_memories(
+    user_id: int, query: str, top_k: int = 10
+) -> list[dict]:
     """Retrieve the most relevant memories for a user given a query."""
     collection = _get_collection(MEMORIES_COLLECTION)
 
@@ -93,16 +96,20 @@ async def retrieve_relevant_memories(user_id: int, query: str, top_k: int = 10) 
         for i, doc in enumerate(results["documents"][0]):
             metadata = results["metadatas"][0][i] if results["metadatas"] else {}
             distance = results["distances"][0][i] if results["distances"] else 0
-            memories.append({
-                "content": doc,
-                "category": metadata.get("category", "general"),
-                "relevance": round(1 - distance, 3),  # cosine: 1 = identical
-            })
+            memories.append(
+                {
+                    "content": doc,
+                    "category": metadata.get("category", "general"),
+                    "relevance": round(1 - distance, 3),  # cosine: 1 = identical
+                }
+            )
 
     return memories
 
 
-async def store_conversation_message(user_id: int, conv_id: int, message_id: int, role: str, content: str):
+async def store_conversation_message(
+    user_id: int, conv_id: int, message_id: int, role: str, content: str
+):
     """Embed and store a conversation message for semantic search."""
     if not content or len(content.strip()) < 5:
         return
@@ -117,7 +124,9 @@ async def store_conversation_message(user_id: int, conv_id: int, message_id: int
     )
 
 
-async def search_conversation_history(user_id: int, query: str, top_k: int = 10) -> list[dict]:
+async def search_conversation_history(
+    user_id: int, query: str, top_k: int = 10
+) -> list[dict]:
     """Semantic search over past conversation messages."""
     collection = _get_collection(HISTORY_COLLECTION)
 
@@ -140,11 +149,13 @@ async def search_conversation_history(user_id: int, query: str, top_k: int = 10)
         for i, doc in enumerate(results["documents"][0]):
             metadata = results["metadatas"][0][i] if results["metadatas"] else {}
             distance = results["distances"][0][i] if results["distances"] else 0
-            messages.append({
-                "content": doc,
-                "role": metadata.get("role", "unknown"),
-                "conversation_id": metadata.get("conversation_id"),
-                "relevance": round(1 - distance, 3),
-            })
+            messages.append(
+                {
+                    "content": doc,
+                    "role": metadata.get("role", "unknown"),
+                    "conversation_id": metadata.get("conversation_id"),
+                    "relevance": round(1 - distance, 3),
+                }
+            )
 
     return messages

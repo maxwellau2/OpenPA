@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 import httpx
 from fastmcp import FastMCP
 
-from tools.credentials import get_creds
 
 mcp = FastMCP("calendar")
 API_BASE = "https://www.googleapis.com/calendar/v3"
@@ -14,6 +13,7 @@ API_BASE = "https://www.googleapis.com/calendar/v3"
 async def _get_token(user_id: int) -> str:
     """Reuse Gmail's OAuth token refresh logic."""
     from tools.gmail import _get_token as gmail_get_token
+
     return await gmail_get_token(user_id)
 
 
@@ -37,7 +37,9 @@ def _parse_date(value: str, now: datetime) -> datetime:
 
 
 @mcp.tool()
-async def list_events(_user_id: int, date_from: str = "", date_to: str = "", max_results: int = 20) -> dict:
+async def list_events(
+    _user_id: int, date_from: str = "", date_to: str = "", max_results: int = 20
+) -> dict:
     """List upcoming calendar events.
 
     Args:
@@ -71,20 +73,29 @@ async def list_events(_user_id: int, date_from: str = "", date_to: str = "", max
     for event in data.get("items", []):
         start = event.get("start", {})
         end = event.get("end", {})
-        events.append({
-            "id": event["id"],
-            "title": event.get("summary", "(No title)"),
-            "start": start.get("dateTime", start.get("date", "")),
-            "end": end.get("dateTime", end.get("date", "")),
-            "location": event.get("location", ""),
-            "description": (event.get("description", "") or "")[:200],
-        })
+        events.append(
+            {
+                "id": event["id"],
+                "title": event.get("summary", "(No title)"),
+                "start": start.get("dateTime", start.get("date", "")),
+                "end": end.get("dateTime", end.get("date", "")),
+                "location": event.get("location", ""),
+                "description": (event.get("description", "") or "")[:200],
+            }
+        )
 
     return {"events": events, "count": len(events)}
 
 
 @mcp.tool()
-async def create_event(_user_id: int, title: str, start: str, end: str, description: str = "", location: str = "") -> dict:
+async def create_event(
+    _user_id: int,
+    title: str,
+    start: str,
+    end: str,
+    description: str = "",
+    location: str = "",
+) -> dict:
     """Create a new calendar event.
 
     Args:

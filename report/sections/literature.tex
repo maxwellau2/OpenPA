@@ -1,0 +1,56 @@
+\section{Literature Review}
+\label{sec:literature}
+
+This section surveys related work across four domains: commercial personal assistants, open-source agent frameworks, coding agents, and retrieval-augmented generation for personalisation.
+
+\subsection{Commercial Personal Assistants}
+
+Commercial personal assistants---Apple Siri, Google Assistant, and Amazon Alexa---provide voice-driven interfaces to a curated set of services. Google Assistant integrates with Gmail, Calendar, and Google Home devices; Alexa extends to smart home control via ``Skills.'' However, these systems share common limitations:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Vendor lock-in}: Each assistant operates within its parent ecosystem. Google Assistant cannot control Spotify playback on non-Google devices; Siri cannot interact with Discord or Mastodon.
+  \item \textbf{Shallow tool use}: Tasks are limited to single-step commands (``set a timer,'' ``play music''). Multi-step workflows requiring reasoning---such as ``check my PRs, summarise them, and send the summary to my team on Discord''---are not supported.
+  \item \textbf{No code generation}: None of these assistants can write, test, or deploy code.
+  \item \textbf{No self-hosting}: Users cannot run these systems on their own infrastructure, raising privacy concerns for sensitive data such as email and messages.
+\end{itemize}
+
+\subsection{Open-Source Agent Frameworks}
+
+The emergence of LLM-based agents has produced several open-source frameworks. LangChain \cite{chase2022langchain} provides abstractions for chaining LLM calls with tool use, memory, and retrieval. AutoGPT \cite{significantgravitas2023autogpt} demonstrated autonomous goal-directed behaviour using GPT-4, iteratively breaking down objectives into sub-tasks. OpenClaw proposed multi-tool orchestration with a focus on composability.
+
+These frameworks establish important architectural patterns---tool registries, agent loops, and memory systems---but they are \textit{frameworks}, not end-user applications. They require significant development effort to integrate with specific services and lack built-in support for OAuth credential management, multi-tenancy, or user-facing chat interfaces.
+
+\subsection{Coding Agents}
+
+A distinct category of agentic systems focuses on autonomous code generation and modification.
+
+\textbf{Claude Code} \cite{anthropic2025claudecode, claudecodesrc2025} is Anthropic's terminal-based coding agent. Analysis of its source code reveals several sophisticated patterns: an async-generator-based agent loop with explicit state transitions, streaming tool execution with concurrency control, multi-layer context compaction (snip, microcompact, autocompact), and a permission system with wildcard pattern matching. Tools return structured results including \texttt{contextModifier} functions that can mutate the agent's context post-execution. The system uses deferred tool loading (\texttt{shouldDefer}) to avoid overwhelming the model with the full tool set on every turn.
+
+\textbf{OpenAI Codex CLI} \cite{openai2025codexcli} provides a terminal-based interface for code generation, execution, and file manipulation. It uses a simpler agent loop but demonstrates effective integration of sandboxed code execution with file system operations.
+
+\textbf{GitHub Copilot} \cite{github2024copilot} operates as an inline code suggestion engine within IDEs. While highly effective for single-function completions, it is not an agentic system---it does not reason over multi-step tasks, invoke external tools, or manage project-level workflows.
+
+\textbf{Pi} \cite{badlogic2025pi} is a minimal terminal coding harness with four core tools: \texttt{read}, \texttt{write}, \texttt{edit}, and \texttt{bash}. Its key architectural insight is that tool errors are returned as structured tool results rather than exceptions, allowing the LLM to read the error and recover autonomously. Pi also employs \texttt{beforeToolCall}/\texttt{afterToolCall} hooks for validation and supports extensibility through TypeScript extensions and prompt templates.
+
+These coding agents are powerful but operate in isolation. None integrates with broader digital services (email, messaging, music), and none provides multi-user support or persistent personalisation.
+
+\subsection{Retrieval-Augmented Generation and Personalisation}
+
+Retrieval-Augmented Generation (RAG) \cite{lewis2020rag} augments LLM generation with retrieved context from external knowledge stores. By embedding queries and documents into a shared vector space, RAG systems retrieve the most semantically relevant information and inject it into the model's context window.
+
+RAG has been widely adopted for document question-answering, but its application to \textit{user personalisation} in conversational agents remains underexplored. Most personal assistants rely on explicit user settings or session-level context; they do not maintain a persistent semantic memory that grows over time and retrieves relevant user facts based on the current conversation.
+
+\subsection{Tool Calling Protocols}
+
+Anthropic's Model Context Protocol (MCP) \cite{anthropic2024mcp} provides a standardised protocol for connecting LLMs to external tools and data sources. MCP defines a client-server architecture where tool servers expose typed function signatures, and LLM clients discover and invoke these tools at runtime. This decouples the agent's reasoning from the tool implementations, enabling a plugin-like architecture.
+
+\subsection{Prompt Engineering Techniques}
+
+Effective prompting is critical for agent performance. Chain-of-thought prompting \cite{wei2022chainofthought} enables step-by-step reasoning. The ReAct framework \cite{yao2023react} interleaves reasoning traces with action execution. Analysis of production systems such as Claude Code \cite{claudecodesrc2025} and Pi \cite{badlogic2025pi} reveals additional techniques:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Prompt sandwich}: Static system instructions encapsulate dynamic user context and tool definitions, with rules placed both before and after the variable content.
+  \item \textbf{Tool preference hierarchy}: The system prompt explicitly instructs the model which tool to use for which task (e.g., ``use \texttt{workspace\_grep} for searching, not \texttt{bash} with \texttt{grep}'').
+  \item \textbf{Output efficiency directives}: Instructions to ``lead with the answer, not the reasoning'' and ``skip filler words'' reduce token waste and improve user experience.
+  \item \textbf{Adaptive progress injection}: Periodic reminders of the original task and progress so far prevent model drift during long multi-turn sessions.
+\end{itemize}

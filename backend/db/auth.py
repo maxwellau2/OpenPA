@@ -44,7 +44,11 @@ async def create_user(email: str, password: str, display_name: str = "") -> dict
                 (email, hashed, display_name),
             )
             await db.commit()
-            return {"id": cursor.lastrowid, "email": email, "display_name": display_name}
+            return {
+                "id": cursor.lastrowid,
+                "email": email,
+                "display_name": display_name,
+            }
         except aiosqlite.IntegrityError:
             raise ValueError("Email already registered")
 
@@ -58,14 +62,19 @@ async def authenticate_user(email: str, password: str) -> dict:
     if not user or not verify_password(password, user["hashed_password"]):
         raise ValueError("Invalid email or password")
 
-    return {"id": user["id"], "email": user["email"], "display_name": user["display_name"]}
+    return {
+        "id": user["id"],
+        "email": user["email"],
+        "display_name": user["display_name"],
+    }
 
 
 async def get_user(user_id: int) -> dict | None:
     async with aiosqlite.connect(config.db_path) as db:
         db.row_factory = aiosqlite.Row
         cursor = await db.execute(
-            "SELECT id, email, display_name, created_at FROM users WHERE id = ?", (user_id,)
+            "SELECT id, email, display_name, created_at FROM users WHERE id = ?",
+            (user_id,),
         )
         user = await cursor.fetchone()
         return dict(user) if user else None
@@ -106,4 +115,8 @@ async def get_all_user_credentials(user_id: int) -> dict:
             (user_id,),
         )
         rows = await cursor.fetchall()
-        return {"services": [{"service": r["service"], "updated_at": r["updated_at"]} for r in rows]}
+        return {
+            "services": [
+                {"service": r["service"], "updated_at": r["updated_at"]} for r in rows
+            ]
+        }

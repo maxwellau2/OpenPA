@@ -1,7 +1,6 @@
 """Task scheduler — schedule tool calls to execute at a future time."""
 
 import asyncio
-import time
 import uuid
 from datetime import datetime, timezone
 
@@ -58,10 +57,14 @@ async def schedule_task(
             if run_time.tzinfo is None:
                 run_time = run_time.replace(tzinfo=timezone.utc)
         except ValueError:
-            return {"error": f"Invalid datetime format: {run_at}. Use ISO format like 2026-04-09T17:00:00"}
+            return {
+                "error": f"Invalid datetime format: {run_at}. Use ISO format like 2026-04-09T17:00:00"
+            }
     else:
         run_time = datetime.now(timezone.utc).replace(microsecond=0)
-        run_time = run_time.__class__.fromtimestamp(run_time.timestamp() + delay_minutes * 60, tz=timezone.utc)
+        run_time = run_time.__class__.fromtimestamp(
+            run_time.timestamp() + delay_minutes * 60, tz=timezone.utc
+        )
 
     # Parse tool args
     try:
@@ -86,7 +89,9 @@ async def schedule_task(
     task = asyncio.create_task(_execute_job(job_id, delay_seconds, _user_id))
     _running_tasks[job_id] = task
 
-    logger.info(f"Scheduled job {job_id}: {tool_name} in {delay_seconds:.0f}s ({description})")
+    logger.info(
+        f"Scheduled job {job_id}: {tool_name} in {delay_seconds:.0f}s ({description})"
+    )
 
     return {
         "job_id": job_id,
@@ -173,9 +178,12 @@ async def _execute_job(job_id: str, delay_seconds: float, user_id: int):
 
         if hasattr(result, "data") and result.data is not None:
             import json
+
             job["result"] = json.dumps(result.data, default=str)[:1000]
         elif hasattr(result, "content") and result.content:
-            job["result"] = "\n".join(c.text for c in result.content if hasattr(c, "text"))[:1000]
+            job["result"] = "\n".join(
+                c.text for c in result.content if hasattr(c, "text")
+            )[:1000]
         else:
             job["result"] = str(result)[:1000]
 

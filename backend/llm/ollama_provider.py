@@ -17,7 +17,9 @@ class OllamaProvider(LLMProvider):
         self.base_url = config.llm.ollama_base_url
         self.model = model or config.llm.ollama_model
 
-    def _convert_messages(self, messages: list[Message], system: str | None) -> list[dict]:
+    def _convert_messages(
+        self, messages: list[Message], system: str | None
+    ) -> list[dict]:
         """Convert our Message format to OpenAI chat format."""
         result = []
         if system:
@@ -25,11 +27,13 @@ class OllamaProvider(LLMProvider):
 
         for msg in messages:
             if msg.role == "tool":
-                result.append({
-                    "role": "tool",
-                    "tool_call_id": msg.tool_call_id,
-                    "content": msg.content,
-                })
+                result.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": msg.tool_call_id,
+                        "content": msg.content,
+                    }
+                )
             elif msg.role == "assistant" and msg.tool_calls:
                 tool_calls_formatted = [
                     {
@@ -42,11 +46,13 @@ class OllamaProvider(LLMProvider):
                     }
                     for tc in msg.tool_calls
                 ]
-                result.append({
-                    "role": "assistant",
-                    "content": msg.content or "",
-                    "tool_calls": tool_calls_formatted,
-                })
+                result.append(
+                    {
+                        "role": "assistant",
+                        "content": msg.content or "",
+                        "tool_calls": tool_calls_formatted,
+                    }
+                )
             else:
                 result.append({"role": msg.role, "content": msg.content})
 
@@ -62,7 +68,9 @@ class OllamaProvider(LLMProvider):
                 "function": {
                     "name": t["name"],
                     "description": t.get("description", ""),
-                    "parameters": t.get("parameters", {"type": "object", "properties": {}}),
+                    "parameters": t.get(
+                        "parameters", {"type": "object", "properties": {}}
+                    ),
                 },
             }
             for t in tools
@@ -102,21 +110,28 @@ class OllamaProvider(LLMProvider):
                 args = func.get("arguments", "{}")
                 if isinstance(args, str):
                     args = json.loads(args)
-                tool_calls.append(ToolCall(
-                    id=tc.get("id", str(uuid.uuid4())),
-                    name=func["name"],
-                    arguments=args,
-                ))
+                tool_calls.append(
+                    ToolCall(
+                        id=tc.get("id", str(uuid.uuid4())),
+                        name=func["name"],
+                        arguments=args,
+                    )
+                )
 
         content = message.get("content") or ""
         thinking = message.get("reasoning") or ""
 
         # Qwen 3.5 sometimes wraps thinking in <think> tags inside content
         import re
-        think_match = re.search(r"<think(?:ing)?>(.*?)</think(?:ing)?>", content, re.DOTALL)
+
+        think_match = re.search(
+            r"<think(?:ing)?>(.*?)</think(?:ing)?>", content, re.DOTALL
+        )
         if think_match:
             thinking = (thinking + "\n" + think_match.group(1)).strip()
-            content = re.sub(r"<think(?:ing)?>.*?</think(?:ing)?>", "", content, flags=re.DOTALL).strip()
+            content = re.sub(
+                r"<think(?:ing)?>.*?</think(?:ing)?>", "", content, flags=re.DOTALL
+            ).strip()
 
         # Clean up empty strings
         content = content or None

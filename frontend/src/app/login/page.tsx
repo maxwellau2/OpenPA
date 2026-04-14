@@ -27,10 +27,10 @@ export default function LoginPage() {
       const res = isSignup
         ? await signup(email, password, displayName)
         : await login(email, password);
-      setAuth(res.token, res.user as any);
+      setAuth(res.token, res.user as Parameters<typeof setAuth>[1]);
       router.push("/chat");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }

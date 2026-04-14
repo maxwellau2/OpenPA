@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Search, Send, Globe, Activity } from "lucide-react";
+import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Send, Globe, Activity } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -345,8 +345,8 @@ function TelegramConfig({ isConnected }: { isConnected: boolean }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Failed");
       setStep("code_sent");
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -365,8 +365,8 @@ function TelegramConfig({ isConnected }: { isConnected: boolean }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Failed");
       setStep("done");
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setLoading(false);
     }

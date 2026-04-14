@@ -1,0 +1,22 @@
+\section{Problem Statement}
+\label{sec:problem}
+
+Given the gaps identified in Section~\ref{sec:gap}, we define the problem as follows:
+
+\begin{quote}
+\textit{How do we design and implement an open-source, self-hosted personal assistant platform that (1)~orchestrates heterogeneous digital services through a unified natural language interface, (2)~supports multiple LLM providers without vendor lock-in, (3)~learns about users over time through semantic memory, (4)~can autonomously write, test, and deploy code, and (5)~scales to multiple users with per-user credential and data isolation?}
+\end{quote}
+
+This problem decomposes into five sub-problems:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Service Integration (P1)}: How do we provide a uniform interface to services with vastly different APIs (REST, OAuth, WebSocket, local CLI)? The system must handle authentication, rate limiting, and error recovery for each service without exposing this complexity to the user or the LLM.
+
+  \item \textbf{Agent Orchestration (P2)}: How does the LLM decide which tools to call, in what order, and how to handle failures? The agent must support both pre-planned multi-step workflows (e.g., ``search the web, summarise, and send via Telegram'') and adaptive loops where the next action depends on the result of the previous one (e.g., ``run tests; if they fail, fix the code and re-test'').
+
+  \item \textbf{Personalisation (P3)}: How does the system build a persistent understanding of each user that improves over time? The system must store observations about user preferences, personality, interests, and relationships, and retrieve only the \textit{relevant} subset for each conversation---not all memories.
+
+  \item \textbf{Autonomous Code Generation (P4)}: How can the agent modify real codebases safely? It must clone repositories, understand existing code, make targeted changes, run the full test suite and build pipeline, fix any failures, and submit changes via pull request---all without human intervention.
+
+  \item \textbf{Model Compatibility (P5)}: How do we ensure the system works with both large cloud models (70B+ parameters, strong tool-calling) and small local models (7--9B parameters, limited context windows)? The system must adapt the information it sends to the model based on the model's capabilities.
+\end{enumerate}

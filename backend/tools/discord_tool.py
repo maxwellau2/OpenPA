@@ -41,7 +41,9 @@ async def list_servers(_user_id: int) -> dict:
         guild = resp.json()
 
         # Also get channels
-        ch_resp = await client.get(f"{API_BASE}/guilds/{guild_id}/channels", headers=headers)
+        ch_resp = await client.get(
+            f"{API_BASE}/guilds/{guild_id}/channels", headers=headers
+        )
         ch_resp.raise_for_status()
         channels = ch_resp.json()
 
@@ -69,22 +71,28 @@ async def list_channels(_user_id: int, guild_id: str = "") -> dict:
     gid = guild_id or default_guild
 
     if not gid:
-        return {"error": "No guild_id provided and no server connected. Reconnect Discord in Settings."}
+        return {
+            "error": "No guild_id provided and no server connected. Reconnect Discord in Settings."
+        }
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{API_BASE}/guilds/{gid}/channels", headers=headers)
         resp.raise_for_status()
         channels = resp.json()
 
-    return {"channels": [
-        {"id": c["id"], "name": c["name"], "type": c["type"]}
-        for c in channels
-        if c["type"] in (0, 2, 5)
-    ]}
+    return {
+        "channels": [
+            {"id": c["id"], "name": c["name"], "type": c["type"]}
+            for c in channels
+            if c["type"] in (0, 2, 5)
+        ]
+    }
 
 
 @mcp.tool()
-async def send_message(_user_id: int, channel_name: str = "", channel_id: str = "", content: str = "") -> dict:
+async def send_message(
+    _user_id: int, channel_name: str = "", channel_id: str = "", content: str = ""
+) -> dict:
     """Send a message to a Discord channel. You can specify either channel_name or channel_id.
     If channel_name is given, it will look up the channel ID from the connected server.
 
@@ -99,9 +107,13 @@ async def send_message(_user_id: int, channel_name: str = "", channel_id: str = 
     # Resolve channel name to ID if needed
     if channel_name and not channel_id:
         if not guild_id:
-            return {"error": "No server connected. Provide channel_id directly or reconnect Discord."}
+            return {
+                "error": "No server connected. Provide channel_id directly or reconnect Discord."
+            }
         async with httpx.AsyncClient() as client:
-            resp = await client.get(f"{API_BASE}/guilds/{guild_id}/channels", headers=headers)
+            resp = await client.get(
+                f"{API_BASE}/guilds/{guild_id}/channels", headers=headers
+            )
             resp.raise_for_status()
             channels = resp.json()
         for c in channels:
@@ -109,26 +121,37 @@ async def send_message(_user_id: int, channel_name: str = "", channel_id: str = 
                 channel_id = c["id"]
                 break
         if not channel_id:
-            return {"error": f"Channel '{channel_name}' not found. Available: {[c['name'] for c in channels if c['type'] == 0]}"}
+            return {
+                "error": f"Channel '{channel_name}' not found. Available: {[c['name'] for c in channels if c['type'] == 0]}"
+            }
 
     if not channel_id:
         return {"error": "Provide either channel_name or channel_id."}
 
     # Discord has a 2000 char limit — split long messages
-    chunks = [content[i:i+1990] for i in range(0, len(content), 1990)]
+    chunks = [content[i : i + 1990] for i in range(0, len(content), 1990)]
     sent_ids = []
     async with httpx.AsyncClient() as client:
         for chunk in chunks:
             resp = await client.post(
-                f"{API_BASE}/channels/{channel_id}/messages", headers=headers, json={"content": chunk},
+                f"{API_BASE}/channels/{channel_id}/messages",
+                headers=headers,
+                json={"content": chunk},
             )
             resp.raise_for_status()
             sent_ids.append(resp.json()["id"])
-    return {"message_ids": sent_ids, "status": "sent", "parts": len(chunks), "channel_id": channel_id}
+    return {
+        "message_ids": sent_ids,
+        "status": "sent",
+        "parts": len(chunks),
+        "channel_id": channel_id,
+    }
 
 
 @mcp.tool()
-async def read_messages(_user_id: int, channel_name: str = "", channel_id: str = "", limit: int = 20) -> dict:
+async def read_messages(
+    _user_id: int, channel_name: str = "", channel_id: str = "", limit: int = 20
+) -> dict:
     """Read recent messages from a Discord channel. You can specify either channel_name or channel_id.
 
     Args:
@@ -142,9 +165,13 @@ async def read_messages(_user_id: int, channel_name: str = "", channel_id: str =
     # Resolve channel name to ID if needed
     if channel_name and not channel_id:
         if not guild_id:
-            return {"error": "No server connected. Provide channel_id directly or reconnect Discord."}
+            return {
+                "error": "No server connected. Provide channel_id directly or reconnect Discord."
+            }
         async with httpx.AsyncClient() as client:
-            resp = await client.get(f"{API_BASE}/guilds/{guild_id}/channels", headers=headers)
+            resp = await client.get(
+                f"{API_BASE}/guilds/{guild_id}/channels", headers=headers
+            )
             resp.raise_for_status()
             channels = resp.json()
         for c in channels:
@@ -159,17 +186,21 @@ async def read_messages(_user_id: int, channel_name: str = "", channel_id: str =
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(
-            f"{API_BASE}/channels/{channel_id}/messages", headers=headers, params={"limit": limit},
+            f"{API_BASE}/channels/{channel_id}/messages",
+            headers=headers,
+            params={"limit": limit},
         )
         resp.raise_for_status()
         messages = resp.json()
 
-    return {"messages": [
-        {
-            "id": m["id"],
-            "author": m["author"]["username"],
-            "content": m["content"],
-            "timestamp": m["timestamp"],
-        }
-        for m in messages
-    ]}
+    return {
+        "messages": [
+            {
+                "id": m["id"],
+                "author": m["author"]["username"],
+                "content": m["content"],
+                "timestamp": m["timestamp"],
+            }
+            for m in messages
+        ]
+    }

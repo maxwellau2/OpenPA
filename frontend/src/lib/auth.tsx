@@ -27,24 +27,20 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const initialToken = typeof window !== "undefined" ? localStorage.getItem("openpa_token") : null;
+  const [token, setToken] = useState<string | null>(initialToken);
+  const [loading, setLoading] = useState(!!initialToken);
 
   useEffect(() => {
-    const stored = localStorage.getItem("openpa_token");
-    if (stored) {
-      setToken(stored);
-      getMe()
-        .then((data) => setUser(data.user))
-        .catch(() => {
-          localStorage.removeItem("openpa_token");
-          setToken(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, []);
+    if (!token) return;
+    getMe()
+      .then((data) => setUser(data.user))
+      .catch(() => {
+        localStorage.removeItem("openpa_token");
+        setToken(null);
+      })
+      .finally(() => setLoading(false));
+  }, [token]);
 
   function setAuth(newToken: string, newUser: User) {
     localStorage.setItem("openpa_token", newToken);

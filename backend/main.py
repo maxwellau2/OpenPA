@@ -17,9 +17,11 @@ def get_provider() -> LLMProvider:
     """Create the LLM provider based on config."""
     if config.llm.default_provider == "claude":
         from llm.claude_provider import ClaudeProvider
+
         return ClaudeProvider()
     else:
         from llm.ollama_provider import OllamaProvider
+
         return OllamaProvider()
 
 
@@ -30,6 +32,7 @@ async def run_cli():
 
     # Create or get a default CLI user
     from db.auth import create_user, authenticate_user
+
     try:
         user = await create_user("cli@local", "cli", "CLI User")
         logger.info(f"Created CLI user: {user['email']}")
@@ -40,13 +43,20 @@ async def run_cli():
     user_id = user["id"]
 
     logger.info(f"Using LLM provider: {config.llm.default_provider}")
-    logger.info(f"Model: {config.llm.ollama_model if config.llm.default_provider == 'ollama' else config.llm.claude_model}")
+    logger.info(
+        f"Model: {config.llm.ollama_model if config.llm.default_provider == 'ollama' else config.llm.claude_model}"
+    )
 
     async with Client(mcp_server) as mcp_client:
         tools = await mcp_client.list_tools()
         logger.info(f"Loaded {len(tools)} MCP tools: {[t.name for t in tools]}")
 
-        agent = Agent(provider=provider, system_prompt=SYSTEM_PROMPT, mcp_client=mcp_client, user_id=user_id)
+        agent = Agent(
+            provider=provider,
+            system_prompt=SYSTEM_PROMPT,
+            mcp_client=mcp_client,
+            user_id=user_id,
+        )
 
         print("\n=== Personal Assistant ===")
         print(f"Logged in as: {user['email']}")
@@ -55,7 +65,7 @@ async def run_cli():
         while True:
             try:
                 user_input = input("You: ").strip()
-            except (EOFError, KeyboardInterrupt):
+            except EOFError, KeyboardInterrupt:
                 print("\nBye!")
                 break
 
@@ -85,6 +95,7 @@ async def run_telegram():
         logger.info(f"Loaded {len(tools)} MCP tools")
 
         from chat.telegram_bot import create_telegram_app, set_mcp_client, set_provider
+
         set_provider(provider)
         set_mcp_client(mcp_client)
 
@@ -96,7 +107,7 @@ async def run_telegram():
         logger.info("Telegram bot is running. Press Ctrl+C to stop.")
         try:
             await asyncio.Event().wait()  # Run forever
-        except (KeyboardInterrupt, SystemExit):
+        except KeyboardInterrupt, SystemExit:
             pass
         finally:
             await app.updater.stop()
@@ -115,6 +126,7 @@ def run_api():
     """Run the REST API server."""
     import uvicorn
     from services.rest_api import app
+
     uvicorn.run(app, host=config.host, port=config.port)
 
 

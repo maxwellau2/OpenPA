@@ -30,7 +30,11 @@ async def _default_branch(user_id: int, repo: str) -> str:
 
 @mcp.tool()
 async def create_repo(
-    _user_id: int, name: str, description: str = "", private: bool = False, auto_init: bool = True
+    _user_id: int,
+    name: str,
+    description: str = "",
+    private: bool = False,
+    auto_init: bool = True,
 ) -> dict:
     """Create a new GitHub repository for the authenticated user.
 
@@ -49,7 +53,9 @@ async def create_repo(
         "auto_init": auto_init,
     }
     async with httpx.AsyncClient() as client:
-        resp = await client.post(f"{API_BASE}/user/repos", headers=headers, json=payload)
+        resp = await client.post(
+            f"{API_BASE}/user/repos", headers=headers, json=payload
+        )
         resp.raise_for_status()
         repo = resp.json()
     return {
@@ -74,20 +80,26 @@ async def list_repos(_user_id: int, limit: int = 20) -> dict:
         resp = await client.get(
             f"{API_BASE}/user/repos",
             headers=headers,
-            params={"sort": "pushed", "per_page": limit, "affiliation": "owner,collaborator,organization_member"},
+            params={
+                "sort": "pushed",
+                "per_page": limit,
+                "affiliation": "owner,collaborator,organization_member",
+            },
         )
         resp.raise_for_status()
         repos = resp.json()
-    return {"repos": [
-        {
-            "full_name": r["full_name"],
-            "description": (r.get("description") or "")[:100],
-            "private": r["private"],
-            "open_issues": r["open_issues_count"],
-            "pushed_at": r["pushed_at"],
-        }
-        for r in repos
-    ]}
+    return {
+        "repos": [
+            {
+                "full_name": r["full_name"],
+                "description": (r.get("description") or "")[:100],
+                "private": r["private"],
+                "open_issues": r["open_issues_count"],
+                "pushed_at": r["pushed_at"],
+            }
+            for r in repos
+        ]
+    }
 
 
 @mcp.tool()
@@ -115,15 +127,17 @@ async def list_prs(_user_id: int, repo: str = "", state: str = "open") -> dict:
                     )
                     resp.raise_for_status()
                     for pr in resp.json():
-                        all_prs.append({
-                            "repo": r["full_name"],
-                            "number": pr["number"],
-                            "title": pr["title"],
-                            "author": pr["user"]["login"],
-                            "url": pr["html_url"],
-                            "state": pr["state"],
-                            "created_at": pr["created_at"],
-                        })
+                        all_prs.append(
+                            {
+                                "repo": r["full_name"],
+                                "number": pr["number"],
+                                "title": pr["title"],
+                                "author": pr["user"]["login"],
+                                "url": pr["html_url"],
+                                "state": pr["state"],
+                                "created_at": pr["created_at"],
+                            }
+                        )
                 except Exception:
                     continue
         return {"pull_requests": all_prs}
@@ -136,18 +150,20 @@ async def list_prs(_user_id: int, repo: str = "", state: str = "open") -> dict:
         )
         resp.raise_for_status()
         prs = resp.json()
-    return {"pull_requests": [
-        {
-            "repo": repo,
-            "number": pr["number"],
-            "title": pr["title"],
-            "author": pr["user"]["login"],
-            "url": pr["html_url"],
-            "state": pr["state"],
-            "created_at": pr["created_at"],
-        }
-        for pr in prs
-    ]}
+    return {
+        "pull_requests": [
+            {
+                "repo": repo,
+                "number": pr["number"],
+                "title": pr["title"],
+                "author": pr["user"]["login"],
+                "url": pr["html_url"],
+                "state": pr["state"],
+                "created_at": pr["created_at"],
+            }
+            for pr in prs
+        ]
+    }
 
 
 @mcp.tool()
@@ -167,11 +183,15 @@ async def get_pr_diff(_user_id: int, repo: str, pr_number: int) -> dict:
     json_headers = await _headers(_user_id)
 
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{API_BASE}/repos/{repo}/pulls/{pr_number}", headers=diff_headers)
+        resp = await client.get(
+            f"{API_BASE}/repos/{repo}/pulls/{pr_number}", headers=diff_headers
+        )
         resp.raise_for_status()
         diff = resp.text
 
-        meta_resp = await client.get(f"{API_BASE}/repos/{repo}/pulls/{pr_number}", headers=json_headers)
+        meta_resp = await client.get(
+            f"{API_BASE}/repos/{repo}/pulls/{pr_number}", headers=json_headers
+        )
         meta_resp.raise_for_status()
         meta = meta_resp.json()
 
@@ -187,7 +207,9 @@ async def get_pr_diff(_user_id: int, repo: str, pr_number: int) -> dict:
 
 
 @mcp.tool()
-async def create_issue(_user_id: int, repo: str, title: str, body: str, labels: str = "") -> dict:
+async def create_issue(
+    _user_id: int, repo: str, title: str, body: str, labels: str = ""
+) -> dict:
     """Create a new GitHub issue.
 
     Args:
@@ -198,20 +220,136 @@ async def create_issue(_user_id: int, repo: str, title: str, body: str, labels: 
         labels: Comma-separated labels
     """
     headers = await _headers(_user_id)
-    label_list = [l.strip() for l in labels.split(",") if l.strip()] if labels else []
+    label_list = (
+        [lbl.strip() for lbl in labels.split(",") if lbl.strip()] if labels else []
+    )
     payload = {"title": title, "body": body}
     if label_list:
         payload["labels"] = label_list
 
     async with httpx.AsyncClient() as client:
-        resp = await client.post(f"{API_BASE}/repos/{repo}/issues", headers=headers, json=payload)
+        resp = await client.post(
+            f"{API_BASE}/repos/{repo}/issues", headers=headers, json=payload
+        )
         resp.raise_for_status()
         issue = resp.json()
     return {"url": issue["html_url"], "number": issue["number"]}
 
 
 @mcp.tool()
-async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, base: str = "") -> dict:
+async def list_issues(
+    _user_id: int,
+    repo: str = "",
+    state: str = "open",
+    labels: str = "",
+    limit: int = 20,
+) -> dict:
+    """List issues for a repository. If no repo specified, checks recent repos.
+
+    Args:
+        _user_id: User ID (injected automatically)
+        repo: Repository in owner/repo format (auto-discovers if empty)
+        state: Filter by state: 'open', 'closed', or 'all'
+        labels: Comma-separated label filter (e.g. 'bug,enhancement')
+        limit: Max issues to return
+    """
+    headers = await _headers(_user_id)
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        if not repo:
+            # Find repos with open issues
+            resp = await client.get(
+                f"{API_BASE}/user/repos",
+                headers=headers,
+                params={"per_page": 10, "sort": "updated"},
+            )
+            resp.raise_for_status()
+            repos = [
+                r["full_name"] for r in resp.json() if r.get("open_issues_count", 0) > 0
+            ]
+        else:
+            repos = [repo]
+
+        all_issues = []
+        for r in repos[:5]:
+            params = {"state": state, "per_page": min(limit, 30), "sort": "updated"}
+            if labels:
+                params["labels"] = labels
+            resp = await client.get(
+                f"{API_BASE}/repos/{r}/issues", headers=headers, params=params
+            )
+            resp.raise_for_status()
+            for issue in resp.json():
+                if "pull_request" in issue:
+                    continue  # Skip PRs (GitHub API returns PRs as issues)
+                all_issues.append(
+                    {
+                        "repo": r,
+                        "number": issue["number"],
+                        "title": issue["title"],
+                        "state": issue["state"],
+                        "author": issue["user"]["login"],
+                        "labels": [lbl["name"] for lbl in issue.get("labels", [])],
+                        "created_at": issue["created_at"],
+                        "url": issue["html_url"],
+                    }
+                )
+            if len(all_issues) >= limit:
+                break
+
+    return {"issues": all_issues[:limit]}
+
+
+@mcp.tool()
+async def get_issue(_user_id: int, repo: str, issue_number: int) -> dict:
+    """Get full details of a specific issue, including body and comments.
+
+    Args:
+        _user_id: User ID (injected automatically)
+        repo: Repository in owner/repo format
+        issue_number: The issue number
+    """
+    headers = await _headers(_user_id)
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        # Get issue details
+        resp = await client.get(
+            f"{API_BASE}/repos/{repo}/issues/{issue_number}", headers=headers
+        )
+        resp.raise_for_status()
+        issue = resp.json()
+
+        # Get comments
+        resp = await client.get(
+            f"{API_BASE}/repos/{repo}/issues/{issue_number}/comments",
+            headers=headers,
+            params={"per_page": 20},
+        )
+        resp.raise_for_status()
+        comments = resp.json()
+
+    return {
+        "number": issue["number"],
+        "title": issue["title"],
+        "body": issue.get("body", "") or "",
+        "state": issue["state"],
+        "author": issue["user"]["login"],
+        "labels": [lbl["name"] for lbl in issue.get("labels", [])],
+        "created_at": issue["created_at"],
+        "url": issue["html_url"],
+        "comments": [
+            {
+                "author": c["user"]["login"],
+                "body": c["body"][:500],
+                "created_at": c["created_at"],
+            }
+            for c in comments
+        ],
+    }
+
+
+@mcp.tool()
+async def create_pr(
+    _user_id: int, repo: str, title: str, body: str, head: str, base: str = ""
+) -> dict:
     """Create a new pull request. Auto-detects the default branch if base is not specified.
 
     Args:
@@ -244,7 +382,11 @@ async def create_pr(_user_id: int, repo: str, title: str, body: str, head: str, 
                 error_details.append("; ".join(parts) if parts else str(e))
             raise RuntimeError(
                 f"GitHub PR creation failed ({resp.status_code}): {error_body.get('message', 'Unknown error')}. "
-                + (f"Details: {' | '.join(error_details)}" if error_details else f"Raw: {error_body}")
+                + (
+                    f"Details: {' | '.join(error_details)}"
+                    if error_details
+                    else f"Raw: {error_body}"
+                )
             )
         pr = resp.json()
     return {"url": pr["html_url"], "number": pr["number"]}
@@ -259,23 +401,29 @@ async def list_notifications(_user_id: int) -> dict:
     """
     headers = await _headers(_user_id)
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{API_BASE}/notifications", headers=headers, params={"per_page": 20})
+        resp = await client.get(
+            f"{API_BASE}/notifications", headers=headers, params={"per_page": 20}
+        )
         resp.raise_for_status()
         notifs = resp.json()
-    return {"notifications": [
-        {
-            "reason": n["reason"],
-            "title": n["subject"]["title"],
-            "type": n["subject"]["type"],
-            "url": n["subject"].get("url", ""),
-            "updated_at": n["updated_at"],
-        }
-        for n in notifs
-    ]}
+    return {
+        "notifications": [
+            {
+                "reason": n["reason"],
+                "title": n["subject"]["title"],
+                "type": n["subject"]["type"],
+                "url": n["subject"].get("url", ""),
+                "updated_at": n["updated_at"],
+            }
+            for n in notifs
+        ]
+    }
 
 
 @mcp.tool()
-async def create_branch(_user_id: int, repo: str, branch: str, from_branch: str = "") -> dict:
+async def create_branch(
+    _user_id: int, repo: str, branch: str, from_branch: str = ""
+) -> dict:
     """Create a new branch in a repository. Use this before pushing files for a new feature.
 
     Args:
@@ -304,13 +452,20 @@ async def create_branch(_user_id: int, repo: str, branch: str, from_branch: str 
         )
         if resp.status_code == 422:
             # Branch already exists — that's fine, just return it
-            return {"branch": branch, "sha": sha, "based_on": from_branch, "note": "branch already existed"}
+            return {
+                "branch": branch,
+                "sha": sha,
+                "based_on": from_branch,
+                "note": "branch already existed",
+            }
         resp.raise_for_status()
     return {"branch": branch, "sha": sha, "based_on": from_branch}
 
 
 @mcp.tool()
-async def list_files(_user_id: int, repo: str, path: str = "", branch: str = "") -> dict:
+async def list_files(
+    _user_id: int, repo: str, path: str = "", branch: str = ""
+) -> dict:
     """List files and directories in a repository path. Use this to explore repo structure.
 
     Args:
@@ -336,15 +491,17 @@ async def list_files(_user_id: int, repo: str, path: str = "", branch: str = "")
     if isinstance(data, dict):
         return {"type": "file", "name": data["name"], "size": data.get("size", 0)}
 
-    return {"files": [
-        {
-            "name": item["name"],
-            "type": item["type"],  # "file" or "dir"
-            "path": item["path"],
-            "size": item.get("size", 0),
-        }
-        for item in data
-    ]}
+    return {
+        "files": [
+            {
+                "name": item["name"],
+                "type": item["type"],  # "file" or "dir"
+                "path": item["path"],
+                "size": item.get("size", 0),
+            }
+            for item in data
+        ]
+    }
 
 
 @mcp.tool()
@@ -382,7 +539,9 @@ async def get_file(_user_id: int, repo: str, path: str, branch: str = "") -> dic
 
 
 @mcp.tool()
-async def push_file(_user_id: int, repo: str, path: str, content: str, message: str, branch: str) -> dict:
+async def push_file(
+    _user_id: int, repo: str, path: str, content: str, message: str, branch: str
+) -> dict:
     """Create or update a file in a GitHub repository.
 
     Args:
@@ -406,7 +565,9 @@ async def push_file(_user_id: int, repo: str, path: str, content: str, message: 
         if existing.status_code == 200:
             payload["sha"] = existing.json()["sha"]
 
-        resp = await client.put(f"{API_BASE}/repos/{repo}/contents/{path}", headers=headers, json=payload)
+        resp = await client.put(
+            f"{API_BASE}/repos/{repo}/contents/{path}", headers=headers, json=payload
+        )
         resp.raise_for_status()
         result = resp.json()
 

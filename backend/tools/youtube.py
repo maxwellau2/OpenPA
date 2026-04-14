@@ -23,7 +23,9 @@ EXPIRY_SECONDS = 1200
 def _cleanup_expired():
     """Remove expired downloads."""
     now = time.time()
-    expired = [k for k, v in _downloads.items() if now - v["created_at"] > EXPIRY_SECONDS]
+    expired = [
+        k for k, v in _downloads.items() if now - v["created_at"] > EXPIRY_SECONDS
+    ]
     for k in expired:
         path = _downloads[k]["path"]
         if os.path.exists(path):
@@ -62,6 +64,7 @@ async def download_video(_user_id: int, url: str) -> dict:
 
     info = {"title": "video"}
     try:
+
         def _download():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 return ydl.extract_info(url, download=True)
@@ -109,6 +112,7 @@ async def get_video_info(_user_id: int, url: str) -> dict:
     ydl_opts = {"quiet": True, "no_warnings": True}
 
     try:
+
         def _extract():
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 return ydl.extract_info(url, download=False)

@@ -40,7 +40,9 @@ async def get_home_timeline(_user_id: int, limit: int = 20) -> dict:
 
 
 @mcp.tool()
-async def get_public_timeline(_user_id: int, local: bool = False, limit: int = 20) -> dict:
+async def get_public_timeline(
+    _user_id: int, local: bool = False, limit: int = 20
+) -> dict:
     """Fetch the public or local timeline to see what's trending on the instance.
 
     Args:
@@ -79,15 +81,21 @@ async def get_trending_tags(_user_id: int, limit: int = 10) -> dict:
         )
         resp.raise_for_status()
         tags = resp.json()
-    return {"trending_tags": [
-        {
-            "name": t["name"],
-            "url": t.get("url", ""),
-            "uses_today": t.get("history", [{}])[0].get("uses", "0") if t.get("history") else "0",
-            "accounts_today": t.get("history", [{}])[0].get("accounts", "0") if t.get("history") else "0",
-        }
-        for t in tags
-    ]}
+    return {
+        "trending_tags": [
+            {
+                "name": t["name"],
+                "url": t.get("url", ""),
+                "uses_today": t.get("history", [{}])[0].get("uses", "0")
+                if t.get("history")
+                else "0",
+                "accounts_today": t.get("history", [{}])[0].get("accounts", "0")
+                if t.get("history")
+                else "0",
+            }
+            for t in tags
+        ]
+    }
 
 
 @mcp.tool()
@@ -179,7 +187,11 @@ async def post_status(
         )
         resp.raise_for_status()
         status = resp.json()
-    return {"id": status["id"], "url": status.get("url", ""), "created_at": status["created_at"]}
+    return {
+        "id": status["id"],
+        "url": status.get("url", ""),
+        "created_at": status["created_at"],
+    }
 
 
 @mcp.tool()
@@ -200,15 +212,19 @@ async def get_notifications(_user_id: int, limit: int = 15) -> dict:
         )
         resp.raise_for_status()
         notifs = resp.json()
-    return {"notifications": [
-        {
-            "type": n["type"],
-            "created_at": n["created_at"],
-            "account": n["account"]["acct"],
-            "status_content": _strip_html(n["status"]["content"])[:200] if n.get("status") else None,
-        }
-        for n in notifs
-    ]}
+    return {
+        "notifications": [
+            {
+                "type": n["type"],
+                "created_at": n["created_at"],
+                "account": n["account"]["acct"],
+                "status_content": _strip_html(n["status"]["content"])[:200]
+                if n.get("status")
+                else None,
+            }
+            for n in notifs
+        ]
+    }
 
 
 @mcp.tool()
@@ -221,7 +237,9 @@ async def get_account_info(_user_id: int) -> dict:
     headers = await _headers(_user_id)
     base = await _base_url(_user_id)
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{base}/api/v1/accounts/verify_credentials", headers=headers)
+        resp = await client.get(
+            f"{base}/api/v1/accounts/verify_credentials", headers=headers
+        )
         resp.raise_for_status()
         acct = resp.json()
     return {
@@ -256,8 +274,14 @@ def _format_status(s: dict) -> dict:
 def _strip_html(html: str) -> str:
     """Minimal HTML tag stripping for Mastodon content."""
     import re
+
     text = re.sub(r"<br\s*/?>", "\n", html)
     text = re.sub(r"</p><p>", "\n\n", text)
     text = re.sub(r"<[^>]+>", "", text)
-    text = text.replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">").replace("&quot;", '"')
+    text = (
+        text.replace("&amp;", "&")
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace("&quot;", '"')
+    )
     return text.strip()

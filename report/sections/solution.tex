@@ -1,0 +1,275 @@
+\section{Solution Design}
+\label{sec:solution}
+
+This section presents the architecture of OpenPA, mapping each design decision to the sub-problems defined in Section~\ref{sec:problem}.
+
+\subsection{System Architecture Overview}
+
+OpenPA follows a three-tier architecture:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Frontend}: A Next.js 16 \cite{nextjs2024} web application providing the chat interface, settings management, and real-time streaming via Server-Sent Events (SSE).
+  \item \textbf{Backend}: A FastAPI \cite{fastapi2024} server hosting the agent loop, LLM provider abstraction, MCP tool registry, RAG system, and REST API.
+  \item \textbf{Data Layer}: SQLite for relational data (users, conversations, credentials) and ChromaDB \cite{chromadb2024} for vector embeddings (semantic memory and conversation search).
+\end{itemize}
+
+\subsection{MCP-Based Tool Architecture (P1)}
+
+To address the service integration problem, OpenPA adopts Anthropic's Model Context Protocol (MCP) \cite{anthropic2024mcp} as the universal tool interface. Each service is implemented as a self-contained FastMCP \cite{fastmcp2024} server with typed tool definitions.
+
+\begin{lstlisting}[language=Python, caption={Example tool definition (simplified)}]
+@mcp.tool()
+async def send_message(_user_id: int, to: str, message: str):
+    """Send a Telegram message. Auto-resolves contact names."""
+    creds = await get_creds(_user_id, "telegram")
+    # ... send via Telegram API
+\end{lstlisting}
+
+All 15 service servers are mounted into a composite registry with namespace prefixes:
+
+\begin{lstlisting}[language=Python, caption={Tool registry mounting}]
+mcp = FastMCP("openpa")
+mcp.mount(gmail_mcp, namespace="gmail")      # gmail_send_email, ...
+mcp.mount(github_mcp, namespace="github")    # github_create_pr, ...
+mcp.mount(workspace_mcp, namespace="ws")     # ws_workspace_run, ...
+# ... 12 more services
+\end{lstlisting}
+
+This architecture yields 83 tools across 15 namespaces. Each tool receives a \texttt{\_user\_id} parameter injected by the agent loop, ensuring per-user credential isolation. OAuth tokens are stored per-user in the database and fetched on demand via a \texttt{get\_creds(user\_id, service)} helper.
+
+Table~\ref{tab:services} summarises the service integrations.
+
+\begin{table}[H]
+\centering
+\caption{OpenPA service integrations}
+\label{tab:services}
+\small
+\begin{tabularx}{\textwidth}{l|c|X}
+\toprule
+\textbf{Service} & \textbf{Tools} & \textbf{Key Capabilities} \\
+\midrule
+GitHub      & 11 & Repos, PRs, issues, branches, file read/write, notifications \\
+Workspace   & 15 & Clone, edit, grep, inspect, run tests/builds, commit, push \\
+Memory      &  8 & Preferences, semantic memories, conversation search \\
+Gmail       &  4 & Unread, read, send, reply (with search syntax) \\
+Mastodon    &  9 & Timelines, trending, search, post, notifications \\
+Spotify     &  5 & Play, pause, search, playlists, current track \\
+Discord     &  4 & Servers, channels, send/read messages \\
+Telegram    &  4 & Contacts, send/read messages, chat listing \\
+Calendar    &  3 & List, create, delete events \\
+Sandbox     &  7 & Run Python/JS, multi-file test, verify syntax, export files \\
+Scheduler   &  3 & Schedule future tool calls, list, cancel \\
+Web Scrape  &  3 & Fetch page text, extract tables, extract links \\
+RSS         &  4 & Fetch, list, add feeds \\
+YouTube     &  2 & Download video, get video info \\
+Web Search  &  1 & DuckDuckGo search \\
+\midrule
+\textbf{Total} & \textbf{83} & \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Adaptive Agent Loop (P2)}
+
+The agent loop is the core reasoning engine. OpenPA implements a dual-mode execution model:
+
+\subsubsection{Mode A: Plan-Then-Execute}
+
+For multi-step tasks that do \textit{not} involve coding (e.g., ``search the web for coffee roasters, compose a summary, and send it via Telegram''), the agent first generates an execution plan as a JSON array:
+
+\begin{lstlisting}[language=Python, caption={Example execution plan}]
+[
+  {"step": 1, "tool": "web_search", "args": {"query": "..."}},
+  {"step": 2, "tool": "llm_generate", "args": {"prompt": "Summarise..."}, "depends_on": 1},
+  {"step": 3, "tool": "telegram_send_message", "args": {"to": "...", "content": ""}, "depends_on": 2}
+]
+\end{lstlisting}
+
+Steps linked by \texttt{depends\_on} receive the output of the referenced step. A regex-based template replacement system handles various placeholder formats (e.g., \texttt{\{\{step\_2.output\}\}}) that LLMs tend to generate, with a safety net that replaces any remaining \texttt{\{\{...\}\}} templates with the most recent step's result.
+
+\subsubsection{Mode B: Adaptive Loop}
+
+For coding tasks and simple queries, the agent uses an adaptive loop where the LLM decides the next action based on tool results. This is critical for vibe-coding, where test failures require reading the error, fixing the code, and re-testing---a flow that cannot be pre-planned.
+
+\begin{lstlisting}[language=Python, caption={Simplified adaptive loop}]
+while iterations < max_iterations:
+    response = await provider.chat(messages, tools, system_prompt)
+    if response.has_tool_calls:
+        for tool_call in response.tool_calls:
+            result = await call_tool(tool_call.name, tool_call.arguments)
+            # Result appended to conversation; LLM sees it next iteration
+    else:
+        break  # LLM chose to respond with text; task complete
+\end{lstlisting}
+
+The planner explicitly routes coding tasks to the adaptive loop:
+
+\begin{quote}
+\textit{``If the request involves CODING, WORKSPACE, or VIBE-CODING, ALWAYS output \texttt{\{"simple": true\}}. These tasks MUST use the adaptive loop so you can react to test failures.''}
+\end{quote}
+
+Workspace tasks receive an extended iteration limit (50 vs.\ 30) to accommodate multiple test-fix cycles. Progress reminders are injected every three iterations to prevent model drift.
+
+\subsubsection{Tool Filtering (P5)}
+
+To address the model compatibility problem, OpenPA implements context-aware tool filtering. Tools are categorised into nine semantic groups (core, workspace, github, communication, media, web, social, productivity, sandbox). Keywords in the user's message determine which categories are exposed:
+
+\begin{lstlisting}[language=Python, caption={Tool filtering example}]
+# "Add a health check endpoint" -> workspace + github + core = 34 tools
+# "Play some music"             -> media + core = 15 tools
+# "Who am I?"                   -> core only = 8 tools
+\end{lstlisting}
+
+This reduces the tool set from 83 to as few as 8 tools, enabling smaller models (7--9B parameters) to function effectively. When workspace tools are called during execution, the filter dynamically expands to include GitHub and web tools for related operations.
+
+\subsubsection{Error Recovery}
+
+Inspired by the Pi coding agent \cite{badlogic2025pi}, tool errors are returned as structured JSON messages rather than exceptions:
+
+\begin{lstlisting}[language=Python, caption={Error-as-tool-result pattern}]
+{"error": true, "tool": "github_create_pr",
+ "message": "Validation Failed: base branch 'main' not found",
+ "hint": "Read the error message, fix the issue, and try again."}
+\end{lstlisting}
+
+This allows the LLM to read the error, reason about the cause, and take corrective action---such as changing the base branch from \texttt{main} to \texttt{master}.
+
+\subsection{RAG-Based Personalisation (P3)}
+
+OpenPA's personalisation system uses Retrieval-Augmented Generation to build a persistent understanding of each user.
+
+\subsubsection{Architecture}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Embedding model}: Ollama \cite{ollama2024} running \texttt{nomic-embed-text} locally (768-dimensional vectors, no API key required).
+  \item \textbf{Vector store}: ChromaDB \cite{chromadb2024} with persistent storage, cosine similarity, and metadata filtering by \texttt{user\_id}.
+  \item \textbf{Collections}: Two collections---\texttt{user\_memories} (personality, interests, work, relationships) and \texttt{conversation\_history} (semantic search over past messages).
+\end{itemize}
+
+\subsubsection{Memory Lifecycle}
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Acquisition}: The LLM is instructed to call \texttt{remember\_about\_user} whenever the user shares personal information. The system prompt provides explicit examples: \textit{``if a user says `I'm a software developer and I like hiking,' save TWO memories: one for work and one for interests.''}
+  \item \textbf{Embedding}: Each memory is embedded via Ollama and stored in ChromaDB with the user ID and category as metadata.
+  \item \textbf{Retrieval}: On each new message, the user's query is embedded and the top-10 most relevant memories are retrieved by cosine similarity, filtered by user ID.
+  \item \textbf{Injection}: Retrieved memories are appended to the system prompt with relevance scores, providing context without loading all memories.
+\end{enumerate}
+
+This approach scales to thousands of memories per user---only the relevant subset is retrieved per conversation turn, keeping the context window small.
+
+\subsection{Vibe-Coding Workspace (P4)}
+
+The workspace system provides a full git-based development environment for the agent to autonomously develop features.
+
+\subsubsection{Tool Suite}
+
+Fifteen workspace tools cover the complete development workflow:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Exploration}: \texttt{list\_files}, \texttt{read\_file}, \texttt{grep} (regex), \texttt{find} (glob), \texttt{inspect} (AST-based extraction of classes, functions, signatures, and docstrings)
+  \item \textbf{Modification}: \texttt{write\_file}, \texttt{edit\_file} (precise find-and-replace), \texttt{delete\_file}, \texttt{install} (auto-detects pip/uv/npm)
+  \item \textbf{Verification}: \texttt{run} (any shell command---pytest, npm run build, ruff), \texttt{check\_syntax} (py\_compile + ruff for Python, tsc for TypeScript)
+  \item \textbf{Git}: \texttt{diff}, \texttt{commit\_push} (with auto-cleanup), \texttt{create} (clone + branch), \texttt{cleanup}
+\end{itemize}
+
+\subsubsection{Adaptive Workflow}
+
+The system prompt defines a four-phase adaptive workflow:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Understand}: Clone the repository, explore the file structure, read relevant code, grep for patterns, inspect function signatures.
+  \item \textbf{Research}: Search online documentation for unfamiliar libraries using \texttt{web\_search} and \texttt{scrape\_fetch\_page}.
+  \item \textbf{Implement}: Install dependencies, write/edit code, check syntax on each changed file.
+  \item \textbf{Verify (loop)}: Run pytest and npm run build. If either fails, read the error output, fix the code, and re-run. Repeat until all checks pass. If stuck after three attempts, report the issue to the user.
+\end{enumerate}
+
+The workspace is automatically cleaned up after a successful \texttt{commit\_push}, and expires after one hour if abandoned.
+
+\subsubsection{Code Inspection}
+
+The \texttt{workspace\_inspect} tool uses Python's \texttt{ast} module to extract structured information from source files:
+
+\begin{lstlisting}[language=Python, caption={AST-based code inspection output}]
+{"classes": [{"name": "Agent", "bases": ["object"],
+  "methods": [{"name": "__init__", "signature": "def __init__(self, provider: LLMProvider, ...)",
+               "docstring": "Initialize the agent with a provider and system prompt."}]}],
+ "functions": [...], "imports": [...], "constants": [...]}
+\end{lstlisting}
+
+This allows the agent to understand APIs and constructors before using them, rather than reading entire files.
+
+\subsection{Self-Evolution: The Assistant That Extends Itself}
+
+A distinctive feature of OpenPA is that the vibe-coding system can be directed at the assistant's \textit{own} codebase. Since OpenPA's source code is hosted on GitHub (\texttt{maxwellau2/OpenPA}), the same workspace tools that modify external repositories can modify OpenPA itself.
+
+When a user says ``add a LinkedIn tool to OpenPA,'' the agent executes the following self-modification workflow:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Clone self}: \texttt{ws\_workspace\_create(repo="maxwellau2/OpenPA", branch="feature/linkedin-tool")}
+  \item \textbf{Learn patterns}: Read an existing tool file (e.g., \texttt{backend/tools/mastodon.py}) and the tool registry (\texttt{backend/tools/registry.py}) to understand the FastMCP tool pattern, credential handling, and namespace mounting convention.
+  \item \textbf{Generate}: Create \texttt{backend/tools/linkedin.py} following the established pattern, with appropriate tool definitions, OAuth credential retrieval, and API calls.
+  \item \textbf{Register}: Update \texttt{registry.py} to import and mount the new tool server.
+  \item \textbf{Test}: Write unit tests in \texttt{backend/tests/test\_linkedin.py} and run the full test suite.
+  \item \textbf{Build}: Run \texttt{npm run build} on the frontend to ensure no breakage.
+  \item \textbf{Ship}: Commit, push, and create a pull request for human review.
+\end{enumerate}
+
+This makes OpenPA a \textbf{self-evolving platform}: the set of services it supports is not fixed at development time but can grow through natural language requests. The MCP-based tool architecture ensures that new tools are automatically discoverable by the agent loop once registered, without requiring changes to the agent, the system prompt, or the frontend.
+
+\subsubsection{Evolution Triggers}
+
+Self-evolution can be triggered through multiple channels:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Direct user request}: A user types ``add a LinkedIn tool'' in the chat interface. The agent enters workspace mode and executes the self-modification workflow immediately.
+  \item \textbf{GitHub Issues}: The agent can monitor its own repository for new issues using \texttt{github\_list\_notifications}. When a user (or community contributor) files an issue such as ``Feature request: add Notion integration,'' the agent can read the issue, understand the requirements, and autonomously begin implementation---creating a branch, writing the code, and linking the resulting PR to the original issue.
+  \item \textbf{Scheduled evolution}: Using the \texttt{scheduler\_schedule\_task} tool, periodic self-improvement cycles can be scheduled. For example, a nightly job could check for open feature-request issues and attempt to implement the highest-priority one.
+\end{itemize}
+
+\subsubsection{Safety Bounds}
+
+The self-evolution capability is bounded by multiple safety mechanisms:
+
+\begin{itemize}[leftmargin=*]
+  \item Changes are submitted as \textbf{pull requests}, not merged directly---a human reviews before deployment.
+  \item The \textbf{full test suite must pass} before pushing; broken code is never shipped.
+  \item The workspace is \textbf{cleaned up automatically} after push, preventing resource leakage.
+  \item The agent operates on a \textbf{cloned copy} of the repository, not the live deployment, eliminating the risk of corrupting the running instance.
+\end{itemize}
+
+\subsection{System Prompt Design}
+
+The system prompt (approximately 4,500 words) follows a structured format inspired by Claude Code \cite{claudecodesrc2025} and Pi \cite{badlogic2025pi}:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Identity and scope}: Establishes the agent's role and capabilities.
+  \item \textbf{Action rules}: Always use tools; never apologise for lack of access; parallelise independent tool calls.
+  \item \textbf{Memory rules}: Proactively save user facts; check existing memories before acting.
+  \item \textbf{Tool preference hierarchy}: Explicit mapping of task types to tool categories (e.g., ``use workspace tools for repo work, sandbox for one-off scripts'').
+  \item \textbf{Output rules}: Be concise; lead with the answer; summarise tool output.
+  \item \textbf{Coding rules}: Don't over-engineer; read before writing; never push broken code.
+  \item \textbf{Workflow templates}: Detailed vibe-coding and self-evolution workflows.
+  \item \textbf{Concrete examples}: 20+ example user queries mapped to expected tool call sequences.
+\end{enumerate}
+
+Dynamic context---including the user's email, connected services, and RAG-retrieved memories---is appended after the static rules, forming a ``prompt sandwich'' where stable instructions bracket variable context.
+
+\subsection{Multi-Provider LLM Support (P5)}
+
+OpenPA defines an abstract \texttt{LLMProvider} interface with a single method:
+
+\begin{lstlisting}[language=Python]
+async def chat(self, messages: list[Message],
+               tools: list[dict] | None, system: str | None) -> LLMResponse
+\end{lstlisting}
+
+Six providers implement this interface, each converting the unified message and tool format to provider-specific schemas.
+
+OpenPA adopts a \textbf{Bring-Your-Own-Key (BYOK)} model: the server stores no LLM provider credentials. Each user configures their own API keys through the settings page, and these are stored per-user in the database. This design has several advantages:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Cost transparency}: Users pay their own provider bills directly; the platform operator bears no inference cost.
+  \item \textbf{No vendor lock-in}: One user may use Gemini's free tier for casual tasks while another uses Claude Sonnet for complex workflows---on the same OpenPA instance.
+  \item \textbf{Privacy}: Users with strict data requirements can use Ollama \cite{ollama2024} with locally-hosted models (e.g., Gemma 4, Qwen 3.5, Llama 3.1), ensuring no data leaves their machine.
+  \item \textbf{Scalability}: The server-side cost of adding users is near-zero since inference is offloaded to external providers or local hardware.
+\end{itemize}

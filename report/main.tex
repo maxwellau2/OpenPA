@@ -1,0 +1,92 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{pifont}
+\usepackage{amssymb}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% Code listing style
+\definecolor{codebg}{rgb}{0.95,0.95,0.95}
+\definecolor{codegreen}{rgb}{0.0,0.5,0.0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstdefinestyle{codestyle}{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  captionpos=b,
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{codepurple}\bfseries,
+  stringstyle=\color{red},
+  numberstyle=\tiny\color{codegray},
+  numbers=left,
+  frame=single,
+  rulecolor=\color{codegray},
+  tabsize=2
+}
+\lstset{style=codestyle}
+
+% Hyperref config
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!70!black,
+  citecolor=green!50!black,
+  urlcolor=blue!70!black
+}
+
+% Line spacing
+\usepackage{setspace}
+\onehalfspacing
+
+% ─────────────────────────────────────────────────────────
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\Huge\bfseries OpenPA: An Open-Source Personal\\Assistant-as-a-Service with\\LLM-Driven Tool Orchestration\\and Autonomous Code Generation\par}
+  \vspace{1.5cm}
+  {\Large Maxwell Au\par}
+  \vspace{0.5cm}
+  {\large College of Computer and Data Science\\Nanyang Technological University\par}
+  \vspace{1cm}
+  {\large Course Project Report\par}
+  \vspace{0.5cm}
+  {\large April 2026\par}
+  \vfill
+  {\normalsize\textit{Source code: \url{https://github.com/maxwellau2/OpenPA}}\par}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+% ─── Sections ───────────────────────────────────────────
+\input{sections/introduction}
+\input{sections/literature}
+\input{sections/gap}
+\input{sections/problem}
+\input{sections/solution}
+\input{sections/examples}
+\input{sections/conclusion}
+
+% ─── References ─────────────────────────────────────────
+\newpage
+\printbibliography[title={References}]
+
+\end{document}

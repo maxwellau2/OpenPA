@@ -27,12 +27,16 @@ async def _get_headers(user_id: int) -> dict:
             resp = await client.post(
                 "https://accounts.spotify.com/api/token",
                 headers={"Authorization": f"Basic {auth}"},
-                data={"grant_type": "refresh_token", "refresh_token": creds["refresh_token"]},
+                data={
+                    "grant_type": "refresh_token",
+                    "refresh_token": creds["refresh_token"],
+                },
             )
             if resp.is_success:
                 new_data = resp.json()
                 creds["access_token"] = new_data["access_token"]
                 from db.auth import set_user_credentials
+
                 await set_user_credentials(user_id, "spotify", creds)
                 headers = {"Authorization": f"Bearer {creds['access_token']}"}
 
@@ -54,14 +58,29 @@ async def play(_user_id: int, query: str = "", uri: str = "") -> dict:
 
     # If query given but no URI, search for it
     if query and not uri:
-        mood_words = {"focus", "chill", "relax", "study", "workout", "party", "sleep",
-                      "lo-fi", "lofi", "ambient", "jazz", "classical", "calm", "energy"}
+        mood_words = {
+            "focus",
+            "chill",
+            "relax",
+            "study",
+            "workout",
+            "party",
+            "sleep",
+            "lo-fi",
+            "lofi",
+            "ambient",
+            "jazz",
+            "classical",
+            "calm",
+            "energy",
+        }
 
         # Try playlist first for mood/genre queries
         if any(w in query.lower() for w in mood_words):
             async with httpx.AsyncClient() as client:
                 resp = await client.get(
-                    f"{API_BASE}/search", headers=headers,
+                    f"{API_BASE}/search",
+                    headers=headers,
                     params={"q": query, "type": "playlist", "limit": 1},
                 )
                 if resp.is_success:
@@ -74,7 +93,8 @@ async def play(_user_id: int, query: str = "", uri: str = "") -> dict:
         if not uri:
             async with httpx.AsyncClient() as client:
                 resp = await client.get(
-                    f"{API_BASE}/search", headers=headers,
+                    f"{API_BASE}/search",
+                    headers=headers,
                     params={"q": query, "type": "track", "limit": 1},
                 )
                 if resp.is_success:
@@ -96,7 +116,9 @@ async def play(_user_id: int, query: str = "", uri: str = "") -> dict:
 
     async with httpx.AsyncClient() as client:
         # Check for active device; if none, transfer playback to the first available one
-        devices_resp = await client.get(f"{API_BASE}/me/player/devices", headers=headers)
+        devices_resp = await client.get(
+            f"{API_BASE}/me/player/devices", headers=headers
+        )
         if devices_resp.is_success:
             devices = devices_resp.json().get("devices", [])
             active = [d for d in devices if d.get("is_active")]
@@ -110,18 +132,24 @@ async def play(_user_id: int, query: str = "", uri: str = "") -> dict:
                 )
                 # Give Spotify a moment to activate
                 import asyncio
+
                 await asyncio.sleep(1)
             elif not devices:
-                return {"error": "No Spotify devices found. Open Spotify on any device first."}
+                return {
+                    "error": "No Spotify devices found. Open Spotify on any device first."
+                }
 
         resp = await client.put(
-            f"{API_BASE}/me/player/play", headers=headers,
+            f"{API_BASE}/me/player/play",
+            headers=headers,
             json=body if body else None,
         )
         if resp.status_code in (200, 204):
             return {"status": "playing", "query": query or "resumed"}
         if resp.status_code == 404:
-            return {"error": "No active Spotify device found. Open Spotify on your phone or computer and try again."}
+            return {
+                "error": "No active Spotify device found. Open Spotify on your phone or computer and try again."
+            }
         if resp.status_code == 403:
             return {"error": "Spotify playback requires a Premium account."}
         resp.raise_for_status()
@@ -156,11 +184,15 @@ async def current_track(_user_id: int) -> dict:
     """
     headers = await _get_headers(_user_id)
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{API_BASE}/me/player/currently-playing", headers=headers)
+        resp = await client.get(
+            f"{API_BASE}/me/player/currently-playing", headers=headers
+        )
         if resp.status_code == 204:
             return {"status": "nothing_playing"}
         if resp.status_code == 401:
-            return {"error": "Spotify token expired. Please reconnect Spotify in Settings."}
+            return {
+                "error": "Spotify token expired. Please reconnect Spotify in Settings."
+            }
         resp.raise_for_status()
         data = resp.json()
 
@@ -177,7 +209,9 @@ async def current_track(_user_id: int) -> dict:
 
 
 @mcp.tool()
-async def search(_user_id: int, query: str, type: str = "track", limit: int = 5) -> dict:
+async def search(
+    _user_id: int, query: str, type: str = "track", limit: int = 5
+) -> dict:
     """Search Spotify for tracks, albums, or playlists.
 
     Args:
@@ -189,7 +223,8 @@ async def search(_user_id: int, query: str, type: str = "track", limit: int = 5)
     headers = await _get_headers(_user_id)
     async with httpx.AsyncClient() as client:
         resp = await client.get(
-            f"{API_BASE}/search", headers=headers,
+            f"{API_BASE}/search",
+            headers=headers,
             params={"q": query, "type": type, "limit": limit},
         )
         resp.raise_for_status()
@@ -219,12 +254,16 @@ async def get_playlists(_user_id: int, limit: int = 20) -> dict:
     """
     headers = await _get_headers(_user_id)
     async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{API_BASE}/me/playlists", headers=headers, params={"limit": limit})
+        resp = await client.get(
+            f"{API_BASE}/me/playlists", headers=headers, params={"limit": limit}
+        )
         resp.raise_for_status()
         data = resp.json()
 
-    return {"playlists": [
-        {"name": p["name"], "uri": p["uri"], "tracks": p["tracks"]["total"]}
-        for p in data.get("items", [])
-        if p is not None
-    ]}
+    return {
+        "playlists": [
+            {"name": p["name"], "uri": p["uri"], "tracks": p["tracks"]["total"]}
+            for p in data.get("items", [])
+            if p is not None
+        ]
+    }

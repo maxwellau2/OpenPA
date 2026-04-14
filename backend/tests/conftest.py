@@ -11,10 +11,10 @@ import pytest_asyncio
 _test_db = tempfile.mktemp(suffix=".db")
 os.environ["DB_PATH"] = _test_db
 
-from db.database import init_db
-from db.auth import create_user, authenticate_user
-from fastmcp import Client
-from tools.registry import mcp
+from db.database import init_db  # noqa: E402
+from db.auth import create_user, authenticate_user  # noqa: E402
+from fastmcp import Client  # noqa: E402
+from tools.registry import mcp  # noqa: E402
 
 
 @pytest.fixture(scope="session")

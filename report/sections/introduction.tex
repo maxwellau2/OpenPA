@@ -1,0 +1,26 @@
+\section{Introduction}
+\label{sec:introduction}
+
+The modern digital professional interacts with a fragmented ecosystem of services daily---email, version control, messaging platforms, music streaming, social media, calendars, and RSS feeds, among others. Each service operates in isolation with its own interface, notification system, and workflow. Commercial personal assistants such as Apple Siri, Google Assistant, and Amazon Alexa have attempted to unify this experience, but remain constrained by vendor lock-in, limited third-party integrations, and an inability to perform complex, multi-step tasks autonomously.
+
+Recent advances in large language models (LLMs) have introduced a new paradigm: \textit{agentic AI systems} capable of reasoning over tasks, invoking external tools, and adapting their behaviour based on context \cite{yao2023react, schick2023toolformer}. Projects such as Claude Code \cite{anthropic2025claudecode}, OpenAI's Codex CLI \cite{openai2025codexcli}, and the Pi coding agent \cite{badlogic2025pi} demonstrate that LLMs can autonomously read, write, and test code. However, these systems are standalone coding tools---they do not integrate with the broader digital life of a user.
+
+This project presents \textbf{OpenPA} (\textit{Open Personal Assistant}), an open-source, self-hosted Personal Assistant-as-a-Service platform that addresses this gap. OpenPA orchestrates 15 heterogeneous services---including Gmail, GitHub, Spotify, Discord, Telegram, Mastodon, Google Calendar, RSS, and YouTube---through a unified natural language chat interface powered by LLMs. The system is built on Anthropic's Model Context Protocol (MCP) \cite{anthropic2024mcp}, which provides a standardised interface for tool discovery and invocation.
+
+OpenPA makes the following contributions:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Unified multi-service orchestration}: 83 MCP-compliant tools across 15 services, accessible through natural language with automatic credential management and per-user isolation.
+
+  \item \textbf{RAG-based personalisation}: A retrieval-augmented generation system using locally-hosted embeddings (Ollama \texttt{nomic-embed-text}) and ChromaDB \cite{chromadb2024} that learns about the user over time and injects relevant context into every conversation.
+
+  \item \textbf{Autonomous code generation (vibe-coding)}: A workspace-based development environment with 15 tools for cloning repositories, editing files, running tests, and submitting pull requests---with an adaptive test-fix loop inspired by Claude Code's architecture \cite{claudecodesrc2025}.
+
+  \item \textbf{Self-evolving architecture}: Because OpenPA's own source code is hosted on GitHub, the vibe-coding system can modify the assistant's own codebase. Users can request new integrations, tools, or features in natural language (e.g., ``add a LinkedIn tool to OpenPA''), and the agent will read existing code, generate the new tool following established patterns, write tests, verify them, and submit a pull request---enabling the platform to evolve autonomously.
+
+  \item \textbf{Multi-provider LLM support with BYOK}: A provider-agnostic Bring-Your-Own-Key (BYOK) architecture supporting 6 LLM backends (Anthropic Claude, Google Gemini, OpenAI, Groq, OpenRouter, and Ollama for local models). The server holds no provider credentials---each user supplies their own API keys, ensuring cost transparency and eliminating vendor dependency.
+
+  \item \textbf{Context-aware tool filtering}: A dynamic tool selection mechanism that reduces the tool set exposed to the LLM from 83 to as few as 8 tools based on task context, enabling effective use of smaller local models.
+\end{enumerate}
+
+The remainder of this report is structured as follows. Section~\ref{sec:literature} reviews related work in personal assistants, agentic AI, and coding agents. Section~\ref{sec:gap} identifies the research gap. Section~\ref{sec:problem} formalises the problem statement. Section~\ref{sec:solution} presents the solution design in detail. Section~\ref{sec:examples} provides illustrative examples of the system in operation. Section~\ref{sec:conclusion} concludes with a discussion of limitations and future work.

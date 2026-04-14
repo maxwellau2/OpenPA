@@ -29,7 +29,9 @@ _workspaces: dict[str, dict] = {}
 
 def _cleanup_expired():
     now = time.time()
-    expired = [k for k, v in _workspaces.items() if now - v["created_at"] > WORKSPACE_EXPIRY]
+    expired = [
+        k for k, v in _workspaces.items() if now - v["created_at"] > WORKSPACE_EXPIRY
+    ]
     for k in expired:
         path = _workspaces[k]["path"]
         if os.path.exists(path):
@@ -42,7 +44,9 @@ def _get_workspace(workspace_id: str, user_id: int) -> dict:
     _cleanup_expired()
     ws = _workspaces.get(workspace_id)
     if not ws:
-        raise RuntimeError(f"Workspace '{workspace_id}' not found. Create one first with workspace_create.")
+        raise RuntimeError(
+            f"Workspace '{workspace_id}' not found. Create one first with workspace_create."
+        )
     if ws["user_id"] != user_id:
         raise RuntimeError("Access denied.")
     return ws
@@ -53,7 +57,9 @@ async def _run(cmd: str, cwd: str, timeout: int = TIMEOUT_SECONDS) -> dict:
     env = os.environ.copy()
     # Filter secrets but keep git/npm/node stuff
     for key in list(env.keys()):
-        if any(s in key.upper() for s in ["SECRET", "PASSWORD", "API_KEY", "CREDENTIAL"]):
+        if any(
+            s in key.upper() for s in ["SECRET", "PASSWORD", "API_KEY", "CREDENTIAL"]
+        ):
             del env[key]
 
     try:
@@ -72,7 +78,12 @@ async def _run(cmd: str, cwd: str, timeout: int = TIMEOUT_SECONDS) -> dict:
             "stderr": stderr.decode(errors="replace")[:MAX_OUTPUT_CHARS],
         }
     except asyncio.TimeoutError:
-        return {"exit_code": -1, "passed": False, "stdout": "", "stderr": f"Timed out after {timeout}s"}
+        return {
+            "exit_code": -1,
+            "passed": False,
+            "stdout": "",
+            "stderr": f"Timed out after {timeout}s",
+        }
 
 
 # ── Workspace lifecycle ──────────────────────────────────────────────
@@ -131,12 +142,19 @@ async def workspace_create(_user_id: int, repo: str, branch: str = "") -> dict:
     default_branch = default_br["stdout"].strip() if not created_branch else ""
     if not default_branch:
         # If we created a branch, find the base branch
-        db = await _run("git remote show origin | grep 'HEAD branch' | awk '{print $NF}'", repo_dir)
+        db = await _run(
+            "git remote show origin | grep 'HEAD branch' | awk '{print $NF}'", repo_dir
+        )
         default_branch = db["stdout"].strip() or "main"
 
-    tree = await _run("find . -maxdepth 2 -not -path './.git/*' -not -path './.git' | head -50", repo_dir)
+    tree = await _run(
+        "find . -maxdepth 2 -not -path './.git/*' -not -path './.git' | head -50",
+        repo_dir,
+    )
 
-    logger.info(f"Created workspace {workspace_id} for {repo} (branch: {created_branch or default_branch}, default: {default_branch})")
+    logger.info(
+        f"Created workspace {workspace_id} for {repo} (branch: {created_branch or default_branch}, default: {default_branch})"
+    )
     return {
         "workspace_id": workspace_id,
         "repo": repo,
@@ -164,7 +182,9 @@ async def workspace_cleanup(_user_id: int, workspace_id: str) -> dict:
 
 
 @mcp.tool()
-async def workspace_list_files(_user_id: int, workspace_id: str, path: str = ".", max_depth: int = 3) -> dict:
+async def workspace_list_files(
+    _user_id: int, workspace_id: str, path: str = ".", max_depth: int = 3
+) -> dict:
     """List files and directories in the workspace. Like 'tree' or 'ls -R'.
 
     Args:
@@ -203,7 +223,9 @@ async def workspace_read_file(_user_id: int, workspace_id: str, path: str) -> di
 
 
 @mcp.tool()
-async def workspace_write_file(_user_id: int, workspace_id: str, path: str, content: str) -> dict:
+async def workspace_write_file(
+    _user_id: int, workspace_id: str, path: str, content: str
+) -> dict:
     """Write or create a file in the workspace. Creates parent directories if needed.
 
     Args:
@@ -220,7 +242,9 @@ async def workspace_write_file(_user_id: int, workspace_id: str, path: str, cont
 
 
 @mcp.tool()
-async def workspace_edit_file(_user_id: int, workspace_id: str, path: str, old_text: str, new_text: str) -> dict:
+async def workspace_edit_file(
+    _user_id: int, workspace_id: str, path: str, old_text: str, new_text: str
+) -> dict:
     """Edit a file by replacing a specific text block. More precise than rewriting the whole file.
 
     Args:
@@ -240,7 +264,10 @@ async def workspace_edit_file(_user_id: int, workspace_id: str, path: str, old_t
     if count == 0:
         return {"error": "old_text not found in file", "path": path}
     if count > 1:
-        return {"error": f"old_text found {count} times — provide more context to make it unique", "path": path}
+        return {
+            "error": f"old_text found {count} times — provide more context to make it unique",
+            "path": path,
+        }
 
     new_content = content.replace(old_text, new_text, 1)
     Path(full_path).write_text(new_content)
@@ -268,7 +295,9 @@ async def workspace_delete_file(_user_id: int, workspace_id: str, path: str) -> 
 
 
 @mcp.tool()
-async def workspace_grep(_user_id: int, workspace_id: str, pattern: str, path: str = ".", include: str = "") -> dict:
+async def workspace_grep(
+    _user_id: int, workspace_id: str, pattern: str, path: str = ".", include: str = ""
+) -> dict:
     """Search for a pattern in workspace files using grep. Supports regex.
 
     Args:
@@ -294,7 +323,9 @@ async def workspace_grep(_user_id: int, workspace_id: str, pattern: str, path: s
 
 
 @mcp.tool()
-async def workspace_find(_user_id: int, workspace_id: str, pattern: str, path: str = ".") -> dict:
+async def workspace_find(
+    _user_id: int, workspace_id: str, pattern: str, path: str = "."
+) -> dict:
     """Find files by name pattern (glob). Like 'find . -name pattern'.
 
     Args:
@@ -319,7 +350,9 @@ async def workspace_find(_user_id: int, workspace_id: str, pattern: str, path: s
 
 
 @mcp.tool()
-async def workspace_run(_user_id: int, workspace_id: str, command: str, timeout: int = 120) -> dict:
+async def workspace_run(
+    _user_id: int, workspace_id: str, command: str, timeout: int = 120
+) -> dict:
     """Run a shell command in the workspace. Use for tests, builds, linting, etc.
 
     Examples: 'cd backend && pytest', 'cd frontend && npm run build',
@@ -351,21 +384,43 @@ def _extract_errors(output: str) -> list[str]:
     for i, line in enumerate(lines):
         lower = line.lower()
         # Python errors
-        if any(p in lower for p in [
-            "error:", "failed", "traceback", "assert", "importerror",
-            "syntaxerror", "nameerror", "typeerror", "attributeerror",
-            "modulenotfounderror", "keyerror", "valueerror", "indentationerror",
-        ]):
+        if any(
+            p in lower
+            for p in [
+                "error:",
+                "failed",
+                "traceback",
+                "assert",
+                "importerror",
+                "syntaxerror",
+                "nameerror",
+                "typeerror",
+                "attributeerror",
+                "modulenotfounderror",
+                "keyerror",
+                "valueerror",
+                "indentationerror",
+            ]
+        ):
             # Grab the error line + up to 2 lines of context after
-            context = lines[i:i + 3]
+            context = lines[i : i + 3]
             errors.append("\n".join(context).strip())
         # JS/TS errors
-        elif any(p in lower for p in [
-            "error ts", "error:", "cannot find", "is not assignable",
-            "module not found", "syntaxerror", "referenceerror",
-            "type error", "build failed",
-        ]):
-            context = lines[i:i + 3]
+        elif any(
+            p in lower
+            for p in [
+                "error ts",
+                "error:",
+                "cannot find",
+                "is not assignable",
+                "module not found",
+                "syntaxerror",
+                "referenceerror",
+                "type error",
+                "build failed",
+            ]
+        ):
+            context = lines[i : i + 3]
             errors.append("\n".join(context).strip())
         # pytest summary
         elif line.startswith("FAILED ") or line.startswith("E "):
@@ -458,7 +513,7 @@ async def workspace_commit_push(_user_id: int, workspace_id: str, message: str) 
 
 # ── Code inspection ──────────────────────────────────────────────────
 
-_PYTHON_INSPECT_SCRIPT = '''
+_PYTHON_INSPECT_SCRIPT = """
 import ast, sys, json
 
 path = sys.argv[1]
@@ -518,7 +573,7 @@ for node in ast.iter_child_nodes(tree):
                 except: pass
 
 print(json.dumps(result, indent=2))
-'''
+"""
 
 
 @mcp.tool()
@@ -539,12 +594,17 @@ async def workspace_inspect(_user_id: int, workspace_id: str, path: str) -> dict
     if path.endswith(".py"):
         # Use AST-based introspection for Python
         import json as _json
+
         script_path = os.path.join(ws["workspace_dir"], "_inspect.py")
         Path(script_path).write_text(_PYTHON_INSPECT_SCRIPT)
         result = await _run(f"python3 '{script_path}' '{full_path}'", ws["path"])
         if result["passed"]:
             try:
-                return {"path": path, "language": "python", **_json.loads(result["stdout"])}
+                return {
+                    "path": path,
+                    "language": "python",
+                    **_json.loads(result["stdout"]),
+                }
             except Exception:
                 return {"path": path, "raw": result["stdout"]}
         return {"error": result["stderr"]}
@@ -587,20 +647,39 @@ async def workspace_check_syntax(_user_id: int, workspace_id: str, path: str) ->
     if path.endswith(".py"):
         # Syntax check
         result = await _run(f"python3 -m py_compile '{full_path}'", ws["path"])
-        checks.append({"check": "syntax", "passed": result["passed"], "output": result["stderr"]})
+        checks.append(
+            {"check": "syntax", "passed": result["passed"], "output": result["stderr"]}
+        )
         # Ruff lint
         result = await _run(f"ruff check '{full_path}'", ws["path"])
-        checks.append({"check": "ruff", "passed": result["passed"], "output": result["stdout"] + result["stderr"]})
+        checks.append(
+            {
+                "check": "ruff",
+                "passed": result["passed"],
+                "output": result["stdout"] + result["stderr"],
+            }
+        )
 
     elif path.endswith((".ts", ".tsx")):
         # TypeScript check if tsc available
-        result = await _run(f"cd '{os.path.dirname(full_path)}' && npx tsc --noEmit '{full_path}' 2>&1 || true", ws["path"])
-        checks.append({"check": "typescript", "passed": "error" not in result["stdout"].lower(), "output": result["stdout"]})
+        result = await _run(
+            f"cd '{os.path.dirname(full_path)}' && npx tsc --noEmit '{full_path}' 2>&1 || true",
+            ws["path"],
+        )
+        checks.append(
+            {
+                "check": "typescript",
+                "passed": "error" not in result["stdout"].lower(),
+                "output": result["stdout"],
+            }
+        )
 
     elif path.endswith((".js", ".jsx")):
         # Node syntax check
         result = await _run(f"node --check '{full_path}'", ws["path"])
-        checks.append({"check": "syntax", "passed": result["passed"], "output": result["stderr"]})
+        checks.append(
+            {"check": "syntax", "passed": result["passed"], "output": result["stderr"]}
+        )
 
     all_passed = all(c["passed"] for c in checks) if checks else False
     return {"path": path, "passed": all_passed, "checks": checks}
@@ -610,7 +689,9 @@ async def workspace_check_syntax(_user_id: int, workspace_id: str, path: str) ->
 
 
 @mcp.tool()
-async def workspace_install(_user_id: int, workspace_id: str, packages: str, dev: bool = False) -> dict:
+async def workspace_install(
+    _user_id: int, workspace_id: str, packages: str, dev: bool = False
+) -> dict:
     """Install packages in the workspace. Auto-detects Python (pip/uv) or Node (npm).
 
     Args:
@@ -643,18 +724,32 @@ async def workspace_install(_user_id: int, workspace_id: str, packages: str, dev
         results.append({"type": "python", "command": cmd, **result})
     elif has_requirements:
         result = await _run(f"pip install {packages}", repo_dir, timeout=120)
-        results.append({"type": "python", "command": f"pip install {packages}", **result})
+        results.append(
+            {"type": "python", "command": f"pip install {packages}", **result}
+        )
 
     if has_package_json:
         flag = "--save-dev" if dev else ""
         result = await _run(f"npm install {flag} {packages}", repo_dir, timeout=120)
-        results.append({"type": "node", "command": f"npm install {flag} {packages}", **result})
+        results.append(
+            {"type": "node", "command": f"npm install {flag} {packages}", **result}
+        )
     elif has_frontend:
         flag = "--save-dev" if dev else ""
-        result = await _run(f"cd frontend && npm install {flag} {packages}", repo_dir, timeout=120)
-        results.append({"type": "node (frontend)", "command": f"cd frontend && npm install {flag} {packages}", **result})
+        result = await _run(
+            f"cd frontend && npm install {flag} {packages}", repo_dir, timeout=120
+        )
+        results.append(
+            {
+                "type": "node (frontend)",
+                "command": f"cd frontend && npm install {flag} {packages}",
+                **result,
+            }
+        )
 
     if not results:
-        return {"error": "No package.json or pyproject.toml found — can't detect package manager"}
+        return {
+            "error": "No package.json or pyproject.toml found — can't detect package manager"
+        }
 
     return {"results": results}
