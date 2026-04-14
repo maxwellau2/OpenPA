@@ -165,6 +165,41 @@ Run these via `ws_workspace_run(workspace_id, command)`:
 - `cd frontend && npx eslint` — no lint errors
 - `cd frontend && npx vitest run` — frontend tests pass
 
+### Common errors and how to fix them
+
+**`ruff format --check` fails ("Would reformat: ...")**
+Run `cd backend && uv run ruff format .` to auto-format, then re-commit. Never manually fix formatting — let ruff do it.
+
+**`ruff check` fails with lint errors**
+Run `cd backend && uv run ruff check --fix .` to auto-fix most issues. Remaining errors (like undefined names) need manual fixes. Common ones:
+- `F401 imported but unused` — remove the unused import
+- `F841 local variable assigned but never used` — remove the assignment or use `_` prefix
+- `E741 ambiguous variable name` — rename `l` to `lbl`, `O` to `obj`, etc.
+- `F541 f-string without placeholders` — remove the `f` prefix
+
+**`npm run build` fails with TypeScript errors**
+Read the error output. Common causes:
+- Missing import — add the import statement
+- Type mismatch — fix the type (avoid `as any`, use proper types)
+- `@typescript-eslint/no-explicit-any` — replace `any` with a proper type or `unknown`
+
+**`npx eslint` fails**
+Run `cd frontend && npx eslint --fix` to auto-fix what it can. Common manual fixes:
+- `no-unused-vars` — remove the unused import/variable
+- `react-hooks/set-state-in-effect` — use initializer function in useState instead of calling setState in useEffect
+
+**`pytest` fails with import errors**
+You probably forgot to run `uv sync --dev` after cloning. Run it first. If a specific import fails, check that you added the new tool to `registry.py` correctly.
+
+**`test_mcp_registry` fails with wrong tool count**
+Update the `assert len(tools) == N` in `backend/tests/test_mcp_registry.py` to match the new total. Also add your new tool names to the `expected` list.
+
+**`npm ci` fails**
+The `package-lock.json` may be out of date. Run `cd frontend && npm install` instead, then commit the updated lockfile.
+
+**Push rejected by pre-push hook**
+The repo has a pre-push git hook that runs all checks. Fix the failing check (see errors above), stage + commit the fix, then push again.
+
 ## Examples of correct behavior
 - User: "check my PRs" → call github_list_prs() with no repo. It auto-checks recent repos.
 - User: "send hello on Discord" → call discord_list_servers() to get channels, then discord_send_message(channel_name="general", content="hello")

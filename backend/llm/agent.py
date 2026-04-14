@@ -14,7 +14,9 @@ from fastmcp import Client
 from llm.base import LLMProvider, LLMResponse, Message
 
 MAX_ITERATIONS = 30
-MAX_ITERATIONS_WORKSPACE = 80  # Self-evolution tasks touch 9+ files across frontend and backend
+MAX_ITERATIONS_WORKSPACE = (
+    80  # Self-evolution tasks touch 9+ files across frontend and backend
+)
 
 # Tool categories for context-aware filtering
 TOOL_CATEGORIES = {
