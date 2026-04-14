@@ -10,7 +10,6 @@ from loguru import logger
 
 from llm.base import LLMProvider, LLMResponse, Message, ToolCall
 
-
 UNSUPPORTED_SCHEMA_KEYS = {"additionalProperties", "$schema", "default"}
 
 
