@@ -471,7 +471,7 @@ class Agent:
                 return None
             if isinstance(parsed, list) and len(parsed) > 1:
                 return parsed
-        except json.JSONDecodeError, KeyError:
+        except Exception:
             pass
 
         return None
@@ -806,12 +806,15 @@ class Agent:
                                 final_text = f"The tool returned an error: {parsed.get('message', content)}"
                             else:
                                 final_text = content
-                        except (json.JSONDecodeError, AttributeError):
+                        except Exception:
                             final_text = content
                         logger.info("Falling back to raw tool result")
                         break
 
-            final_text = final_text or "Something went wrong — the model returned no response. Please try again."
+            final_text = (
+                final_text
+                or "Something went wrong — the model returned no response. Please try again."
+            )
             self.conversation.append(Message(role="assistant", content=final_text))
             yield AgentEvent("done", {"response": final_text})
             return
