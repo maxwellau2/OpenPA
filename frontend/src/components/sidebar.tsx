@@ -23,6 +23,7 @@ import {
   MessageSquare,
   Trash2,
   Play,
+  CloudSun,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -172,6 +173,16 @@ const SECTIONS: SidebarSection[] = [
       { label: "My preferences", prompt: "Show my saved preferences" },
       { label: "Save a note", prompt: "Save a note: " },
       { label: "Search history", prompt: "Search my conversation history for " },
+    ],
+  },
+  {
+    id: "weather",
+    label: "Weather",
+    icon: <CloudSun className="w-4 h-4" />,
+    service: "weather",
+    actions: [
+      { label: "Current weather", prompt: "What's the weather in " },
+      { label: "Weather forecast", prompt: "What's the weather forecast for " },
     ],
   },
 ];

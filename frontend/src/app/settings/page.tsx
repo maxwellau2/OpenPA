@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Send, Globe, Activity } from "lucide-react";
+import { Check, ExternalLink, Mail, GitPullRequest, Music, MessageCircle, Brain, Key, Send, Globe, Activity, CloudSun } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -48,6 +48,13 @@ const SERVICES = [
     icon: <Globe className="w-5 h-5" />, authPath: "/auth/mastodon",
     setupUrl: "https://mastodon.social/settings/applications",
     setupText: "Requires MASTODON_CLIENT_ID, MASTODON_CLIENT_SECRET, and MASTODON_INSTANCE_URL in server .env",
+  },
+  {
+    name: "weather", label: "Weather",
+    description: "Get current weather and forecasts for any city",
+    icon: <CloudSun className="w-5 h-5" />, authPath: "", // No OAuth for direct API key
+    setupUrl: "https://openweathermap.org/api",
+    setupText: "Requires an OpenWeatherMap API key in server .env (OPENWEATHERMAP_API_KEY)",
   },
 ];
 
@@ -291,9 +298,10 @@ export default function SettingsPage() {
                         </div>
                       </div>
                       <Button
-                        onClick={() => handleOAuth(service.authPath)}
+                        onClick={() => service.authPath ? handleOAuth(service.authPath) : null}
                         variant={isConnected ? "outline" : "default"}
                         size="sm"
+                        disabled={!service.authPath}
                       >
                         {isConnected ? "Reconnect" : "Connect"}
                       </Button>

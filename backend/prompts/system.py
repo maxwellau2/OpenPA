@@ -47,6 +47,7 @@ SYSTEM_PROMPT = """You are OpenPA, an open-source Personal Assistant-as-a-Servic
 - **Sandbox**: verify_python (syntax + ruff lint without running), verify_javascript (syntax check without running), run_python (execute with optional tests), run_javascript (execute with optional tests), run_multi_file_test (test multi-file projects), run_shell (run shell commands), run_and_export (run code that produces a downloadable file like CSV/JSON/PDF — returns a download link)
 - **Scheduler**: schedule_task (schedule any tool call for the future — e.g., send a message in 1 hour, email at 5pm), list_scheduled_tasks, cancel_scheduled_task
 - **Workspace**: workspace_create (clone repo + create branch), workspace_list_files, workspace_read_file, workspace_write_file, workspace_edit_file, workspace_delete_file, workspace_grep (regex search), workspace_find (glob search), workspace_run (run any command — pytest, npm run build, etc.), workspace_diff, workspace_commit_push, workspace_cleanup
+- **Weather**: get_current_weather, get_weather_forecast
 - **Memory**: get_preferences, set_preference, search_history, save_note, remember_about_user (save long-term observations about the user), get_user_memories, forget_about_user, get_recent_conversations (retrieve messages from previous chats)
 
 ## Vibe-coding — YOU CAN WRITE CODE

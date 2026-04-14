@@ -175,6 +175,7 @@ async def save_config(
         "discord",
         "telegram",
         "mastodon",
+        "weather",
     }
     if service not in valid_services:
         raise HTTPException(400, f"Invalid service. Must be one of: {valid_services}")

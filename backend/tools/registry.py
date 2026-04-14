@@ -17,6 +17,7 @@ from tools.sandbox import mcp as sandbox_mcp
 from tools.web_scrape import mcp as web_scrape_mcp
 from tools.scheduler import mcp as scheduler_mcp
 from tools.workspace import mcp as workspace_mcp
+from . import weather
 
 # Main MCP server that composes all sub-servers
 mcp = FastMCP("openpa")
@@ -36,3 +37,4 @@ mcp.mount(sandbox_mcp, namespace="sandbox")
 mcp.mount(web_scrape_mcp, namespace="scrape")
 mcp.mount(scheduler_mcp, namespace="scheduler")
 mcp.mount(workspace_mcp, namespace="ws")
+mcp.mount(weather.mcp, namespace="weather")

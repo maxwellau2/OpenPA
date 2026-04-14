@@ -123,6 +123,10 @@ TOOL_CATEGORIES = {
         "sandbox_run_shell",
         "sandbox_run_and_export",
     },
+    "weather": {
+        "weather_get_current_weather",
+        "weather_get_weather_forecast",
+    },
 }
 
 # Keywords that hint which categories are needed
@@ -188,6 +192,16 @@ CATEGORY_KEYWORDS = {
         "daily",
     ],
     "sandbox": ["run code", "execute", "python", "javascript", "test code", "sandbox"],
+    "weather": [
+        "weather",
+        "temperature",
+        "forecast",
+        "climate",
+        "how hot",
+        "how cold",
+        "rain",
+        "snow",
+    ],
 }
 
 

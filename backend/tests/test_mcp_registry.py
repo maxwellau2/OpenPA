@@ -52,6 +52,9 @@ async def test_all_tools_loaded(mcp_client):
         "telegram_send_message",
         # Web search
         "web_search",
+        # Weather
+        "weather_get_current_weather",
+        "weather_get_weather_forecast",
     ]
 
     for tool_name in expected:
@@ -80,4 +83,4 @@ async def test_tools_have_schemas(mcp_client):
 async def test_tool_count(mcp_client):
     """Verify total tool count."""
     tools = await mcp_client.list_tools()
-    assert len(tools) == 85, f"Expected 85 tools, got {len(tools)}"
+    assert len(tools) == 87, f"Expected 87 tools, got {len(tools)}"
