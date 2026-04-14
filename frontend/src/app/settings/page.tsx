@@ -49,6 +49,13 @@ const SERVICES = [
     setupUrl: "https://mastodon.social/settings/applications",
     setupText: "Requires MASTODON_CLIENT_ID, MASTODON_CLIENT_SECRET, and MASTODON_INSTANCE_URL in server .env",
   },
+  {
+    name: "mcp_sort", label: "MCP Sort",
+    description: "Sorts a list of numbers in ascending or descending order",
+    icon: <Activity className="w-5 h-5" />, authPath: "", // No OAuth needed for this tool
+    setupUrl: "#",
+    setupText: "No special setup required.",
+  },
 ];
 
 export default function SettingsPage() {
