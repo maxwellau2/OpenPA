@@ -20,6 +20,7 @@ async def test_all_tools_loaded(mcp_client):
         "rss_fetch_all_feeds",
         "rss_add_feed",
         "rss_list_feeds",
+        "rss_remove_feed",
         # GitHub
         "github_list_repos",
         "github_list_prs",
@@ -83,4 +84,4 @@ async def test_tools_have_schemas(mcp_client):
 async def test_tool_count(mcp_client):
     """Verify total tool count."""
     tools = await mcp_client.list_tools()
-    assert len(tools) == 87, f"Expected 87 tools, got {len(tools)}"
+    assert len(tools) == 88, f"Expected 88 tools, got {len(tools)}"

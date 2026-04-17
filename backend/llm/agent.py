@@ -110,6 +110,7 @@ TOOL_CATEGORIES = {
         "rss_fetch_all_feeds",
         "rss_add_feed",
         "rss_list_feeds",
+        "rss_remove_feed",
         "scheduler_schedule_task",
         "scheduler_list_scheduled_tasks",
         "scheduler_cancel_scheduled_task",
@@ -158,6 +159,8 @@ CATEGORY_KEYWORDS = {
         "branch",
         "endpoint",
         "feature",
+        "briefing",
+        "daily",
     ],
     "communication": [
         "send",
@@ -287,7 +290,11 @@ class Agent:
         """Build system prompt with auto-injected user context and RAG-retrieved memories."""
         # Base context (user info, services, preferences) is cached
         if not self._system_prompt_built:
-            context_parts = []
+            from datetime import datetime
+
+            context_parts = [
+                f"Today's date: {datetime.now().strftime('%A, %B %d, %Y')}"
+            ]
 
             try:
                 from db.auth import get_all_user_credentials, get_user

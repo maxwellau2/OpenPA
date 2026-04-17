@@ -38,7 +38,7 @@ SYSTEM_PROMPT = """You are OpenPA, an open-source Personal Assistant-as-a-Servic
 - **Calendar**: list_events, create_event, delete_event
 - **Spotify**: play (just say what mood/genre/song — it auto-searches), pause, current_track, search, get_playlists
 - **Discord**: list_servers (shows connected server + channels), list_channels, send_message (by channel name or ID), read_messages (by channel name or ID)
-- **RSS**: fetch_feed (by URL or saved feed name), fetch_all_feeds, add_feed (auto-detects name), list_feeds
+- **RSS**: fetch_feed (by URL or saved feed name), fetch_all_feeds, add_feed (auto-detects name), list_feeds, remove_feed (unsubscribe by name or URL, partial match)
 - **Telegram**: search_contacts (find people by name), send_message (auto-resolves names like "Mom"), list_chats, read_messages (auto-resolves chat names)
 - **Mastodon**: get_home_timeline, get_public_timeline, get_trending_tags, get_trending_statuses, search_posts, get_hashtag_timeline, post_status, get_notifications, get_account_info
 - **YouTube**: download_video (download by URL, returns a download link), get_video_info (get title, duration, uploader without downloading)
@@ -207,6 +207,8 @@ The repo has a pre-push git hook that runs all checks. Fix the failing check (se
 - User: "play some chill music" → call spotify_play(query="chill") — it auto-searches for a playlist
 - User: "reply to John's email saying I'll be there" → call gmail_reply_email(search="from:john", body="I'll be there")
 - User: "what's the crypto news" → call rss_fetch_all_feeds() or rss_fetch_feed(feed="crypto")
+- User: "unsubscribe from the hacker news feed" → call rss_remove_feed(feed="hacker news")
+- User: "I don't want the crypto RSS anymore" → call rss_remove_feed(feed="crypto")
 - User: "send a telegram to John" → call telegram_search_contacts(query="John") to find him, then telegram_send_message(to="John", message="...")
 - User: "read my telegram messages from Mom" → call telegram_read_messages(chat="Mom") — auto-resolves the name
 - User: "daily briefing" → call calendar_list_events + gmail_get_unread + github_list_notifications + rss_fetch_all_feeds IN PARALLEL, then format the response as a structured markdown briefing with separate sections for each service:

@@ -42,7 +42,7 @@ AutoGPT            & \ding{55}\textsuperscript{d}   & \checkmark & $\sim$    & \
 
 \textbf{Key observations.} Commercial assistants (Google, Siri, Alexa) support a moderate number of services but are constrained to their respective ecosystems and cannot perform multi-step reasoning, code generation, or self-hosting. Coding agents (Claude Code, Codex CLI, Pi) excel at autonomous code generation and multi-step task execution but operate in isolation from broader digital services---they cannot send emails, post to social media, or manage calendars. Agent frameworks (LangChain, AutoGPT) provide composable building blocks but are developer tools, not end-user applications; they require custom integration code for each service and lack built-in OAuth management, multi-tenancy, or chat interfaces.
 
-OpenPA is the only system that simultaneously supports all eight dimensions: 16 integrated services with 87 MCP tools, multi-step orchestration via dual-mode planning, autonomous code generation with test-fix loops, self-evolution through vibe-coding on its own codebase, RAG-based personalisation with persistent semantic memory, full self-hosting capability, 6 LLM providers with BYOK, and per-user multi-tenancy with credential isolation.
+OpenPA is the only system that simultaneously supports all eight dimensions: 16 integrated services with 88 MCP tools, multi-step orchestration via dual-mode planning, autonomous code generation with test-fix loops, self-evolution through vibe-coding on its own codebase, RAG-based personalisation with persistent semantic memory, full self-hosting capability, 6 LLM providers with BYOK, and per-user multi-tenancy with credential isolation.
 
 \subsection{Service Integration Scope}
 
@@ -59,17 +59,17 @@ Table~\ref{tab:toolscope} quantifies the tool integration across five functional
 Communication    & Gmail, Discord, Telegram                      & 12 \\
 Development      & GitHub, Workspace, Sandbox                    & 35 \\
 Media \& Social  & Spotify, Mastodon, YouTube                    & 16 \\
-Productivity     & Calendar, RSS, Scheduler, Weather             & 12 \\
+Productivity     & Calendar, RSS, Scheduler, Weather             & 13 \\
 Intelligence     & Memory, Web Search, Web Scrape                & 12 \\
 \midrule
-\textbf{Total}   & \textbf{16 services}                          & \textbf{87} \\
+\textbf{Total}   & \textbf{16 services}                          & \textbf{88} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The Development category accounts for the largest share (40\%) of tools, reflecting the vibe-coding system's requirement for fine-grained file operations, git commands, and build/test execution. The Intelligence category---memory, search, and scraping---provides the foundational capabilities that other categories rely on (e.g., web research informing a Telegram message, or memory retrieval personalising a calendar summary).
 
-All 87 tools pass automated validation: each tool is registered with a non-empty description and a typed input schema including the \texttt{\_user\_id} parameter for credential isolation.
+All 88 tools pass automated validation: each tool is registered with a non-empty description and a typed input schema including the \texttt{\_user\_id} parameter for credential isolation.
 
 \subsection{Context-Aware Tool Filtering}
 
@@ -77,7 +77,7 @@ A key design contribution is the dynamic tool filtering system that reduces the 
 
 \begin{table}[H]
 \centering
-\caption{Tool filtering: tools exposed per query type (from 87 total)}
+\caption{Tool filtering: tools exposed per query type (from 88 total)}
 \label{tab:filtering}
 \small
 \begin{tabular}{l l r r}
@@ -97,9 +97,9 @@ A key design contribution is the dynamic tool filtering system that reduces the 
 \end{tabular}
 \end{table}
 
-On average, the filtering system reduces the tool set by 72.6\%, from 87 to approximately 24 tools. For simple queries (``Who am I?''), the reduction is over 90\%, exposing only 8 core memory tools. This is critical for smaller local models (7--9B parameters) where large tool definition blocks consume a significant portion of the context window and degrade tool-calling accuracy.
+On average, the filtering system reduces the tool set by 72.6\%, from 88 to approximately 24 tools. For simple queries (``Who am I?''), the reduction is over 90\%, exposing only 8 core memory tools. This is critical for smaller local models (7--9B parameters) where large tool definition blocks consume a significant portion of the context window and degrade tool-calling accuracy.
 
-The filtering system includes a safety fallback: if fewer than 3 tools remain after filtering, all 87 tools are exposed to avoid over-constraining the model. During execution, the filter dynamically expands when workspace tools are invoked---adding GitHub and web tools for related operations such as creating pull requests or researching documentation.
+The filtering system includes a safety fallback: if fewer than 3 tools remain after filtering, all 88 tools are exposed to avoid over-constraining the model. During execution, the filter dynamically expands when workspace tools are invoked---adding GitHub and web tools for related operations such as creating pull requests or researching documentation.
 
 \subsection{Multi-Provider LLM Compatibility}
 

@@ -166,3 +166,26 @@ async def list_feeds(_user_id: int) -> dict:
         )
         rows = await cursor.fetchall()
         return {"feeds": [{k: row[k] for k in row.keys()} for row in rows]}
+
+
+@mcp.tool()
+async def remove_feed(_user_id: int, feed: str) -> dict:
+    """Unsubscribe from an RSS feed. Accepts a feed name, URL, or partial match.
+
+    Args:
+        _user_id: User ID (injected automatically)
+        feed: Feed name or URL to remove (partial match works)
+    """
+    async with aiosqlite.connect(config.db_path) as db:
+        db.row_factory = aiosqlite.Row
+        cursor = await db.execute(
+            "SELECT id, url, name FROM rss_feeds WHERE user_id = ? AND (LOWER(name) LIKE ? OR LOWER(url) LIKE ?)",
+            (_user_id, f"%{feed.lower()}%", f"%{feed.lower()}%"),
+        )
+        row = await cursor.fetchone()
+        if not row:
+            return {"error": f"No feed matching '{feed}' found."}
+
+        await db.execute("DELETE FROM rss_feeds WHERE id = ?", (row["id"],))
+        await db.commit()
+        return {"status": "removed", "name": row["name"], "url": row["url"]}

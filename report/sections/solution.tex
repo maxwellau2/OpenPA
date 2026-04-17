@@ -39,7 +39,7 @@ mcp.mount(workspace_mcp, namespace="ws")     # ws_workspace_run, ...
 # ... 12 more services
 \end{lstlisting}
 
-This architecture yields 87 tools across 16 namespaces. Each tool receives a \texttt{\_user\_id} parameter injected by the agent loop, ensuring per-user credential isolation. OAuth tokens are stored per-user in the database and fetched on demand via a \texttt{get\_creds(user\_id, service)} helper.
+This architecture yields 88 tools across 16 namespaces. Each tool receives a \texttt{\_user\_id} parameter injected by the agent loop, ensuring per-user credential isolation. OAuth tokens are stored per-user in the database and fetched on demand via a \texttt{get\_creds(user\_id, service)} helper.
 
 Table~\ref{tab:services} summarises the service integrations.
 
@@ -64,12 +64,12 @@ Calendar    &  3 & List, create, delete events \\
 Sandbox     &  7 & Run Python/JS, multi-file test, verify syntax, export files \\
 Scheduler   &  3 & Schedule future tool calls, list, cancel \\
 Web Scrape  &  3 & Fetch page text, extract tables, extract links \\
-RSS         &  4 & Fetch, list, add feeds \\
+RSS         &  5 & Fetch, list, add, remove feeds \\
 YouTube     &  2 & Download video, get video info \\
 Web Search  &  1 & DuckDuckGo search \\
 Weather     &  2 & Current conditions, forecast \\
 \midrule
-\textbf{Total} & \textbf{87} & \\
+\textbf{Total} & \textbf{88} & \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -125,7 +125,7 @@ To address the model compatibility problem, OpenPA implements context-aware tool
 # "Who am I?"                   -> core only = 8 tools
 \end{lstlisting}
 
-This reduces the tool set from 87 to as few as 8 tools, enabling smaller models (7--9B parameters) to function effectively. When workspace tools are called during execution, the filter dynamically expands to include GitHub and web tools for related operations.
+This reduces the tool set from 88 to as few as 8 tools, enabling smaller models (7--9B parameters) to function effectively. When workspace tools are called during execution, the filter dynamically expands to include GitHub and web tools for related operations.
 
 \subsubsection{Error Recovery}
 

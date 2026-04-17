@@ -4,15 +4,19 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       - HOST=0.0.0.0
       - PORT=8000
+      - DB_PATH=/app/pa.db
       - FRONTEND_URL=http://localhost:3000
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_BASE_URL=http://host.containers.internal:11434
+      - TZ=Asia/Singapore
+    extra_hosts:
+      - "host.containers.internal:host-gateway"
     volumes:
-      - backend-data:/app/pa.db
-      - chroma-data:/app/chroma_data
+      - ./backend/pa.db:/app/pa.db:Z
+      - ./backend/chroma_data:/app/chroma_data:Z
     restart: unless-stopped
 
   frontend:
@@ -24,7 +28,3 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-
-volumes:
-  backend-data:
-  chroma-data:

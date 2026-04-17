@@ -10,7 +10,7 @@ This project presents \textbf{OpenPA} (\textit{Open Personal Assistant}), an ope
 OpenPA makes the following contributions:
 
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{Unified multi-service orchestration}: 87 MCP-compliant tools across 16 services, accessible through natural language with automatic credential management and per-user isolation.
+  \item \textbf{Unified multi-service orchestration}: 88 MCP-compliant tools across 16 services, accessible through natural language with automatic credential management and per-user isolation.
 
   \item \textbf{RAG-based personalisation}: A retrieval-augmented generation system using locally-hosted embeddings (Ollama \texttt{nomic-embed-text}) and ChromaDB \cite{chromadb2024} that learns about the user over time and injects relevant context into every conversation.
 
@@ -20,7 +20,7 @@ OpenPA makes the following contributions:
 
   \item \textbf{Multi-provider LLM support with BYOK}: A provider-agnostic Bring-Your-Own-Key (BYOK) architecture supporting 6 LLM backends (Anthropic Claude, Google Gemini, OpenAI, Groq, OpenRouter, and Ollama for local models). The server holds no provider credentials---each user supplies their own API keys, ensuring cost transparency and eliminating vendor dependency.
 
-  \item \textbf{Context-aware tool filtering}: A dynamic tool selection mechanism that reduces the tool set exposed to the LLM from 87 to as few as 8 tools based on task context, enabling effective use of smaller local models.
+  \item \textbf{Context-aware tool filtering}: A dynamic tool selection mechanism that reduces the tool set exposed to the LLM from 88 to as few as 8 tools based on task context, enabling effective use of smaller local models.
 \end{enumerate}
 
 The remainder of this report is structured as follows. Section~\ref{sec:literature} reviews related work in personal assistants, agentic AI, and coding agents. Section~\ref{sec:gap} identifies the research gap. Section~\ref{sec:problem} formalises the problem statement. Section~\ref{sec:solution} presents the solution design in detail. Section~\ref{sec:examples} provides illustrative examples of the system in operation. Section~\ref{sec:evaluation} evaluates the system through qualitative comparison with baselines and analysis of tool filtering, multi-provider compatibility, and agent execution characteristics. Section~\ref{sec:conclusion} concludes with a discussion of limitations and future work.

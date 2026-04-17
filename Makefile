@@ -1,4 +1,4 @@
-.PHONY: install dev backend frontend test lint build clean
+.PHONY: install dev backend frontend test lint build clean deploy deploy-down
 
 # Install all dependencies
 install:
@@ -27,6 +27,14 @@ lint:
 # Build frontend for production
 build:
 	cd frontend && npm run build
+
+# Deploy with podman
+deploy:
+	podman compose up --build -d
+
+# Stop deployment
+deploy-down:
+	podman compose down
 
 # Clean generated files
 clean:
