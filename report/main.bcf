@@ -2379,11 +2379,10 @@
     <bcf:citekey order="4" intorder="1">badlogic2025pi</bcf:citekey>
     <bcf:citekey order="5" intorder="1">anthropic2024mcp</bcf:citekey>
     <bcf:citekey order="6" intorder="1">chromadb2024</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">claudecodesrc2025</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">anthropic2025claudecode</bcf:citekey>
     <bcf:citekey order="8" intorder="1">chase2022langchain</bcf:citekey>
     <bcf:citekey order="9" intorder="1">significantgravitas2023autogpt</bcf:citekey>
     <bcf:citekey order="10" intorder="1">anthropic2025claudecode</bcf:citekey>
-    <bcf:citekey order="10" intorder="2">claudecodesrc2025</bcf:citekey>
     <bcf:citekey order="11" intorder="1">openai2025codexcli</bcf:citekey>
     <bcf:citekey order="12" intorder="1">github2024copilot</bcf:citekey>
     <bcf:citekey order="13" intorder="1">badlogic2025pi</bcf:citekey>
@@ -2391,7 +2390,7 @@
     <bcf:citekey order="15" intorder="1">anthropic2024mcp</bcf:citekey>
     <bcf:citekey order="16" intorder="1">wei2022chainofthought</bcf:citekey>
     <bcf:citekey order="17" intorder="1">yao2023react</bcf:citekey>
-    <bcf:citekey order="18" intorder="1">claudecodesrc2025</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">anthropic2025claudecode</bcf:citekey>
     <bcf:citekey order="19" intorder="1">badlogic2025pi</bcf:citekey>
     <bcf:citekey order="20" intorder="1">nextjs2024</bcf:citekey>
     <bcf:citekey order="21" intorder="1">fastapi2024</bcf:citekey>
@@ -2401,11 +2400,10 @@
     <bcf:citekey order="25" intorder="1">badlogic2025pi</bcf:citekey>
     <bcf:citekey order="26" intorder="1">ollama2024</bcf:citekey>
     <bcf:citekey order="27" intorder="1">chromadb2024</bcf:citekey>
-    <bcf:citekey order="28" intorder="1">claudecodesrc2025</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">anthropic2025claudecode</bcf:citekey>
     <bcf:citekey order="29" intorder="1">badlogic2025pi</bcf:citekey>
     <bcf:citekey order="30" intorder="1">ollama2024</bcf:citekey>
     <bcf:citekey order="31" intorder="1">anthropic2025claudecode</bcf:citekey>
-    <bcf:citekey order="31" intorder="2">claudecodesrc2025</bcf:citekey>
     <bcf:citekey order="32" intorder="1">badlogic2025pi</bcf:citekey>
     <bcf:citekey order="33" intorder="1">openai2025codexcli</bcf:citekey>
   </bcf:section>

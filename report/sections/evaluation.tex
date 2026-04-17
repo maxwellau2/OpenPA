@@ -1,0 +1,156 @@
+\section{Evaluation}
+\label{sec:evaluation}
+
+This section evaluates OpenPA across four dimensions: a qualitative comparison with existing systems, tool integration scope, context-aware tool filtering effectiveness, and multi-provider LLM compatibility.
+
+\subsection{Qualitative Comparison with Baselines}
+
+Table~\ref{tab:qualitative} extends the capability comparison from Section~\ref{sec:gap} with a qualitative assessment across eight dimensions. Each system is rated on a three-point scale: \ding{55} (not supported), $\sim$ (partial), and \checkmark (fully supported).
+
+\begin{table}[H]
+\centering
+\caption{Qualitative comparison of OpenPA against baseline systems}
+\label{tab:qualitative}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c c c c}
+\toprule
+\textbf{System} & \textbf{Services} & \textbf{Multi-Step} & \textbf{Code Gen} & \textbf{Self-Evolve} & \textbf{Personalisation} & \textbf{Self-Host} & \textbf{Multi-LLM} & \textbf{Multi-User} \\
+\midrule
+Google Assistant   & $\sim$\textsuperscript{a}     & \ding{55} & \ding{55} & \ding{55} & $\sim$\textsuperscript{b} & \ding{55} & \ding{55} & \ding{55} \\
+Apple Siri         & $\sim$\textsuperscript{a}     & \ding{55} & \ding{55} & \ding{55} & $\sim$\textsuperscript{b} & \ding{55} & \ding{55} & \ding{55} \\
+Amazon Alexa       & $\sim$\textsuperscript{a}     & \ding{55} & \ding{55} & \ding{55} & \ding{55}                & \ding{55} & \ding{55} & \ding{55} \\
+Claude Code        & \ding{55}                      & \checkmark & \checkmark & \ding{55} & \ding{55}               & \ding{55} & \ding{55} & \ding{55} \\
+Codex CLI          & \ding{55}                      & \checkmark & \checkmark & \ding{55} & \ding{55}               & \checkmark & \ding{55} & \ding{55} \\
+Pi Agent           & \ding{55}                      & \checkmark & \checkmark & \ding{55} & \ding{55}               & \checkmark & $\sim$\textsuperscript{c} & \ding{55} \\
+LangChain          & \ding{55}\textsuperscript{d}   & \checkmark & \ding{55} & \ding{55} & $\sim$\textsuperscript{e} & \checkmark & \checkmark & \ding{55} \\
+AutoGPT            & \ding{55}\textsuperscript{d}   & \checkmark & $\sim$    & \ding{55} & \ding{55}               & \checkmark & \ding{55} & \ding{55} \\
+\midrule
+\textbf{OpenPA}    & \checkmark                     & \checkmark & \checkmark & \checkmark & \checkmark             & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{0.5em}
+
+\footnotesize{%
+\textsuperscript{a}Limited to parent ecosystem services (Google, Apple, Amazon).
+\textsuperscript{b}Explicit preferences only; no semantic retrieval.
+\textsuperscript{c}Supports OpenAI and some local models; no unified provider abstraction.
+\textsuperscript{d}Frameworks requiring custom per-service integration.
+\textsuperscript{e}Supports memory modules but requires developer configuration.
+}
+\end{table}
+
+\textbf{Key observations.} Commercial assistants (Google, Siri, Alexa) support a moderate number of services but are constrained to their respective ecosystems and cannot perform multi-step reasoning, code generation, or self-hosting. Coding agents (Claude Code, Codex CLI, Pi) excel at autonomous code generation and multi-step task execution but operate in isolation from broader digital services---they cannot send emails, post to social media, or manage calendars. Agent frameworks (LangChain, AutoGPT) provide composable building blocks but are developer tools, not end-user applications; they require custom integration code for each service and lack built-in OAuth management, multi-tenancy, or chat interfaces.
+
+OpenPA is the only system that simultaneously supports all eight dimensions: 16 integrated services with 87 MCP tools, multi-step orchestration via dual-mode planning, autonomous code generation with test-fix loops, self-evolution through vibe-coding on its own codebase, RAG-based personalisation with persistent semantic memory, full self-hosting capability, 6 LLM providers with BYOK, and per-user multi-tenancy with credential isolation.
+
+\subsection{Service Integration Scope}
+
+Table~\ref{tab:toolscope} quantifies the tool integration across five functional categories. This represents the breadth of the MCP tool registry as implemented.
+
+\begin{table}[H]
+\centering
+\caption{Tool distribution across functional categories}
+\label{tab:toolscope}
+\begin{tabular}{l l r}
+\toprule
+\textbf{Category} & \textbf{Services} & \textbf{Tools} \\
+\midrule
+Communication    & Gmail, Discord, Telegram                      & 12 \\
+Development      & GitHub, Workspace, Sandbox                    & 35 \\
+Media \& Social  & Spotify, Mastodon, YouTube                    & 16 \\
+Productivity     & Calendar, RSS, Scheduler, Weather             & 12 \\
+Intelligence     & Memory, Web Search, Web Scrape                & 12 \\
+\midrule
+\textbf{Total}   & \textbf{16 services}                          & \textbf{87} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Development category accounts for the largest share (40\%) of tools, reflecting the vibe-coding system's requirement for fine-grained file operations, git commands, and build/test execution. The Intelligence category---memory, search, and scraping---provides the foundational capabilities that other categories rely on (e.g., web research informing a Telegram message, or memory retrieval personalising a calendar summary).
+
+All 87 tools pass automated validation: each tool is registered with a non-empty description and a typed input schema including the \texttt{\_user\_id} parameter for credential isolation.
+
+\subsection{Context-Aware Tool Filtering}
+
+A key design contribution is the dynamic tool filtering system that reduces the tool set exposed to the LLM based on task context. Table~\ref{tab:filtering} shows the filtering behaviour for representative query types.
+
+\begin{table}[H]
+\centering
+\caption{Tool filtering: tools exposed per query type (from 87 total)}
+\label{tab:filtering}
+\small
+\begin{tabular}{l l r r}
+\toprule
+\textbf{Query Type} & \textbf{Categories Activated} & \textbf{Tools} & \textbf{Reduction} \\
+\midrule
+``Who am I?''                    & core                              &  8 & 90.8\% \\
+``Play some chill music''        & media + core                      & 15 & 82.8\% \\
+``Send Alex a message''          & communication + core              & 20 & 77.0\% \\
+``What's trending on Mastodon?'' & social + core                     & 17 & 80.5\% \\
+``Summarise my emails and schedule'' & communication + productivity + core & 28 & 67.8\% \\
+``Add a feature to the repo''    & workspace + github + core         & 36 & 58.6\% \\
+``Build and test the project''   & workspace + github + sandbox + core & 43 & 50.6\% \\
+\midrule
+\textit{Average}                 &                                   & \textit{24} & \textit{72.6\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On average, the filtering system reduces the tool set by 72.6\%, from 87 to approximately 24 tools. For simple queries (``Who am I?''), the reduction is over 90\%, exposing only 8 core memory tools. This is critical for smaller local models (7--9B parameters) where large tool definition blocks consume a significant portion of the context window and degrade tool-calling accuracy.
+
+The filtering system includes a safety fallback: if fewer than 3 tools remain after filtering, all 87 tools are exposed to avoid over-constraining the model. During execution, the filter dynamically expands when workspace tools are invoked---adding GitHub and web tools for related operations such as creating pull requests or researching documentation.
+
+\subsection{Multi-Provider LLM Compatibility}
+
+OpenPA supports six LLM providers through a unified provider abstraction. Table~\ref{tab:providers} summarises the providers, their available models, and key trade-offs observed during development and testing.
+
+\begin{table}[H]
+\centering
+\caption{LLM provider compatibility and observed characteristics}
+\label{tab:providers}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l l l l l}
+\toprule
+\textbf{Provider} & \textbf{Models} & \textbf{Cost} & \textbf{Tool Calling} & \textbf{Notes} \\
+\midrule
+Anthropic & Claude Sonnet 4, Haiku 4.5     & Pay-per-token & Excellent  & Best multi-step reasoning \\
+Google    & Gemini 2.5 Flash/Pro, 2.0 Lite & Free tier     & Good       & Free tier: 15 req/min \\
+OpenAI    & GPT-4o, GPT-4o-mini, GPT-3.5   & Pay-per-token & Excellent  & Widely supported \\
+Groq      & Llama 3.3 70B, Mixtral, Gemma  & Free tier     & Good       & Very fast inference \\
+OpenRouter& Gemini Flash, Llama 70B, Qwen  & Free tier     & Moderate   & Free models available \\
+Ollama    & Gemma 4, Qwen 3.5, Llama 3.1   & Free (local)  & Limited    & No API key; privacy-first \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\textbf{Observations.} Cloud providers (Anthropic, OpenAI) demonstrate the strongest tool-calling accuracy, reliably selecting the correct tool and constructing valid argument schemas in multi-step workflows. Google Gemini and Groq perform well for single-step and moderately complex tasks, with Gemini's free tier making it suitable for casual usage. Local models via Ollama (7--9B parameters) handle simple queries and single-tool invocations but struggle with complex multi-step plans involving 3+ tool calls---the context-aware tool filtering described above is essential for these models.
+
+The BYOK architecture ensures that the platform operator bears no inference cost. Each user configures their own API keys, and models can be switched per-conversation---allowing a user to use Gemini's free tier for casual tasks and Claude Sonnet for complex coding workflows on the same OpenPA instance.
+
+\subsection{Agent Execution Characteristics}
+
+Table~\ref{tab:agentconfig} summarises the key runtime parameters governing agent behaviour.
+
+\begin{table}[H]
+\centering
+\caption{Agent loop runtime configuration}
+\label{tab:agentconfig}
+\begin{tabular}{l r l}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Purpose} \\
+\midrule
+Max iterations (standard)  & 30             & Prevents infinite loops for general tasks \\
+Max iterations (workspace) & 80             & Allows extended test-fix cycles for coding \\
+Command timeout            & 120\,s         & Bounds long-running build/test processes \\
+Max command output          & 15\,000 chars  & Prevents context overflow from verbose logs \\
+Workspace expiry           & 3\,600\,s      & Auto-cleans abandoned workspaces \\
+RAG retrieval count        & 10 memories    & Top-$k$ relevant memories per query \\
+Progress reminder interval & Every 3 iters  & Prevents model drift in long sessions \\
+LLM max output tokens      & 16\,384        & Per-response generation limit \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The workspace iteration limit (80) is significantly higher than the standard limit (30) because vibe-coding tasks typically involve multiple phases---exploration, implementation, testing, and fixing---each requiring several tool calls. A single ``add a feature'' request commonly requires 10--20 tool invocations (clone, read files, grep for patterns, edit code, check syntax, run tests, fix failures, commit, push, create PR). The progress reminder injection every three iterations addresses the known issue of model drift in long multi-turn conversations, where the LLM may lose sight of the original objective.

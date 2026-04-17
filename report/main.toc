@@ -10,31 +10,37 @@
 \contentsline {section}{\numberline {4}Problem Statement}{8}{section.4}%
 \contentsline {section}{\numberline {5}Solution Design}{9}{section.5}%
 \contentsline {subsection}{\numberline {5.1}System Architecture Overview}{9}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}MCP-Based Tool Architecture (P1)}{9}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Adaptive Agent Loop (P2)}{10}{subsection.5.3}%
-\contentsline {subsubsection}{\numberline {5.3.1}Mode A: Plan-Then-Execute}{10}{subsubsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.2}MCP-Based Tool Architecture (P1)}{10}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Adaptive Agent Loop (P2)}{11}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}Mode A: Plan-Then-Execute}{11}{subsubsection.5.3.1}%
 \contentsline {subsubsection}{\numberline {5.3.2}Mode B: Adaptive Loop}{11}{subsubsection.5.3.2}%
-\contentsline {subsubsection}{\numberline {5.3.3}Tool Filtering (P5)}{11}{subsubsection.5.3.3}%
+\contentsline {subsubsection}{\numberline {5.3.3}Tool Filtering (P5)}{12}{subsubsection.5.3.3}%
 \contentsline {subsubsection}{\numberline {5.3.4}Error Recovery}{12}{subsubsection.5.3.4}%
 \contentsline {subsection}{\numberline {5.4}RAG-Based Personalisation (P3)}{12}{subsection.5.4}%
-\contentsline {subsubsection}{\numberline {5.4.1}Architecture}{12}{subsubsection.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.4.2}Memory Lifecycle}{12}{subsubsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.1}Architecture}{13}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Memory Lifecycle}{13}{subsubsection.5.4.2}%
 \contentsline {subsection}{\numberline {5.5}Vibe-Coding Workspace (P4)}{13}{subsection.5.5}%
 \contentsline {subsubsection}{\numberline {5.5.1}Tool Suite}{13}{subsubsection.5.5.1}%
-\contentsline {subsubsection}{\numberline {5.5.2}Adaptive Workflow}{13}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.2}Adaptive Workflow}{14}{subsubsection.5.5.2}%
 \contentsline {subsubsection}{\numberline {5.5.3}Code Inspection}{14}{subsubsection.5.5.3}%
 \contentsline {subsection}{\numberline {5.6}Self-Evolution: The Assistant That Extends Itself}{14}{subsection.5.6}%
 \contentsline {subsubsection}{\numberline {5.6.1}Evolution Triggers}{15}{subsubsection.5.6.1}%
-\contentsline {subsubsection}{\numberline {5.6.2}Safety Bounds}{15}{subsubsection.5.6.2}%
-\contentsline {subsection}{\numberline {5.7}System Prompt Design}{15}{subsection.5.7}%
-\contentsline {subsection}{\numberline {5.8}Multi-Provider LLM Support (P5)}{16}{subsection.5.8}%
-\contentsline {section}{\numberline {6}Illustrative Examples}{16}{section.6}%
+\contentsline {subsubsection}{\numberline {5.6.2}Safety Bounds}{16}{subsubsection.5.6.2}%
+\contentsline {subsection}{\numberline {5.7}System Prompt Design}{16}{subsection.5.7}%
+\contentsline {subsection}{\numberline {5.8}Multi-Provider LLM Support (P5)}{17}{subsection.5.8}%
+\contentsline {section}{\numberline {6}Illustrative Examples}{17}{section.6}%
 \contentsline {subsection}{\numberline {6.1}Example 1: Daily Briefing (Multi-Service Orchestration)}{17}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Example 2: Semantic Memory and RAG (Personalisation)}{17}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.2}Example 2: Semantic Memory and RAG (Personalisation)}{18}{subsection.6.2}%
 \contentsline {subsection}{\numberline {6.3}Example 3: Vibe-Coding (Autonomous Code Generation)}{18}{subsection.6.3}%
 \contentsline {subsection}{\numberline {6.4}Example 4: Cross-Service Workflow (Plan-Then-Execute)}{19}{subsection.6.4}%
-\contentsline {section}{\numberline {7}Conclusion}{20}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Summary}{20}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Limitations}{20}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Future Work}{20}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4}Closing Remarks}{22}{subsection.7.4}%
+\contentsline {section}{\numberline {7}Evaluation}{20}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Qualitative Comparison with Baselines}{20}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Service Integration Scope}{21}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Context-Aware Tool Filtering}{22}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Multi-Provider LLM Compatibility}{22}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Agent Execution Characteristics}{23}{subsection.7.5}%
+\contentsline {section}{\numberline {8}Conclusion}{24}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Summary}{24}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Limitations}{24}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3}Future Work}{24}{subsection.8.3}%
+\contentsline {subsection}{\numberline {8.4}Closing Remarks}{26}{subsection.8.4}%

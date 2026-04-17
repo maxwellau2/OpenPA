@@ -13,6 +13,10 @@ OpenPA follows a three-tier architecture:
   \item \textbf{Data Layer}: SQLite for relational data (users, conversations, credentials) and ChromaDB \cite{chromadb2024} for vector embeddings (semantic memory and conversation search).
 \end{itemize}
 
+Figure~\ref{fig:architecture} illustrates the high-level architecture and data flow between components.
+
+\input{sections/architecture}
+
 \subsection{MCP-Based Tool Architecture (P1)}
 
 To address the service integration problem, OpenPA adopts Anthropic's Model Context Protocol (MCP) \cite{anthropic2024mcp} as the universal tool interface. Each service is implemented as a self-contained FastMCP \cite{fastmcp2024} server with typed tool definitions.
@@ -25,7 +29,7 @@ async def send_message(_user_id: int, to: str, message: str):
     # ... send via Telegram API
 \end{lstlisting}
 
-All 15 service servers are mounted into a composite registry with namespace prefixes:
+All 16 service servers are mounted into a composite registry with namespace prefixes:
 
 \begin{lstlisting}[language=Python, caption={Tool registry mounting}]
 mcp = FastMCP("openpa")
@@ -35,7 +39,7 @@ mcp.mount(workspace_mcp, namespace="ws")     # ws_workspace_run, ...
 # ... 12 more services
 \end{lstlisting}
 
-This architecture yields 83 tools across 15 namespaces. Each tool receives a \texttt{\_user\_id} parameter injected by the agent loop, ensuring per-user credential isolation. OAuth tokens are stored per-user in the database and fetched on demand via a \texttt{get\_creds(user\_id, service)} helper.
+This architecture yields 87 tools across 16 namespaces. Each tool receives a \texttt{\_user\_id} parameter injected by the agent loop, ensuring per-user credential isolation. OAuth tokens are stored per-user in the database and fetched on demand via a \texttt{get\_creds(user\_id, service)} helper.
 
 Table~\ref{tab:services} summarises the service integrations.
 
@@ -48,7 +52,7 @@ Table~\ref{tab:services} summarises the service integrations.
 \toprule
 \textbf{Service} & \textbf{Tools} & \textbf{Key Capabilities} \\
 \midrule
-GitHub      & 11 & Repos, PRs, issues, branches, file read/write, notifications \\
+GitHub      & 13 & Repos, PRs, issues, branches, file read/write, notifications \\
 Workspace   & 15 & Clone, edit, grep, inspect, run tests/builds, commit, push \\
 Memory      &  8 & Preferences, semantic memories, conversation search \\
 Gmail       &  4 & Unread, read, send, reply (with search syntax) \\
@@ -63,8 +67,9 @@ Web Scrape  &  3 & Fetch page text, extract tables, extract links \\
 RSS         &  4 & Fetch, list, add feeds \\
 YouTube     &  2 & Download video, get video info \\
 Web Search  &  1 & DuckDuckGo search \\
+Weather     &  2 & Current conditions, forecast \\
 \midrule
-\textbf{Total} & \textbf{83} & \\
+\textbf{Total} & \textbf{87} & \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -120,7 +125,7 @@ To address the model compatibility problem, OpenPA implements context-aware tool
 # "Who am I?"                   -> core only = 8 tools
 \end{lstlisting}
 
-This reduces the tool set from 83 to as few as 8 tools, enabling smaller models (7--9B parameters) to function effectively. When workspace tools are called during execution, the filter dynamically expands to include GitHub and web tools for related operations.
+This reduces the tool set from 87 to as few as 8 tools, enabling smaller models (7--9B parameters) to function effectively. When workspace tools are called during execution, the filter dynamically expands to include GitHub and web tools for related operations.
 
 \subsubsection{Error Recovery}
 
@@ -239,7 +244,7 @@ The self-evolution capability is bounded by multiple safety mechanisms:
 
 \subsection{System Prompt Design}
 
-The system prompt (approximately 4,500 words) follows a structured format inspired by Claude Code \cite{claudecodesrc2025} and Pi \cite{badlogic2025pi}:
+The system prompt (approximately 4,500 words) follows a structured format inspired by Claude Code \cite{anthropic2025claudecode} and Pi \cite{badlogic2025pi}:
 
 \begin{enumerate}[leftmargin=*]
   \item \textbf{Identity and scope}: Establishes the agent's role and capabilities.

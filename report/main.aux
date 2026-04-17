@@ -28,8 +28,8 @@
 \abx@aux@segm{0}{0}{anthropic2024mcp}
 \abx@aux@cite{0}{chromadb2024}
 \abx@aux@segm{0}{0}{chromadb2024}
-\abx@aux@cite{0}{claudecodesrc2025}
-\abx@aux@segm{0}{0}{claudecodesrc2025}
+\abx@aux@cite{0}{anthropic2025claudecode}
+\abx@aux@segm{0}{0}{anthropic2025claudecode}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{3}{section.1}\protected@file@percent }
 \newlabel{sec:introduction}{{1}{3}{Introduction}{section.1}{}}
 \abx@aux@cite{0}{chase2022langchain}
@@ -41,8 +41,6 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Commercial Personal Assistants}{4}{subsection.2.1}\protected@file@percent }
 \abx@aux@cite{0}{anthropic2025claudecode}
 \abx@aux@segm{0}{0}{anthropic2025claudecode}
-\abx@aux@cite{0}{claudecodesrc2025}
-\abx@aux@segm{0}{0}{claudecodesrc2025}
 \abx@aux@cite{0}{openai2025codexcli}
 \abx@aux@segm{0}{0}{openai2025codexcli}
 \abx@aux@cite{0}{github2024copilot}
@@ -59,8 +57,8 @@
 \abx@aux@segm{0}{0}{wei2022chainofthought}
 \abx@aux@cite{0}{yao2023react}
 \abx@aux@segm{0}{0}{yao2023react}
-\abx@aux@cite{0}{claudecodesrc2025}
-\abx@aux@segm{0}{0}{claudecodesrc2025}
+\abx@aux@cite{0}{anthropic2025claudecode}
+\abx@aux@segm{0}{0}{anthropic2025claudecode}
 \abx@aux@cite{0}{badlogic2025pi}
 \abx@aux@segm{0}{0}{badlogic2025pi}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Retrieval-Augmented Generation and Personalisation}{6}{subsection.2.4}\protected@file@percent }
@@ -85,68 +83,85 @@
 \@writefile{toc}{\contentsline {section}{\numberline {5}Solution Design}{9}{section.5}\protected@file@percent }
 \newlabel{sec:solution}{{5}{9}{Solution Design}{section.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}System Architecture Overview}{9}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}MCP-Based Tool Architecture (P1)}{9}{subsection.5.2}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Example tool definition (simplified)}{9}{lstlisting.1}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Tool registry mounting}{9}{lstlisting.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces High-level architecture of the OpenPA system. The frontend communicates with the FastAPI backend via REST and SSE. The agent loop orchestrates LLM inference, tool execution across 16 MCP namespaces (87 tools), and RAG-based retrieval. Data persists in SQLite and ChromaDB, while external LLM and service APIs are accessed through provider abstractions and OAuth-managed credentials.}}{9}{figure.1}\protected@file@percent }
+\newlabel{fig:architecture}{{1}{9}{High-level architecture of the OpenPA system. The frontend communicates with the FastAPI backend via REST and SSE. The agent loop orchestrates LLM inference, tool execution across 16 MCP namespaces (87 tools), and RAG-based retrieval. Data persists in SQLite and ChromaDB, while external LLM and service APIs are accessed through provider abstractions and OAuth-managed credentials}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}MCP-Based Tool Architecture (P1)}{10}{subsection.5.2}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1}Example tool definition (simplified)}{10}{lstlisting.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2}Tool registry mounting}{10}{lstlisting.2}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces OpenPA service integrations}}{10}{table.2}\protected@file@percent }
 \newlabel{tab:services}{{2}{10}{OpenPA service integrations}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Adaptive Agent Loop (P2)}{10}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Mode A: Plan-Then-Execute}{10}{subsubsection.5.3.1}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}Example execution plan}{10}{lstlisting.3}\protected@file@percent }
-\abx@aux@cite{0}{badlogic2025pi}
-\abx@aux@segm{0}{0}{badlogic2025pi}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Adaptive Agent Loop (P2)}{11}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Mode A: Plan-Then-Execute}{11}{subsubsection.5.3.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3}Example execution plan}{11}{lstlisting.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Mode B: Adaptive Loop}{11}{subsubsection.5.3.2}\protected@file@percent }
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {4}Simplified adaptive loop}{11}{lstlisting.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.3}Tool Filtering (P5)}{11}{subsubsection.5.3.3}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Tool filtering example}{11}{lstlisting.5}\protected@file@percent }
+\abx@aux@cite{0}{badlogic2025pi}
+\abx@aux@segm{0}{0}{badlogic2025pi}
 \abx@aux@cite{0}{ollama2024}
 \abx@aux@segm{0}{0}{ollama2024}
-\abx@aux@cite{0}{chromadb2024}
-\abx@aux@segm{0}{0}{chromadb2024}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.3}Tool Filtering (P5)}{12}{subsubsection.5.3.3}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5}Tool filtering example}{12}{lstlisting.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.4}Error Recovery}{12}{subsubsection.5.3.4}\protected@file@percent }
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {6}Error-as-tool-result pattern}{12}{lstlisting.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.4}RAG-Based Personalisation (P3)}{12}{subsection.5.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Architecture}{12}{subsubsection.5.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Memory Lifecycle}{12}{subsubsection.5.4.2}\protected@file@percent }
+\abx@aux@cite{0}{chromadb2024}
+\abx@aux@segm{0}{0}{chromadb2024}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Architecture}{13}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Memory Lifecycle}{13}{subsubsection.5.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Vibe-Coding Workspace (P4)}{13}{subsection.5.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.1}Tool Suite}{13}{subsubsection.5.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.2}Adaptive Workflow}{13}{subsubsection.5.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.2}Adaptive Workflow}{14}{subsubsection.5.5.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.5.3}Code Inspection}{14}{subsubsection.5.5.3}\protected@file@percent }
 \@writefile{lol}{\contentsline {lstlisting}{\numberline {7}AST-based code inspection output}{14}{lstlisting.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Self-Evolution: The Assistant That Extends Itself}{14}{subsection.5.6}\protected@file@percent }
-\abx@aux@cite{0}{claudecodesrc2025}
-\abx@aux@segm{0}{0}{claudecodesrc2025}
-\abx@aux@cite{0}{badlogic2025pi}
-\abx@aux@segm{0}{0}{badlogic2025pi}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.6.1}Evolution Triggers}{15}{subsubsection.5.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.6.2}Safety Bounds}{15}{subsubsection.5.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}System Prompt Design}{15}{subsection.5.7}\protected@file@percent }
-\abx@aux@cite{0}{ollama2024}
-\abx@aux@segm{0}{0}{ollama2024}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Multi-Provider LLM Support (P5)}{16}{subsection.5.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Illustrative Examples}{16}{section.6}\protected@file@percent }
-\newlabel{sec:examples}{{6}{16}{Illustrative Examples}{section.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Example 1: Daily Briefing (Multi-Service Orchestration)}{17}{subsection.6.1}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {8}Daily briefing plan execution}{17}{lstlisting.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Example 2: Semantic Memory and RAG (Personalisation)}{17}{subsection.6.2}\protected@file@percent }
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {9}RAG-injected context}{17}{lstlisting.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Example 3: Vibe-Coding (Autonomous Code Generation)}{18}{subsection.6.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Example 4: Cross-Service Workflow (Plan-Then-Execute)}{19}{subsection.6.4}\protected@file@percent }
 \abx@aux@cite{0}{anthropic2025claudecode}
 \abx@aux@segm{0}{0}{anthropic2025claudecode}
-\abx@aux@cite{0}{claudecodesrc2025}
-\abx@aux@segm{0}{0}{claudecodesrc2025}
+\abx@aux@cite{0}{badlogic2025pi}
+\abx@aux@segm{0}{0}{badlogic2025pi}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.6.2}Safety Bounds}{16}{subsubsection.5.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}System Prompt Design}{16}{subsection.5.7}\protected@file@percent }
+\abx@aux@cite{0}{ollama2024}
+\abx@aux@segm{0}{0}{ollama2024}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Multi-Provider LLM Support (P5)}{17}{subsection.5.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Illustrative Examples}{17}{section.6}\protected@file@percent }
+\newlabel{sec:examples}{{6}{17}{Illustrative Examples}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Example 1: Daily Briefing (Multi-Service Orchestration)}{17}{subsection.6.1}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {8}Daily briefing plan execution}{17}{lstlisting.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Example 2: Semantic Memory and RAG (Personalisation)}{18}{subsection.6.2}\protected@file@percent }
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {9}RAG-injected context}{18}{lstlisting.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Example 3: Vibe-Coding (Autonomous Code Generation)}{18}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Example 4: Cross-Service Workflow (Plan-Then-Execute)}{19}{subsection.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Evaluation}{20}{section.7}\protected@file@percent }
+\newlabel{sec:evaluation}{{7}{20}{Evaluation}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Qualitative Comparison with Baselines}{20}{subsection.7.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Qualitative comparison of OpenPA against baseline systems}}{21}{table.3}\protected@file@percent }
+\newlabel{tab:qualitative}{{3}{21}{Qualitative comparison of OpenPA against baseline systems}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Service Integration Scope}{21}{subsection.7.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Tool distribution across functional categories}}{21}{table.4}\protected@file@percent }
+\newlabel{tab:toolscope}{{4}{21}{Tool distribution across functional categories}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Context-Aware Tool Filtering}{22}{subsection.7.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Tool filtering: tools exposed per query type (from 87 total)}}{22}{table.5}\protected@file@percent }
+\newlabel{tab:filtering}{{5}{22}{Tool filtering: tools exposed per query type (from 87 total)}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Multi-Provider LLM Compatibility}{22}{subsection.7.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces LLM provider compatibility and observed characteristics}}{23}{table.6}\protected@file@percent }
+\newlabel{tab:providers}{{6}{23}{LLM provider compatibility and observed characteristics}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Agent Execution Characteristics}{23}{subsection.7.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Agent loop runtime configuration}}{23}{table.7}\protected@file@percent }
+\newlabel{tab:agentconfig}{{7}{23}{Agent loop runtime configuration}{table.7}{}}
+\abx@aux@cite{0}{anthropic2025claudecode}
+\abx@aux@segm{0}{0}{anthropic2025claudecode}
 \abx@aux@cite{0}{badlogic2025pi}
 \abx@aux@segm{0}{0}{badlogic2025pi}
 \abx@aux@cite{0}{openai2025codexcli}
 \abx@aux@segm{0}{0}{openai2025codexcli}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Conclusion}{20}{section.7}\protected@file@percent }
-\newlabel{sec:conclusion}{{7}{20}{Conclusion}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Summary}{20}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Limitations}{20}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Future Work}{20}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Closing Remarks}{22}{subsection.7.4}\protected@file@percent }
-\abx@aux@read@bbl@mdfivesum{134EDCFDECD5CD6737C3786156602505}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{24}{section.8}\protected@file@percent }
+\newlabel{sec:conclusion}{{8}{24}{Conclusion}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Summary}{24}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Limitations}{24}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Future Work}{24}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Closing Remarks}{26}{subsection.8.4}\protected@file@percent }
+\abx@aux@read@bbl@mdfivesum{EDDD623B486DE7DC175004CC8C2AA59D}
 \abx@aux@defaultrefcontext{0}{yao2023react}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{schick2023toolformer}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{anthropic2025claudecode}{none/global//global/global/global}
@@ -154,7 +169,6 @@
 \abx@aux@defaultrefcontext{0}{badlogic2025pi}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{anthropic2024mcp}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{chromadb2024}{none/global//global/global/global}
-\abx@aux@defaultrefcontext{0}{claudecodesrc2025}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{chase2022langchain}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{significantgravitas2023autogpt}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{github2024copilot}{none/global//global/global/global}
@@ -164,4 +178,4 @@
 \abx@aux@defaultrefcontext{0}{fastapi2024}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{fastmcp2024}{none/global//global/global/global}
 \abx@aux@defaultrefcontext{0}{ollama2024}{none/global//global/global/global}
-\gdef \@abspage@last{25}
+\gdef \@abspage@last{29}

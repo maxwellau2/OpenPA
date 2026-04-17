@@ -24,7 +24,7 @@ These frameworks establish important architectural patterns---tool registries, a
 
 A distinct category of agentic systems focuses on autonomous code generation and modification.
 
-\textbf{Claude Code} \cite{anthropic2025claudecode, claudecodesrc2025} is Anthropic's terminal-based coding agent. Analysis of its source code reveals several sophisticated patterns: an async-generator-based agent loop with explicit state transitions, streaming tool execution with concurrency control, multi-layer context compaction (snip, microcompact, autocompact), and a permission system with wildcard pattern matching. Tools return structured results including \texttt{contextModifier} functions that can mutate the agent's context post-execution. The system uses deferred tool loading (\texttt{shouldDefer}) to avoid overwhelming the model with the full tool set on every turn.
+\textbf{Claude Code} \cite{anthropic2025claudecode} is Anthropic's terminal-based coding agent. Its architecture features an async-generator-based agent loop with explicit state transitions, streaming tool execution with concurrency control, and a permission system with pattern matching. The system uses deferred tool loading to avoid overwhelming the model with the full tool set on every turn, and supports context compaction to manage long conversations within context window limits.
 
 \textbf{OpenAI Codex CLI} \cite{openai2025codexcli} provides a terminal-based interface for code generation, execution, and file manipulation. It uses a simpler agent loop but demonstrates effective integration of sandboxed code execution with file system operations.
 
@@ -46,7 +46,7 @@ Anthropic's Model Context Protocol (MCP) \cite{anthropic2024mcp} provides a stan
 
 \subsection{Prompt Engineering Techniques}
 
-Effective prompting is critical for agent performance. Chain-of-thought prompting \cite{wei2022chainofthought} enables step-by-step reasoning. The ReAct framework \cite{yao2023react} interleaves reasoning traces with action execution. Analysis of production systems such as Claude Code \cite{claudecodesrc2025} and Pi \cite{badlogic2025pi} reveals additional techniques:
+Effective prompting is critical for agent performance. Chain-of-thought prompting \cite{wei2022chainofthought} enables step-by-step reasoning. The ReAct framework \cite{yao2023react} interleaves reasoning traces with action execution. Analysis of production systems such as Claude Code \cite{anthropic2025claudecode} and Pi \cite{badlogic2025pi} reveals additional techniques:
 
 \begin{itemize}[leftmargin=*]
   \item \textbf{Prompt sandwich}: Static system instructions encapsulate dynamic user context and tool definitions, with rules placed both before and after the variable content.

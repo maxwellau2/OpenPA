@@ -609,15 +609,25 @@ class Agent:
                                 + f"\n\nContext from previous steps:\n{prev}"
                             )
                         else:
-                            # Clean up: if the result looks like JSON, skip it — only inject human-readable text
+                            # Clean up: if the result looks like JSON, extract useful data
                             clean_prev = prev.strip()
+                            extracted_uri = ""
+                            extracted_name = ""
                             if clean_prev.startswith("{") or clean_prev.startswith("["):
-                                # Try to extract a meaningful text field from JSON
                                 try:
                                     import json as _json
 
                                     parsed = _json.loads(clean_prev)
                                     if isinstance(parsed, dict):
+                                        # Extract from "results" array (e.g. search results)
+                                        results_list = parsed.get("results") or parsed.get("items")
+                                        if isinstance(results_list, list) and results_list:
+                                            first = results_list[0]
+                                            if isinstance(first, dict):
+                                                extracted_uri = first.get("uri", "")
+                                                extracted_name = first.get("name", "")
+
+                                        # Also try top-level text fields
                                         for key in (
                                             "content",
                                             "message",
@@ -632,8 +642,12 @@ class Agent:
                                                 break
                                 except Exception:
                                     pass
-                            # Inject into the first empty text-like field
+
+                            # Inject into empty args, preferring structured data when available
                             for field in (
+                                "uri",
+                                "query",
+                                "status",
                                 "content",
                                 "message",
                                 "body",
@@ -641,7 +655,12 @@ class Agent:
                                 "prompt",
                             ):
                                 if field in args and args[field] == "":
-                                    args[field] = clean_prev[:4000]
+                                    if field == "uri" and extracted_uri:
+                                        args[field] = extracted_uri
+                                    elif field == "query" and extracted_name:
+                                        args[field] = extracted_name
+                                    else:
+                                        args[field] = clean_prev[:4000]
                                     break
 
                 yield AgentEvent("tool_call", {"tool": tool_name, "arguments": args})

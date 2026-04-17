@@ -165,19 +165,19 @@ async def get_hashtag_timeline(_user_id: int, hashtag: str, limit: int = 20) -> 
 
 @mcp.tool()
 async def post_status(
-    _user_id: int, content: str, visibility: str = "public", spoiler_text: str = ""
+    _user_id: int, status: str, visibility: str = "public", spoiler_text: str = ""
 ) -> dict:
     """Post a new status (toot) to Mastodon.
 
     Args:
         _user_id: User ID (injected automatically)
-        content: The text content of the post
+        status: The text content of the post
         visibility: One of: public, unlisted, private, direct
         spoiler_text: Optional content warning text
     """
     headers = await _headers(_user_id)
     base = await _base_url(_user_id)
-    payload = {"status": content, "visibility": visibility}
+    payload = {"status": status, "visibility": visibility}
     if spoiler_text:
         payload["spoiler_text"] = spoiler_text
 

@@ -259,7 +259,7 @@
     and Autonomous Code Generation
   </p>
   <p style="font-size:0.5em; color:#6b7280; margin-top:1.5em;">
-    Maxwell Au &middot; College of Computer and Data Science<br>
+    Maxwell Au (U2321963E) &middot; College of Computer and Data Science<br>
     Nanyang Technological University &middot; April 2026
   </p>
 </section>
@@ -359,15 +359,15 @@
   </h1>
   <p style="font-size:0.65em; color:#d1d5db; max-width:700px; margin:0.5em auto;">
     An open-source, self-hosted personal assistant that orchestrates<br>
-    <span class="accent">15 services</span> through a single LLM-powered chat interface.
+    <span class="accent">16 services</span> through a single LLM-powered chat interface.
   </p>
   <div class="grid-3" style="margin-top:1.2em; max-width:850px; margin-left:auto; margin-right:auto;">
     <div class="stat-box">
-      <div class="number">83</div>
+      <div class="number">87</div>
       <div class="label">MCP Tools</div>
     </div>
     <div class="stat-box">
-      <div class="number">15</div>
+      <div class="number">16</div>
       <div class="label">Integrated Services</div>
     </div>
     <div class="stat-box">
@@ -383,7 +383,7 @@
   <div class="grid-2">
     <div class="card">
       <h3><span class="accent">1.</span> Unified Multi-Service Orchestration</h3>
-      <p>83 MCP-compliant tools across 15 services, accessible through natural language with per-user credential isolation.</p>
+      <p>87 MCP-compliant tools across 16 services, accessible through natural language with per-user credential isolation.</p>
     </div>
     <div class="card">
       <h3><span class="accent-purple">2.</span> RAG-Based Personalisation</h3>
@@ -431,10 +431,10 @@ mcp.mount(gmail_mcp,     namespace="gmail")      # gmail_send_email, gmail_get_u
 mcp.mount(github_mcp,    namespace="github")     # github_create_pr, github_list_issues, ...
 mcp.mount(workspace_mcp, namespace="ws")         # ws_workspace_run, ws_workspace_edit, ...
 mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search, ...
-# ... 11 more services</code></pre>
+# ... 12 more services</code></pre>
   </div>
   <div style="display:flex; flex-wrap:wrap; gap:0.3em; margin-top:0.5em;">
-    <span class="pill pill-green">GitHub (11)</span>
+    <span class="pill pill-green">GitHub (13)</span>
     <span class="pill pill-green">Workspace (15)</span>
     <span class="pill pill-purple">Memory (8)</span>
     <span class="pill pill-blue">Gmail (4)</span>
@@ -449,6 +449,7 @@ mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search,
     <span class="pill pill-purple">RSS (4)</span>
     <span class="pill pill-pink">YouTube (2)</span>
     <span class="pill pill-green">Web Search (1)</span>
+    <span class="pill pill-orange">Weather (2)</span>
   </div>
 </section>
 
@@ -484,7 +485,7 @@ mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search,
   else:
     break  # done</code></pre>
       </div>
-      <p style="margin-top:0.5em;">50 iterations for code &middot; 30 for general tasks</p>
+      <p style="margin-top:0.5em;">80 iterations for code &middot; 30 for general tasks</p>
     </div>
   </div>
 </section>
@@ -493,7 +494,7 @@ mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search,
 <section>
   <h2>Context-Aware Tool Filtering</h2>
   <p style="font-size:0.6em; color:#9ca3af;">
-    83 tools overwhelm small models. OpenPA dynamically filters by task context.
+    87 tools overwhelm small models. OpenPA dynamically filters by task context.
   </p>
   <div style="margin:0.8em 0;">
     <div style="display:flex; align-items:center; gap:0.5em; margin-bottom:0.5em;">
@@ -502,7 +503,7 @@ mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search,
       <span class="pill pill-green">workspace</span>
       <span class="pill pill-green">github</span>
       <span class="pill pill-purple">core</span>
-      <span style="font-size:0.55em; color:#6ee7b7; font-weight:600;">= 34 tools</span>
+      <span style="font-size:0.55em; color:#6ee7b7; font-weight:600;">= 36 tools</span>
     </div>
     <div style="display:flex; align-items:center; gap:0.5em; margin-bottom:0.5em;">
       <span style="font-size:0.55em; color:#9ca3af; width:280px;">"Play some jazz"</span>
@@ -519,7 +520,7 @@ mcp.mount(spotify_mcp,   namespace="spotify")    # spotify_play, spotify_search,
     </div>
   </div>
   <div style="background:#111827; border:1px solid #1f2937; border-radius:12px; padding:0.8em; margin-top:0.8em; text-align:center;">
-    <span style="font-size:2em; font-weight:800; color:#ef4444;">83</span>
+    <span style="font-size:2em; font-weight:800; color:#ef4444;">87</span>
     <span style="font-size:1em; color:#6b7280; margin:0 0.5em;">&rarr;</span>
     <span style="font-size:2em; font-weight:800; color:#6ee7b7;">8</span>
     <p style="font-size:0.5em; color:#9ca3af; margin-top:0.3em;">Enables 7&ndash;9B local models (Gemma, Qwen, Llama) to function effectively</p>
@@ -793,7 +794,6 @@ User (day 7): "Who am I?"
   <ul style="font-size:0.6em;">
     <li><strong>SQLite</strong> limits horizontal scaling &mdash; needs PostgreSQL for production</li>
     <li class="fragment"><strong>Local models</strong> (7&ndash;9B) still struggle with complex multi-step tool-calling</li>
-    <li class="fragment"><strong>No containerisation</strong> yet &mdash; Docker/K8s configs are future work</li>
     <li class="fragment"><strong>Security</strong> &mdash; OAuth tokens stored without encryption at rest</li>
     <li class="fragment"><strong>Test coverage</strong> &mdash; core tests exist, but no full end-to-end agent loop tests</li>
   </ul>
@@ -815,6 +815,7 @@ User (day 7): "Who am I?"
     <span class="pill pill-orange" style="font-size:0.6em;">SSE Streaming</span>
     <span class="pill pill-blue" style="font-size:0.6em;">OAuth 2.0</span>
     <span class="pill pill-pink" style="font-size:0.6em;">JWT Auth</span>
+    <span class="pill pill-green" style="font-size:0.6em;">Docker Compose</span>
   </div>
   <div style="margin-top:1.5em;">
     <p style="font-size:0.6em; color:#6b7280;">
@@ -831,7 +832,7 @@ User (day 7): "Who am I?"
   <p style="font-size:0.8em; color:#9ca3af; margin-top:0.5em;">Questions?</p>
   <div style="margin-top:2em;">
     <p style="font-size:0.55em; color:#6b7280;">
-      Maxwell Au &middot; NTU CCDS &middot; April 2026<br>
+      Maxwell Au (U2321963E) &middot; NTU CCDS &middot; April 2026<br>
       <a href="https://github.com/maxwellau2/OpenPA" style="color:#6ee7b7;">github.com/maxwellau2/OpenPA</a>
     </p>
   </div>

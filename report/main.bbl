@@ -257,29 +257,6 @@
       \field{title}{Chroma: The Open-Source Embedding Database}
       \field{year}{2024}
     \endentry
-    \entry{claudecodesrc2025}{misc}{}{}
-      \name{author}{1}{}{%
-        {{hash=e9f3349f74aabebbe413e8effa4217f0}{%
-           family={{codeaashu}},
-           familyi={c\bibinitperiod}}}%
-      }
-      \strng{namehash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{fullhash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{fullhashraw}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{bibnamehash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{authorbibnamehash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{authornamehash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{authorfullhash}{e9f3349f74aabebbe413e8effa4217f0}
-      \strng{authorfullhashraw}{e9f3349f74aabebbe413e8effa4217f0}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{howpublished}{\url{https://github.com/codeaashu/claude-code}}
-      \field{note}{Deobfuscated source code of Anthropic's Claude Code agent, used for architectural analysis}
-      \field{title}{Claude Code Source Code (Leaked)}
-      \field{year}{2025}
-    \endentry
     \entry{chase2022langchain}{article}{}{}
       \name{author}{1}{}{%
         {{hash=c6b41fd745709d65ec7ab70864b8b466}{%

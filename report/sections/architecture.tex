@@ -1,0 +1,179 @@
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+    % Base styles
+    node distance=0.6cm and 0.8cm,
+    >=stealth,
+    % Box styles
+    base/.style={
+        draw, rounded corners=4pt, minimum height=0.9cm,
+        font=\sffamily\small, align=center, thick
+    },
+    % Layer styles
+    user/.style={base, fill=gray!12, draw=gray!60, minimum width=2.8cm},
+    frontend/.style={base, fill=blue!8, draw=blue!50, minimum width=2.8cm},
+    backend/.style={base, fill=green!8, draw=green!50!black!40, minimum width=2.8cm},
+    toolns/.style={base, fill=green!5, draw=green!40!black!30, minimum width=2.4cm,
+                   minimum height=0.75cm, font=\sffamily\scriptsize},
+    datalayer/.style={base, fill=violet!10, draw=violet!50, minimum width=2.8cm},
+    external/.style={base, fill=orange!10, draw=orange!50!black!40, minimum width=2.8cm},
+    % Group box style
+    groupbox/.style={draw=#1!40, rounded corners=6pt, thick,
+                     fill=#1!3, inner sep=8pt},
+    % Arrow styles
+    dataflow/.style={->, thick, color=gray!70},
+    biflow/.style={<->, thick, color=gray!70},
+    sseflow/.style={->, thick, color=blue!50, densely dashed},
+]
+
+% ============================================================
+% USER
+% ============================================================
+\node[user, minimum width=3.2cm, minimum height=1cm]
+    (user) {\textbf{User}\\{\scriptsize Browser / Client}};
+
+% ============================================================
+% FRONTEND LAYER
+% ============================================================
+\node[frontend, below=1.0cm of user, xshift=-2.2cm] (chatui) {Chat UI\\{\scriptsize SSE Streaming}};
+\node[frontend, right=0.5cm of chatui] (settings) {Settings\\{\scriptsize API Key Mgmt}};
+\node[frontend, right=0.5cm of settings] (oauth-fe) {OAuth\\{\scriptsize Connections}};
+
+% Frontend group box
+\begin{scope}[on background layer]
+    \node[groupbox=blue, fit=(chatui)(settings)(oauth-fe)] (fe-group) {};
+\end{scope}
+\node[font=\sffamily\bfseries\small, blue!60!black, fill=white, inner sep=2pt]
+    at (fe-group.north) {Frontend (Next.js 16)};
+
+% ============================================================
+% BACKEND LAYER
+% ============================================================
+% Row 1: Core components
+\node[backend, below=1.4cm of chatui, xshift=-0.3cm] (agent) {Agent Loop\\{\scriptsize Plan-then-Execute /}\\{\scriptsize Adaptive}};
+\node[backend, right=0.5cm of agent] (llmprov) {LLM Provider\\{\scriptsize Abstraction}\\{\scriptsize (6 providers)}};
+\node[backend, right=0.5cm of llmprov] (mcpreg) {MCP Tool\\{\scriptsize Registry}\\{\scriptsize (87 tools)}};
+\node[backend, right=0.5cm of mcpreg] (rag) {RAG Engine\\{\scriptsize nomic-embed-text}};
+
+% Row 2: Supporting components
+\node[backend, below=0.7cm of agent, xshift=1.5cm] (restapi) {REST API\\{\scriptsize + SSE}};
+\node[backend, right=0.5cm of restapi] (oauthmgr) {OAuth\\{\scriptsize Manager}};
+
+% Backend group box
+\begin{scope}[on background layer]
+    \node[groupbox=green, fit=(agent)(llmprov)(mcpreg)(rag)(restapi)(oauthmgr),
+          inner sep=10pt] (be-group) {};
+\end{scope}
+\node[font=\sffamily\bfseries\small, green!40!black, fill=white, inner sep=2pt]
+    at (be-group.north) {Backend (FastAPI)};
+
+% ============================================================
+% MCP TOOL NAMESPACES
+% ============================================================
+\node[toolns, below=1.6cm of restapi, xshift=-2.0cm]
+    (comm) {\textbf{Communication}\\Gmail\,\textperiodcentered\,Discord\,\textperiodcentered\,Telegram\\{\tiny (12 tools)}};
+\node[toolns, right=0.35cm of comm]
+    (dev) {\textbf{Development}\\GitHub\,\textperiodcentered\,Workspace\,\textperiodcentered\,Sandbox\\{\tiny (35 tools)}};
+\node[toolns, right=0.35cm of dev]
+    (media) {\textbf{Media \& Social}\\Spotify\,\textperiodcentered\,Mastodon\,\textperiodcentered\,YouTube\\{\tiny (16 tools)}};
+\node[toolns, right=0.35cm of media]
+    (prod) {\textbf{Productivity}\\Calendar\,\textperiodcentered\,RSS\,\textperiodcentered\,Scheduler\,\textperiodcentered\,Weather\\{\tiny (12 tools)}};
+\node[toolns, right=0.35cm of prod]
+    (intel) {\textbf{Intelligence}\\Memory\,\textperiodcentered\,Web Search\,\textperiodcentered\,Scrape\\{\tiny (12 tools)}};
+
+% MCP group box
+\begin{scope}[on background layer]
+    \node[groupbox=green!70!black, fit=(comm)(dev)(media)(prod)(intel),
+          inner sep=8pt] (mcp-group) {};
+\end{scope}
+\node[font=\sffamily\bfseries\small, green!30!black, fill=white, inner sep=2pt]
+    at (mcp-group.north) {MCP Tool Namespaces (16 namespaces)};
+
+% ============================================================
+% DATA LAYER
+% ============================================================
+\node[datalayer, below=1.5cm of dev, xshift=-0.5cm]
+    (sqlite) {\textbf{SQLite}\\{\scriptsize Users, Conversations,}\\{\scriptsize Credentials}};
+\node[datalayer, right=1.5cm of sqlite]
+    (chroma) {\textbf{ChromaDB}\\{\scriptsize Vector Embeddings}\\{\scriptsize (Memory + Search)}};
+
+% Data layer group box
+\begin{scope}[on background layer]
+    \node[groupbox=violet, fit=(sqlite)(chroma),
+          inner sep=10pt] (data-group) {};
+\end{scope}
+\node[font=\sffamily\bfseries\small, violet!60!black, fill=white, inner sep=2pt]
+    at (data-group.south) {Data Layer};
+
+% ============================================================
+% EXTERNAL SERVICES (right side)
+% ============================================================
+\node[external, right=1.8cm of rag, yshift=0.3cm]
+    (llmapis) {\textbf{LLM APIs}\\{\scriptsize Anthropic\,\textperiodcentered\,Google}\\{\scriptsize OpenAI\,\textperiodcentered\,Groq\,\textperiodcentered\,OpenRouter}};
+\node[external, below=0.5cm of llmapis]
+    (ollama) {\textbf{Ollama}\\{\scriptsize Local Models}};
+\node[external, below=0.5cm of ollama]
+    (svcapis) {\textbf{Service APIs}\\{\scriptsize Gmail\,\textperiodcentered\,GitHub\,\textperiodcentered\,Spotify}\\{\scriptsize Discord\,\textperiodcentered\,Telegram\,\textperiodcentered\,etc.}};
+
+% External group box
+\begin{scope}[on background layer]
+    \node[groupbox=orange, fit=(llmapis)(ollama)(svcapis),
+          inner sep=10pt] (ext-group) {};
+\end{scope}
+\node[font=\sffamily\bfseries\small, orange!60!black, fill=white, inner sep=2pt]
+    at (ext-group.north) {External Services};
+
+% ============================================================
+% ARROWS: User <-> Frontend
+% ============================================================
+\draw[biflow] (user.south) -- ++(0,-0.35) -| (chatui.north);
+\draw[biflow] (user.south) -- ++(0,-0.35) -| (settings.north);
+\draw[biflow] (user.south) -- ++(0,-0.35) -| (oauth-fe.north);
+
+% ============================================================
+% ARROWS: Frontend <-> Backend
+% ============================================================
+\draw[sseflow] (chatui.south) -- ++(0,-0.5) -| (restapi.north);
+\draw[dataflow] (settings.south) -- ++(0,-0.5) -| (restapi.north west);
+\draw[dataflow] (oauth-fe.south) -- ++(0,-0.5) -| (oauthmgr.north);
+
+% ============================================================
+% ARROWS: Internal backend
+% ============================================================
+\draw[dataflow] (restapi.north) -- ++(0, 0.25) -| (agent.south);
+\draw[dataflow] (agent.east) -- (llmprov.west);
+\draw[dataflow] (agent.south east) -- ++(0.3,-0.1) -| (mcpreg.south);
+\draw[dataflow] (agent) -- ++(0,0) |- ([yshift=-0.15cm]rag.west);
+\draw[dataflow] (mcpreg.south) -- ++(0,-0.65) -- (mcp-group.north);
+
+% ============================================================
+% ARROWS: Backend -> External
+% ============================================================
+\draw[dataflow] (llmprov.east) -- (llmapis.west);
+\draw[dataflow] (rag.east) -- (ollama.west);
+\draw[dataflow] (oauthmgr.east) -| ([xshift=-0.3cm]svcapis.west) -- (svcapis.west);
+
+% MCP -> Service APIs
+\draw[dataflow] (mcp-group.east) -| ([xshift=-0.8cm]svcapis.south west) -- (svcapis.south west);
+
+% ============================================================
+% ARROWS: Backend -> Data Layer
+% ============================================================
+\draw[dataflow] (restapi.south) -- ++(0,-0.4) -| (sqlite.north);
+\draw[dataflow] (rag.south) -- ++(0,-1.8) -| (chroma.north);
+
+% ============================================================
+% LEGEND
+% ============================================================
+\node[anchor=north west, font=\sffamily\scriptsize] at ([xshift=0.3cm, yshift=-0.2cm]data-group.south west) {
+    \tikz[baseline=-0.5ex]{\draw[->, thick, gray!70] (0,0) -- (0.6,0);} Data flow \quad
+    \tikz[baseline=-0.5ex]{\draw[->, thick, blue!50, densely dashed] (0,0) -- (0.6,0);} SSE stream \quad
+    \tikz[baseline=-0.5ex]{\draw[<->, thick, gray!70] (0,0) -- (0.6,0);} Bidirectional
+};
+
+\end{tikzpicture}%
+}% end resizebox
+\caption{High-level architecture of the OpenPA system. The frontend communicates with the FastAPI backend via REST and SSE. The agent loop orchestrates LLM inference, tool execution across 16 MCP namespaces (87 tools), and RAG-based retrieval. Data persists in SQLite and ChromaDB, while external LLM and service APIs are accessed through provider abstractions and OAuth-managed credentials.}
+\label{fig:architecture}
+\end{figure}
