@@ -24,6 +24,7 @@ import {
   Trash2,
   Play,
   CloudSun,
+  Presentation,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -56,6 +57,7 @@ const SECTIONS: SidebarSection[] = [
       { label: "Open PRs", prompt: "List my open pull requests" },
       { label: "Review a PR", prompt: "Review my latest PR" },
       { label: "Notifications", prompt: "Check my GitHub notifications" },
+      { label: "My issues", prompt: "List my GitHub issues" },
       { label: "Create issue", prompt: "Help me create a GitHub issue" },
       { label: "Vibe code", prompt: "Help me vibe code a new feature" },
     ],
@@ -340,6 +342,14 @@ export default function Sidebar({ onAction, onNewChat, onLoadConversation, activ
       </ScrollArea>
 
       <div className="p-2 border-t border-border">
+        <Link
+          href="/slides"
+          target="_blank"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+        >
+          <Presentation className="w-4 h-4" />
+          Slides
+        </Link>
         <Link
           href="/settings"
           className="w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"

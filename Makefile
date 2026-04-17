@@ -1,4 +1,4 @@
-.PHONY: install dev backend frontend test lint build clean deploy deploy-down
+.PHONY: install dev backend frontend test lint build clean deploy deploy-down slides
 
 # Install all dependencies
 install:
@@ -35,6 +35,10 @@ deploy:
 # Stop deployment
 deploy-down:
 	podman compose down
+
+# Copy slides to frontend public dir
+slides:
+	cp slides/index.html frontend/public/slides.html
 
 # Clean generated files
 clean:

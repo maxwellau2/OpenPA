@@ -139,6 +139,14 @@ Inspired by the Pi coding agent \cite{badlogic2025pi}, tool errors are returned 
 
 This allows the LLM to read the error, reason about the cause, and take corrective action---such as changing the base branch from \texttt{main} to \texttt{master}.
 
+\subsubsection{Tool-Call-as-Text Recovery}
+
+Some LLM providers (particularly free-tier and smaller models) occasionally output tool invocations as plain text rather than structured function calls---for example, responding with the literal string \texttt{github\_list\_notifications()} instead of issuing a proper tool call. This causes the agent to treat the output as a final response and return it to the user, effectively failing silently.
+
+OpenPA addresses this with a detection-and-nudge mechanism: on the first iteration of the adaptive loop, if the LLM produces text containing a recognised tool name in function-call syntax (e.g., \texttt{tool\_name(...)}) without making any actual tool calls, the agent detects this via regex matching against the registered tool set. It then appends a corrective message---\textit{``You wrote tool\_name() as text instead of calling it. Actually call the tool now.''}---and re-enters the loop, giving the LLM another opportunity to issue the call correctly.
+
+This recovery mechanism is lightweight (a single regex check per turn) and only activates when no tools have been called yet, avoiding interference with normal text responses in later turns.
+
 \subsection{RAG-Based Personalisation (P3)}
 
 OpenPA's personalisation system uses Retrieval-Augmented Generation to build a persistent understanding of each user.
@@ -242,22 +250,60 @@ The self-evolution capability is bounded by multiple safety mechanisms:
   \item The agent operates on a \textbf{cloned copy} of the repository, not the live deployment, eliminating the risk of corrupting the running instance.
 \end{itemize}
 
-\subsection{System Prompt Design}
+\subsection{LLM Harness and Prompt Engineering}
 
-The system prompt (approximately 4,500 words) follows a structured format inspired by Claude Code \cite{anthropic2025claudecode} and Pi \cite{badlogic2025pi}:
+Controlling LLM behaviour in a multi-tool agent is a non-trivial engineering challenge. Without careful prompt design and runtime guardrails, models exhibit failure modes including: calling tools one at a time when they could be parallelised, summarising tool output too aggressively, outputting tool calls as plain text instead of structured function calls, and drifting from the original task during long multi-turn sessions. OpenPA addresses these through a layered harness comprising a structured system prompt, dynamic context injection, output format enforcement, and runtime recovery mechanisms.
+
+\subsubsection{Structured System Prompt}
+
+The system prompt (approximately 5,000 words) follows a structured format inspired by Claude Code \cite{anthropic2025claudecode} and Pi \cite{badlogic2025pi}. It is organised into eight layers, each targeting a specific failure mode:
 
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{Identity and scope}: Establishes the agent's role and capabilities.
-  \item \textbf{Action rules}: Always use tools; never apologise for lack of access; parallelise independent tool calls.
-  \item \textbf{Memory rules}: Proactively save user facts; check existing memories before acting.
-  \item \textbf{Tool preference hierarchy}: Explicit mapping of task types to tool categories (e.g., ``use workspace tools for repo work, sandbox for one-off scripts'').
-  \item \textbf{Output rules}: Be concise; lead with the answer; summarise tool output.
-  \item \textbf{Coding rules}: Don't over-engineer; read before writing; never push broken code.
-  \item \textbf{Workflow templates}: Detailed vibe-coding and self-evolution workflows.
-  \item \textbf{Concrete examples}: 20+ example user queries mapped to expected tool call sequences.
+  \item \textbf{Identity and scope}: Establishes the agent's role as a personal assistant managing 16 services. This anchors the model's behaviour and prevents it from refusing requests with ``I don't have access to that service.''
+
+  \item \textbf{Parallelisation rules}: Explicitly instructs the model to call independent tools in a single response. Without this, models default to sequential tool calls, causing unnecessary latency. Example instruction: \textit{``fetching emails + calendar + github notifications for a daily briefing should be parallel tool calls, not sequential turns.''}
+
+  \item \textbf{Memory rules}: Instructs the model to proactively save user facts (``if a user mentions they like hiking, save it'') and check existing memories before acting. This drives the RAG personalisation system.
+
+  \item \textbf{Tool preference hierarchy}: Explicit mapping of task types to tool categories, preventing the model from choosing the wrong tool. For example: \textit{``use workspace tools for repository work, sandbox for one-off code snippets, never use sandbox for modifying real repositories.''}
+
+  \item \textbf{Output format enforcement}: Rather than letting the model decide how to present information, structured templates define the expected output for common tasks. The daily briefing template, for instance, requires \textit{every individual item} to be listed separately with specific formatting---preventing the model from collapsing 10 emails into ``you have some emails about transactions.''
+
+  \item \textbf{Coding workflow}: A four-phase adaptive workflow (Understand, Research, Implement, Verify) with explicit rules: read before writing, check syntax after every edit, run the full test suite before pushing, never ship broken code.
+
+  \item \textbf{Self-evolution checklist}: A step-by-step checklist for modifying OpenPA's own codebase, listing every file that must be updated when adding a new tool (tool file, registry, agent categories, test file, system prompt, frontend sidebar).
+
+  \item \textbf{Concrete examples}: 20+ example user queries mapped to expected tool call sequences. These serve as few-shot examples that guide the model's tool selection. For instance: \textit{``user: `unsubscribe from the hacker news feed' $\rightarrow$ call rss\_remove\_feed(feed=`hacker news').''}
 \end{enumerate}
 
-Dynamic context---including the user's email, connected services, and RAG-retrieved memories---is appended after the static rules, forming a ``prompt sandwich'' where stable instructions bracket variable context.
+\subsubsection{Dynamic Context Injection}
+
+The system prompt is not static. At runtime, the agent appends dynamic context after the static rules, forming a ``prompt sandwich'' where stable instructions bracket variable content:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Current date}: \texttt{datetime.now()} formatted as ``Thursday, April 17, 2026.'' Without this, LLMs hallucinate the date---a critical bug for calendar and scheduling tasks.
+  \item \textbf{User identity}: The authenticated user's email and list of connected services, so the agent knows which tools are available.
+  \item \textbf{User preferences}: Key-value pairs from the preference store (e.g., preferred language, timezone).
+  \item \textbf{RAG-retrieved memories}: The top-10 most relevant semantic memories for the current message, with relevance scores (Section~\ref{sec:solution}.\ref{sec:rag}).
+\end{itemize}
+
+\subsubsection{Runtime Guardrails}
+
+Beyond the static prompt, the agent loop implements several runtime mechanisms to correct LLM misbehaviour:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Progress reminders}: Every three iterations, the agent injects a reminder of the original user request and the tools called so far. This prevents model drift during long coding sessions (up to 80 iterations), where the model may forget the original objective.
+
+  \item \textbf{Tool-call-as-text recovery}: Some providers (particularly free-tier models) occasionally output tool invocations as plain text rather than structured function calls. The agent detects this via regex matching against the registered tool set and nudges the model to retry with a proper call (Section~5.3.5).
+
+  \item \textbf{Error-as-result}: Tool failures are returned as structured JSON (not exceptions), allowing the model to read the error, reason about the cause, and take corrective action autonomously (Section~5.3.4).
+
+  \item \textbf{Empty response nudging}: If the model returns empty text after tool calls, the agent injects ``Please summarize the tool results above'' to elicit a response, with a fallback to raw tool output if the nudge also fails.
+
+  \item \textbf{Dynamic tool expansion}: When workspace tools are invoked during execution, the tool filter automatically expands to include GitHub and web tools, anticipating that the agent will need to create pull requests or research documentation.
+\end{itemize}
+
+These guardrails collectively ensure that OpenPA behaves reliably across six different LLM providers with varying tool-calling capabilities---from Claude Sonnet (near-perfect structured output) to Ollama local models (7--9B parameters with limited instruction-following).
 
 \subsection{Multi-Provider LLM Support (P5)}
 

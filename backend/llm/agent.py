@@ -825,6 +825,30 @@ class Agent:
                 continue
 
             final_text = response.content
+
+            # Detect when the LLM outputs a tool call as text instead of a structured call
+            if final_text and iterations == 1 and not tools_called:
+                import re
+
+                tool_as_text = re.search(r"(\w+_\w+)\s*\(", final_text)
+                if tool_as_text:
+                    candidate = tool_as_text.group(1)
+                    tool_names = {t["name"] for t in tools} if tools else set()
+                    if candidate in tool_names:
+                        logger.warning(
+                            f"LLM output tool call as text: {candidate} — nudging to call it properly"
+                        )
+                        self.conversation.append(
+                            Message(role="assistant", content=final_text)
+                        )
+                        self.conversation.append(
+                            Message(
+                                role="user",
+                                content=f"You wrote {candidate}() as text instead of calling it. Actually call the tool now.",
+                            )
+                        )
+                        continue
+
             if not final_text:
                 # LLM returned empty after tool calls — nudge it to summarize
                 self.conversation.append(

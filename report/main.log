@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.4.17)  17 APR 2026 15:06
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) (preloaded format=pdflatex 2026.4.17)  17 APR 2026 15:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1163,7 +1163,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.36 ...{\numberline {7}Evaluation}{20}{section.7}
+l.36 ...ervice Orchestration)}{19}{subsection.6.1}
                                                   % [1])
 \tf@toc=\write6
 \openout6 = `main.toc'.
@@ -1251,45 +1251,56 @@ Overfull \hbox (14.56818pt too wide) in paragraph at lines 93--94
 for-mats (e.g., \T1/lmtt/m/n/12 {{step_2.output}}\T1/lmr/m/n/12 )
  []
 
-[11]
-Overfull \hbox (0.6728pt too wide) in paragraph at lines 149--150
+[11] [12]
+Overfull \hbox (0.6728pt too wide) in paragraph at lines 157--158
 []\T1/lmr/bx/n/12 Embedding model\T1/lmr/m/n/12 : Ol-lama [[][]16[][]] run-ning
  \T1/lmtt/m/n/12 nomic-embed-text \T1/lmr/m/n/12 lo-cally (768-dimensional
  []
 
-[12]
-Overfull \hbox (20.2869pt too wide) in paragraph at lines 175--176
+[13]
+Overfull \hbox (20.2869pt too wide) in paragraph at lines 183--184
 []\T1/lmr/bx/n/12 Modification\T1/lmr/m/n/12 : \T1/lmtt/m/n/12 write_file\T1/lm
 r/m/n/12 , \T1/lmtt/m/n/12 edit_file \T1/lmr/m/n/12 (pre-cise find-and-replace)
 , \T1/lmtt/m/n/12 delete_file\T1/lmr/m/n/12 , \T1/lmtt/m/n/12 install
  []
 
-[13]
-Overfull \hbox (17.87389pt too wide) in paragraph at lines 208--209
+[14]
+Overfull \hbox (17.87389pt too wide) in paragraph at lines 216--217
 \T1/lmr/m/n/12 tant's \T1/lmr/m/it/12 own \T1/lmr/m/n/12 code-base. Since OpenP
 A's source code is hosted on GitHub (\T1/lmtt/m/n/12 maxwellau2/OpenPA\T1/lmr/m
 /n/12 ),
  []
 
 
-Overfull \hbox (100.62071pt too wide) in paragraph at lines 213--214
+Overfull \hbox (100.62071pt too wide) in paragraph at lines 221--222
 []\T1/lmr/bx/n/12 Clone self\T1/lmr/m/n/12 : \T1/lmtt/m/n/12 ws_workspace_creat
 e(repo="maxwellau2/OpenPA", branch="feature/linkedin-tool") 
  []
 
-[14]
-Overfull \hbox (36.27213pt too wide) in paragraph at lines 231--232
+[15]
+Overfull \hbox (36.27213pt too wide) in paragraph at lines 239--240
 []\T1/lmr/bx/n/12 Scheduled evo-lu-tion\T1/lmr/m/n/12 : Us-ing the \T1/lmtt/m/n
 /12 scheduler_schedule_task \T1/lmr/m/n/12 tool, pe-ri-odic self-improvement
  []
 
-[15] [16]) (./sections/examples.tex [17]
+[16]
+Overfull \hbox (27.3497pt too wide) in paragraph at lines 276--277
+\T1/lmr/m/n/12 stance: \T1/lmr/m/it/12 ``user: `un-sub-scribe from the hacker n
+ews feed' $\OMS/lmsy/m/n/12 !$ \T1/lmr/m/it/12 call rss_remove_feed(feed=`hacke
+r
+ []
+
+[17{/usr/share/texlive/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
+
+LaTeX Warning: Reference `sec:rag' on page 18 undefined on input line 287.
+
+[18]) (./sections/examples.tex [19] [20]
 Overfull \hbox (29.07004pt too wide) in paragraph at lines 66--68
 []\T1/lmtt/m/n/12 ws_workspace_create(repo="maxwellau2/OpenPA", branch="feature
 /health-check") 
  []
 
-[18]
+
 Overfull \hbox (10.54503pt too wide) in paragraph at lines 72--74
 []\T1/lmtt/m/n/12 ws_workspace_read_file(workspace_id, path="backend/services/r
 est_api.py") 
@@ -1325,7 +1336,7 @@ Overfull \hbox (78.47006pt too wide) in paragraph at lines 93--95
 th-check", title="feat:
  []
 
-[19]
+[21]
 Overfull \hbox (41.42004pt too wide) in paragraph at lines 106--107
 []\T1/lmtt/m/n/12 memory_remember_about_user(content="Friend Alex wants to open
  specialty coffee
@@ -1337,8 +1348,7 @@ Overfull \hbox (59.94505pt too wide) in paragraph at lines 112--115
 original names...") 
  []
 
-) (./sections/evaluation.tex [20{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
-lm/lm-mathsy.enc}] [21
+) (./sections/evaluation.tex [22] [23
 pdfTeX warning (ext4): destination with the same identifier (name{table.3}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
@@ -1355,7 +1365,7 @@ Overfull \hbox (43.49318pt too wide) in paragraph at lines 83--98
  [][] 
  []
 
-[22
+[24
 pdfTeX warning (ext4): destination with the same identifier (name{table.5}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
@@ -1366,7 +1376,7 @@ Overfull \hbox (12.2964pt too wide) in paragraph at lines 140--154
  [][] 
  []
 
-) (./sections/conclusion.tex [23
+) (./sections/conclusion.tex [25
 pdfTeX warning (ext4): destination with the same identifier (name{table.6}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
@@ -1378,33 +1388,36 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.7}) has
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.7 
-    {/usr/share/texlive/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}] [24]
+    {/usr/share/texlive/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}] [26]
 Overfull \hbox (11.48878pt too wide) in paragraph at lines 33--34
 []\T1/lmr/bx/n/12 Fine-tuned tool-calling mod-els\T1/lmr/m/n/12 : Fine-tune sma
 ll open-source mod-els (Qwen, Gemma)
  []
 
-) [25] [26]
+) [27] [28]
 Overfull \hbox (3.85251pt too wide) in paragraph at lines 95--95
 []\T1/lmr/m/n/12 Chroma. \T1/lmr/m/it/12 Chroma: The Open-Source Em-bed-ding Da
 tabase\T1/lmr/m/n/12 . [][]$\T1/lmtt/m/n/12 https : / / www . trychroma .
  []
 
-[27] [28] (./main.aux)
+[29] [30] (./main.aux)
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D0C4CAE6E8C0293EE9B743AFC9D6A03E;8545.
+(rerunfilecheck)             Checksum: 37FEB007B031492EE0D920D201E6FDA4;9376.
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32087 strings out of 478087
- 602721 string characters out of 5842650
+ 32098 strings out of 478087
+ 602904 string characters out of 5842650
  2013388 words of memory out of 6000000
- 51404 multiletter control sequences out of 15000+600000
+ 51409 multiletter control sequences out of 15000+600000
  613497 words of font info for 100 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 84i,13n,83p,1129b,1459s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,13n,83p,1129b,2055s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/share/texlive/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/share/t
 exlive/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/share/texlive/texmf-di
 st/fonts/type1/public/lm/lmmi12.pfb></usr/share/texlive/texmf-dist/fonts/type1/
@@ -1423,10 +1436,10 @@ f-dist/fonts/type1/public/lm/lmtt12.pfb></usr/share/texlive/texmf-dist/fonts/ty
 pe1/public/lm/lmtti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
 fonts/symbols/msam10.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/zapfdin
 g/uzdr.pfb>
-Output written on main.pdf (29 pages, 545179 bytes).
+Output written on main.pdf (31 pages, 552780 bytes).
 PDF statistics:
- 776 PDF objects out of 1000 (max. 8388607)
- 678 compressed objects within 7 object streams
- 226 named destinations out of 1000 (max. 500000)
- 477 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 808 PDF objects out of 1000 (max. 8388607)
+ 707 compressed objects within 8 object streams
+ 232 named destinations out of 1000 (max. 500000)
+ 509 words of extra memory for PDF output out of 10000 (max. 10000000)
 
