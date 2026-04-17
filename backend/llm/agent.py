@@ -620,8 +620,13 @@ class Agent:
                                     parsed = _json.loads(clean_prev)
                                     if isinstance(parsed, dict):
                                         # Extract from "results" array (e.g. search results)
-                                        results_list = parsed.get("results") or parsed.get("items")
-                                        if isinstance(results_list, list) and results_list:
+                                        results_list = parsed.get(
+                                            "results"
+                                        ) or parsed.get("items")
+                                        if (
+                                            isinstance(results_list, list)
+                                            and results_list
+                                        ):
                                             first = results_list[0]
                                             if isinstance(first, dict):
                                                 extracted_uri = first.get("uri", "")
